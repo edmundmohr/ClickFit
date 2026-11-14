@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { DownloadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/layout/page-header";
 import { requireUser } from "@/features/auth/session";
+import { PushCard } from "@/features/notifications/components/push-card";
+import { getEnv } from "@/lib/server/context";
 import { ChangePasswordForm } from "@/features/users/components/change-password-form";
 import { PreferencesForm } from "@/features/users/components/preferences-form";
 import { ProfileForm } from "@/features/users/components/profile-form";
@@ -17,6 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function SettingsPage() {
   const user = await requireUser();
   const t = await getTranslations("settings");
+  // Ohne Schlüssel ist Web Push nicht eingerichtet: Dann entfällt die Karte.
+  const vapidPublicKey: string | undefined = getEnv().VAPID_PUBLIC_KEY;
   return (
     <>
       <PageHeader title={t("title")} />
@@ -52,15 +57,31 @@ export default async function SettingsPage() {
             <CardTitle>{t("data.title")}</CardTitle>
             <CardDescription>{t("data.description")}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-wrap gap-2">
+            <Button asChild>
+              <Link href="/export">
+                <DownloadIcon aria-hidden />
+                {t("data.export")}
+              </Link>
+            </Button>
             <Button asChild variant="outline">
               <a href="/api/me/export" download>
-                <DownloadIcon aria-hidden />
                 {t("data.exportJson")}
               </a>
             </Button>
           </CardContent>
         </Card>
+        {vapidPublicKey ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("push.title")}</CardTitle>
+              <CardDescription>{t("push.description")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PushCard publicKey={vapidPublicKey} />
+            </CardContent>
+          </Card>
+        ) : null}
       </div>
     </>
   );

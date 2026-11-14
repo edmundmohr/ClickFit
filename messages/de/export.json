@@ -1,0 +1,117 @@
+{
+  "title": "Daten exportieren",
+  "description": "Lade deine Daten als Tabelle oder PDF herunter. In der Datei stehen nur deine eigenen Daten.",
+  "datasets": {
+    "training": "Training",
+    "weight": "Gewicht",
+    "nutrition": "Ernährung"
+  },
+  "datasetHints": {
+    "training": "Alle Sätze abgeschlossener Trainings, eine Übersicht der Einheiten sowie Cardio und Zusatzsport.",
+    "weight": "Deine Messungen mit dem geglätteten Trend.",
+    "nutrition": "Die Summen je Tag und alle Einträge aus dem Tagebuch mit Nährwerten."
+  },
+  "documentTitles": {
+    "training": "ClickFit – Training",
+    "weight": "ClickFit – Gewicht",
+    "nutrition": "ClickFit – Ernährung"
+  },
+  "tables": {
+    "sets": "Sätze",
+    "sessions": "Einheiten",
+    "activities": "Cardio & Zusatzsport",
+    "weight": "Gewicht",
+    "days": "Tagessummen",
+    "entries": "Einträge"
+  },
+  "columns": {
+    "date": "Datum",
+    "workout": "Training",
+    "exercise": "Übung",
+    "setNumber": "Satz-Nr.",
+    "setType": "Satz-Typ",
+    "weight": "Gewicht ({unit})",
+    "reps": "Wiederholungen",
+    "seconds": "Sekunden",
+    "rir": "RIR",
+    "note": "Notiz",
+    "durationMinutes": "Dauer (min)",
+    "sets": "Sätze",
+    "volume": "Volumen ({unit})",
+    "activityType": "Art",
+    "distanceKm": "Distanz (km)",
+    "heartRate": "Puls (Schläge/min)",
+    "zone": "Puls-Zone",
+    "intensity": "Anstrengung",
+    "bodyWeight": "Gewicht ({unit})",
+    "trend": "Trend ({unit})",
+    "kcal": "kcal",
+    "protein": "Eiweiß (g)",
+    "carbs": "Kohlenhydrate (g)",
+    "fat": "Fett (g)",
+    "meal": "Mahlzeit",
+    "food": "Lebensmittel",
+    "amount": "Menge",
+    "unit": "Einheit"
+  },
+  "unknownExercise": "Unbekannte Übung",
+  "period": {
+    "range": "Zeitraum: {from} – {to}",
+    "until": "Zeitraum: alle Daten bis {to}"
+  },
+  "pdf": {
+    "created": "Erstellt am {date}",
+    "empty": "Keine Daten in diesem Zeitraum.",
+    "page": "Seite {current} von {total}"
+  },
+  "fileNames": {
+    "all": "gesamt",
+    "datasets": {
+      "training": "training",
+      "weight": "gewicht",
+      "nutrition": "ernaehrung"
+    },
+    "tables": {
+      "sets": "saetze",
+      "sessions": "einheiten",
+      "activities": "cardio",
+      "weight": "gewicht",
+      "days": "tagessummen",
+      "entries": "eintraege"
+    }
+  },
+  "form": {
+    "dataset": "Was möchtest du exportieren?",
+    "period": "Zeitraum",
+    "periods": {
+      "days30": "30 Tage",
+      "days90": "90 Tage",
+      "year": "Dieses Jahr",
+      "all": "Alles",
+      "custom": "Eigener Zeitraum"
+    },
+    "from": "Von",
+    "to": "Bis",
+    "invalidRange": "Bitte wähle zwei gültige Tage. „Von“ darf nicht nach „Bis“ liegen.",
+    "format": "Format",
+    "formats": {
+      "csv": "CSV",
+      "xlsx": "Excel",
+      "pdf": "PDF"
+    },
+    "formatHints": {
+      "csv": "Eine Tabelle pro Datei, mit Semikolon getrennt. Lässt sich direkt in Excel oder Numbers öffnen.",
+      "xlsx": "Eine Excel-Datei mit einem Blatt pro Tabelle.",
+      "pdf": "Zum Lesen und Drucken. Lange Texte werden gekürzt."
+    },
+    "table": "Tabelle",
+    "tableHint": "Eine CSV-Datei enthält genau eine Tabelle.",
+    "contains": "In der Datei: {tables}.",
+    "download": "Herunterladen"
+  },
+  "full": {
+    "title": "Vollständige Kopie",
+    "description": "Alle über dich gespeicherten Daten in einer JSON-Datei, zum Beispiel als Sicherung.",
+    "download": "Alle Daten als JSON herunterladen"
+  }
+}

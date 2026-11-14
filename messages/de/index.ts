@@ -20,6 +20,8 @@ import routines from "./routines.json";
 import adjustments from "./adjustments.json";
 import cardio from "./cardio.json";
 import mobility from "./mobility.json";
+import dataExport from "./export.json";
+import sync from "./offline-sync.json";
 
 const messages = {
   common,
@@ -44,6 +46,8 @@ const messages = {
   adjustments,
   cardio,
   mobility,
+  export: dataExport,
+  sync,
 };
 
 export default messages;

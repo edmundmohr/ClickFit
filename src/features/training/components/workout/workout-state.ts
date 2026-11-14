@@ -88,7 +88,47 @@ export function toLoggedSet(exercise: ExerciseDraft, set: SetDraft): LoggedSet {
   };
 }
 
+/** Noch nicht übertragene Änderungen aus der Offline-Warteschlange. */
+export interface PendingChanges {
+  saves: SaveSetInput[];
+  deletedSetIds: string[];
+}
+
+function fromPayload(payload: SaveSetInput, unit: WeightUnit): SetDraft {
+  return {
+    id: payload.id,
+    type: payload.type,
+    weightText: toInputText(payload.weightKg === null ? null : toDisplayWeight(payload.weightKg, unitSystemOf(unit))),
+    repsText: toInputText(payload.reps),
+    rir: payload.rir,
+    note: payload.note ?? "",
+    completed: payload.completed,
+  };
+}
+
+/**
+ * Legt wartende Änderungen über den vom Server geladenen Stand: Nach einem Neuladen ohne Netz
+ * zeigt die Seite sonst einen älteren Stand als den, der auf dem Gerät gespeichert ist.
+ */
+export function applyPendingChanges(state: ExerciseDraft[], changes: PendingChanges): ExerciseDraft[] {
+  const deleted = new Set(changes.deletedSetIds);
+  return state.map((exercise) => {
+    const sets = exercise.sets.filter((set) => !deleted.has(set.id));
+    const saves = changes.saves
+      .filter((payload) => payload.workoutExerciseId === exercise.id)
+      .sort((a, b) => a.position - b.position);
+    for (const payload of saves) {
+      const draft = fromPayload(payload, exercise.unit);
+      const index = sets.findIndex((set) => set.id === payload.id);
+      if (index >= 0) sets[index] = draft;
+      else sets.splice(Math.min(payload.position, sets.length), 0, draft);
+    }
+    return { ...exercise, sets };
+  });
+}
+
 export type WorkoutAction =
+  | { type: "restore"; changes: PendingChanges }
   | { type: "edit"; exerciseId: string; setId: string; patch: Partial<SetDraft> }
   | { type: "add"; exerciseId: string; set: SetDraft }
   | { type: "remove"; exerciseId: string; setId: string }
@@ -96,6 +136,7 @@ export type WorkoutAction =
   | { type: "note"; catalogExerciseId: string; note: string };
 
 export function workoutReducer(state: ExerciseDraft[], action: WorkoutAction): ExerciseDraft[] {
+  if (action.type === "restore") return applyPendingChanges(state, action.changes);
   if (action.type === "note") {
     return state.map((exercise) =>
       exercise.exerciseId === action.catalogExerciseId ? { ...exercise, note: action.note } : exercise,

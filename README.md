@@ -6,8 +6,8 @@ Läuft komplett auf Cloudflare (Workers, D1, R2) unter `clickfit.online`.
 - Anforderungen: [docs/SPEC.md](docs/SPEC.md)
 - Umsetzungsplan und Stand: [docs/ROADMAP.md](docs/ROADMAP.md)
 
-**Stand:** Die Phasen 1 bis 5 sind fertig (Fundament, Training-Kern, Ernährung, Fortschritt,
-Flexibilität). Als Nächstes folgt Phase 6 (Offline & Export).
+**Stand:** Die Phasen 1 bis 6 sind fertig (Fundament, Training-Kern, Ernährung, Fortschritt,
+Flexibilität, Offline & Export). Als Nächstes folgt Phase 7 (Integrationen & optionale KI).
 
 ## Technik
 
@@ -20,6 +20,9 @@ Flexibilität). Als Nächstes folgt Phase 6 (Offline & Export).
 | Anmeldung | Better Auth, Login per Benutzername, Sessions in der Datenbank |
 | Texte | next-intl, nur Deutsch, alle Texte in `messages/de/*.json` |
 | Drag & Drop | `@dnd-kit` im Plan-Builder (Touch, Maus und Tastatur) |
+| Offline | Service Worker (Seiten-Cache) und Warteschlange in IndexedDB, Übertragung über `/api/sync` |
+| Web Push | VAPID mit Web Crypto, zeitversetzte Zustellung über Cloudflare Queues |
+| Export | CSV, Excel (`fflate`) und PDF (`pdf-lib`) |
 | Tests | Vitest gegen eine echte lokale D1 (Miniflare) |
 
 ## Projektregeln
@@ -46,6 +49,17 @@ cp .dev.vars.example .dev.vars
 ```
 
 Trage in `.dev.vars` ein zufälliges `BETTER_AUTH_SECRET` ein (z. B. aus `openssl rand -base64 32`).
+
+Für die Pausen-Benachrichtigung braucht es zusätzlich den privaten Push-Schlüssel. Das Skript
+schreibt ihn selbst in `.dev.vars` und zeigt nur den öffentlichen Schlüssel an:
+
+```bash
+npx tsx scripts/generate-vapid-keys.ts
+```
+
+Der öffentliche Schlüssel steht in `wrangler.jsonc` (`vars.VAPID_PUBLIC_KEY`). Ein neues Paar
+macht alle bestehenden Push-Abos ungültig; das Skript erzeugt deshalb nur dann eines, wenn noch
+keines da ist.
 
 ```bash
 npm run db:migrate
@@ -205,6 +219,37 @@ Typprüfung nicht an ihnen scheitert.
 - **Zyklus:** Die Phase wird rein nach Kalender aus dem letzten Periodenbeginn geschätzt. Die
   Angaben lassen sich jederzeit samt Abschalten löschen.
 
+## Offline & Export (Phase 6)
+
+- **Was offline geht:** das laufende Training. Sätze, Löschen von Sätzen, die Notiz zur
+  Einheit und das Beenden landen zuerst in einer Warteschlange auf dem Gerät (IndexedDB,
+  `src/lib/offline`) und werden über `POST /api/sync` übertragen, sobald Verbindung besteht.
+  Jeder Vorgang hat eine Kennung; der Server führt ihn höchstens einmal aus
+  (`sync_operation`). Abgehakt und beendet wird mit der Zeit auf dem Gerät.
+- **Was eine Verbindung braucht:** ein Training starten, Ernährung, Gewicht, Cardio, Mobility
+  und alle Einstellungen.
+- **Seiten ohne Netz:** Der Service Worker (`src/sw/sw.ts`) merkt sich zuletzt geladene Seiten
+  und zeigt ohne Netz den zuletzt gesehenen Stand, sonst die Offline-Seite. Das laufende
+  Training, die Heute-Seite und der Plan werden dafür gezielt vorgemerkt. Beim Abmelden werden
+  die gemerkten Seiten gelöscht.
+- **Pausen-Benachrichtigung:** unter **Mehr → Einstellungen** je Gerät einschalten. Geht die
+  App während einer Pause in den Hintergrund, meldet sie dem Server das Ende der Pause; der
+  legt eine Nachricht mit passender Verzögerung in die Queue `clickfit-rest-timer`. Der
+  Verbraucher läuft im Worker-Einstieg `worker.ts` und schickt den Push nur, wenn die Pause
+  noch gilt. Kommt die App vorher zurück, wird die Benachrichtigung abgesagt.
+  - Der Push hat keinen Inhalt; den Text zeigt der Service Worker selbst. So muss nichts
+    verschlüsselt werden und es verlässt kein Trainingsinhalt den Server.
+  - Push-Endpunkte werden nur für die Dienste von Apple, Google, Mozilla und Microsoft
+    angenommen.
+  - **iPhone:** Web Push gibt es nur in der zum Home-Bildschirm hinzugefügten App (ab
+    iOS 16.4) und erst nach der Erlaubnis. Die Benachrichtigung kann nur geplant werden, wenn
+    das iPhone beim Wechsel in den Hintergrund Verbindung hat.
+- **Export:** unter **Mehr → Daten exportieren** (`/export`). Training, Gewicht und Ernährung
+  als CSV, Excel oder PDF über `GET /api/export/<datensatz>?format=…&from=…&to=…`. Die CSV nutzt
+  Semikolon und Dezimalkomma, damit deutsches Excel sie direkt richtig öffnet; Textzellen, die
+  wie eine Formel beginnen, werden entschärft. Der JSON-Vollexport bleibt unter
+  `/api/me/export`.
+
 ## Datenbank
 
 Das Schema steht in `src/db/schema`. Nach einer Änderung:
@@ -228,6 +273,11 @@ angelegt. Eine neue Version geht so live:
 
 1. Neue Migrationen einspielen: `npm run db:migrate:prod`
 2. Deployen: `npm run deploy`
+
+Seit Phase 6 braucht der Worker zusätzlich die Queue `clickfit-rest-timer`
+(`npx wrangler queues create clickfit-rest-timer`) und das Secret `VAPID_PRIVATE_KEY`
+(`npx wrangler secret put VAPID_PRIVATE_KEY`, Wert aus `.dev.vars`). Beides muss vor dem
+ersten Deployment mit Phase 6 vorhanden sein.
 
 Die Staging-Umgebung ist vorbereitet, aber noch nicht angelegt.
 

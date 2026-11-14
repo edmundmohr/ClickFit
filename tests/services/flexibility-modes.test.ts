@@ -5,7 +5,7 @@ import { EQUIPMENT } from "@/domain/exercises/types";
 import { toLocalDate } from "@/lib/dates";
 import { createUserWithPassword } from "@/features/auth/services/user-factory";
 import type { OnboardingInput } from "@/features/training/schemas";
-import { getTrainingStats } from "@/features/training/services/history-service";
+import { getTrainingStats, listSessionsBetween } from "@/features/training/services/history-service";
 import { createPlanFromProfile, getActivePlan, getRoutine, swapPlanExercise } from "@/features/training/services/plan-service";
 import { saveOnboarding } from "@/features/training/services/profile-service";
 import { getRecoveryDay } from "@/features/training/services/recovery-day-service";
@@ -246,5 +246,20 @@ describe("recovery-oriented mode", () => {
     const next = await getRecoveryDay(testDb.db, annaId, new Date(NOW.getTime() + 2 * 60 * 60_000));
     const repeated = next!.exercises.filter((entry) => trained.has(entry.exerciseId));
     expect(repeated.length).toBeLessThan(next!.exercises.length);
+  });
+});
+
+describe("history with many workouts", () => {
+  it("summarizes more than a hundred sessions without hitting the parameter limit", async () => {
+    const plan = await getActivePlan(testDb.db, annaId, TODAY);
+    const dayId = plan!.days[0].id;
+    for (let index = 0; index < 105; index++) {
+      const start = new Date(NOW.getTime() - (index + 1) * 86_400_000);
+      const sessionId = await startWorkout(testDb.db, annaId, dayId, start);
+      await finishWorkout(testDb.db, annaId, sessionId, new Date(start.getTime() + 30 * 60_000));
+    }
+    const sessions = await listSessionsBetween(testDb.db, annaId, "2026-01-01", TODAY);
+    expect(sessions).toHaveLength(105);
+    expect(sessions[0].durationMinutes).toBe(30);
   });
 });

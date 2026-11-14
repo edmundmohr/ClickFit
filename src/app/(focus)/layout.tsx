@@ -1,3 +1,4 @@
+import { OfflineSync } from "@/components/offline-sync";
 import { requireUser } from "@/features/auth/session";
 import { ThemeSync } from "@/features/users/components/theme-sync";
 
@@ -7,6 +8,7 @@ export default async function FocusLayout({ children }: LayoutProps<"/">) {
   return (
     <>
       <ThemeSync theme={user.theme} />
+      <OfflineSync userId={user.id} banner={false} />
       {children}
     </>
   );

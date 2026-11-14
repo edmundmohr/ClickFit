@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { saveSetAction } from "../../actions";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import { useSyncState } from "@/components/offline-sync";
+import { getSyncEngine } from "@/lib/offline/client";
 import { toSavePayload, type ExerciseDraft } from "./workout-state";
 
 const EDIT_DEBOUNCE_MS = 700;
@@ -9,75 +10,71 @@ const EDIT_DEBOUNCE_MS = 700;
 export interface SetSync {
   /** Merkt einen Satz zum Speichern vor: sofort oder nach einer kurzen Tipp-Pause. */
   schedule: (setId: string, immediately?: boolean) => void;
-  /** Schickt alle noch offenen Änderungen sofort ab. */
-  flushAll: () => Promise<void>;
-  /** Vergisst einen Satz (z. B. nach dem Löschen). */
-  forget: (setId: string) => void;
+  /** Schreibt alle offenen Änderungen in die Warteschlange und überträgt sie; `true`, wenn alles angekommen ist. */
+  flushAll: () => Promise<boolean>;
+  /** Löscht einen Satz (auch auf dem Server, sobald Verbindung besteht). */
+  remove: (setId: string) => void;
+  /** Es warten Änderungen, und der letzte Übertragungsversuch ist gescheitert. */
   failed: boolean;
+  /** Zahl der noch nicht übertragenen Änderungen. */
+  pending: number;
 }
 
 /**
- * Speichert geänderte Sätze im Hintergrund. Schlägt ein Speichern fehl (z. B. kein Netz),
- * bleibt der Satz vorgemerkt und kann erneut gesendet werden.
+ * Speichert geänderte Sätze im Hintergrund. Jede Änderung landet zuerst in der Warteschlange
+ * auf dem Gerät (IndexedDB) und wird dann übertragen: So geht ohne Netz nichts verloren, und
+ * nach einem Neuladen ist der Stand wieder da.
  */
 export function useSetSync(exercises: ExerciseDraft[]): SetSync {
   const exercisesRef = useRef(exercises);
-  const dirty = useRef(new Set<string>());
   const timers = useRef(new Map<string, number>());
-  const [failed, setFailed] = useState(false);
+  const state = useSyncState();
 
   useLayoutEffect(() => {
     exercisesRef.current = exercises;
   }, [exercises]);
 
-  const flush = useCallback(
-    async (setId: string) => {
-      timers.current.delete(setId);
-      const exercise = exercisesRef.current.find((item) => item.sets.some((set) => set.id === setId));
-      const set = exercise?.sets.find((item) => item.id === setId);
-      if (!exercise || !set) {
-        dirty.current.delete(setId);
-        return;
-      }
-      const saved = await saveSetAction(toSavePayload(exercise, set)).then(
-        (result) => result.ok,
-        () => false,
-      );
-      // Wurde der Satz inzwischen erneut geändert, läuft dafür bereits ein neuer Timer.
-      if (saved && !timers.current.has(setId)) dirty.current.delete(setId);
-      if (!saved) setFailed(true);
-      else if (dirty.current.size === 0) setFailed(false);
-    },
-    [],
-  );
+  /** Legt den aktuellen Stand des Satzes in die Warteschlange. */
+  const store = useCallback(async (setId: string) => {
+    timers.current.delete(setId);
+    const exercise = exercisesRef.current.find((item) => item.sets.some((set) => set.id === setId));
+    const set = exercise?.sets.find((item) => item.id === setId);
+    if (!exercise || !set) return;
+    await getSyncEngine().enqueue({ type: "set.save", payload: toSavePayload(exercise, set) });
+  }, []);
 
   const schedule = useCallback(
     (setId: string, immediately = false) => {
-      dirty.current.add(setId);
       const existing = timers.current.get(setId);
       if (existing !== undefined) window.clearTimeout(existing);
       timers.current.set(
         setId,
-        window.setTimeout(() => void flush(setId), immediately ? 0 : EDIT_DEBOUNCE_MS),
+        window.setTimeout(
+          () => void store(setId).then(() => getSyncEngine().syncNow()),
+          immediately ? 0 : EDIT_DEBOUNCE_MS,
+        ),
       );
     },
-    [flush],
+    [store],
   );
 
   const flushAll = useCallback(async () => {
-    for (const timer of timers.current.values()) window.clearTimeout(timer);
-    timers.current.clear();
-    await Promise.all([...dirty.current].map((setId) => flush(setId)));
-  }, [flush]);
+    const waiting = [...timers.current.entries()];
+    for (const [, timer] of waiting) window.clearTimeout(timer);
+    await Promise.all(waiting.map(([setId]) => store(setId)));
+    return getSyncEngine().syncNow();
+  }, [store]);
 
-  const forget = useCallback((setId: string) => {
+  const remove = useCallback((setId: string) => {
     const timer = timers.current.get(setId);
     if (timer !== undefined) window.clearTimeout(timer);
     timers.current.delete(setId);
-    dirty.current.delete(setId);
+    // Der Löschvorgang ersetzt einen noch wartenden Speichervorgang desselben Satzes.
+    const engine = getSyncEngine();
+    void engine.enqueue({ type: "set.delete", payload: { setId } }).then(() => engine.syncNow());
   }, []);
 
-  // Beim Verlassen oder Wegschalten der Seite offene Änderungen noch abschicken.
+  // Beim Verlassen oder Wegschalten der Seite offene Änderungen noch sichern.
   useEffect(() => {
     const onHide = () => {
       if (document.visibilityState === "hidden") void flushAll();
@@ -90,5 +87,5 @@ export function useSetSync(exercises: ExerciseDraft[]): SetSync {
     };
   }, [flushAll]);
 
-  return { schedule, flushAll, forget, failed };
+  return { schedule, flushAll, remove, failed: state.failed && state.pending > 0, pending: state.pending };
 }

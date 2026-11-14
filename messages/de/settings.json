@@ -33,7 +33,29 @@
   },
   "data": {
     "title": "Meine Daten",
-    "description": "Lade alle über dich gespeicherten Daten als JSON-Datei herunter.",
-    "exportJson": "Daten exportieren (JSON)"
+    "description": "Exportiere Training, Gewicht und Ernährung als CSV, Excel oder PDF – oder alles zusammen als JSON-Datei.",
+    "export": "Zum Export",
+    "exportJson": "Alles als JSON"
+  },
+  "push": {
+    "title": "Pausen-Benachrichtigung",
+    "description": "Meldet das Ende der Pause, auch wenn die App im Hintergrund ist oder das iPhone gesperrt ist. Die Einstellung gilt für dieses Gerät.",
+    "enable": "Benachrichtigung einschalten",
+    "disable": "Ausschalten",
+    "test": "Test senden",
+    "testSent": "Test gesendet. Die Benachrichtigung sollte in wenigen Sekunden erscheinen.",
+    "testFailed": "Der Test konnte nicht gesendet werden.",
+    "enabled": "Auf diesem Gerät eingeschaltet.",
+    "enabledToast": "Benachrichtigung eingeschaltet.",
+    "disabledToast": "Benachrichtigung ausgeschaltet.",
+    "failed": "Das Einschalten hat nicht geklappt. Versuche es bitte noch einmal.",
+    "states": {
+      "unsupported": "Dieser Browser unterstützt keine Benachrichtigungen für Web-Apps.",
+      "needs-install": "Am iPhone geht das nur in der installierten App: In Safari auf „Teilen“ tippen, „Zum Home-Bildschirm“ wählen und ClickFit von dort öffnen.",
+      "blocked": "Benachrichtigungen sind für ClickFit gesperrt. Erlaube sie in den Einstellungen des Geräts und öffne diese Seite erneut.",
+      "inactive": "Auf diesem Gerät ausgeschaltet.",
+      "enabled": "Auf diesem Gerät eingeschaltet."
+    },
+    "checking": "Wird geprüft …"
   }
 }

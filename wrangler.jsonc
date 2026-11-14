@@ -1,7 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "clickfit",
-  "main": ".open-next/worker.js",
+  // Eigener Einstieg: reicht Anfragen an OpenNext weiter und verarbeitet zusätzlich die Queue.
+  "main": "worker.ts",
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   // Ohne dies hängt esbuild `__name(...)` an Funktionen. Das bricht Inline-Skripte, die per
@@ -18,7 +19,16 @@
     { "pattern": "www.clickfit.online", "custom_domain": true }
   ],
   "vars": {
-    "APP_URL": "https://clickfit.online"
+    "APP_URL": "https://clickfit.online",
+    // Öffentlicher Schlüssel für Web Push. Der private liegt als Secret VAPID_PRIVATE_KEY vor.
+    "VAPID_PUBLIC_KEY": "BLsjzLNKQxia_Hj6yAbwq8y9GoJUkEe_uXi-ld1Tj4WQtfa9u8YpTYoT1whEk0qwv9QNBg07042n5T8-UZRfnHQ"
+  },
+  "queues": {
+    // Zeitversetzte Nachrichten für die Benachrichtigung am Ende der Pause.
+    "producers": [{ "binding": "REST_TIMER_QUEUE", "queue": "clickfit-rest-timer" }],
+    "consumers": [
+      { "queue": "clickfit-rest-timer", "max_batch_size": 10, "max_batch_timeout": 0, "max_retries": 2 }
+    ]
   },
   "d1_databases": [
     {
@@ -42,7 +52,14 @@
       "workers_dev": true,
       "routes": [],
       "vars": {
-        "APP_URL": "https://clickfit-staging.<your-subdomain>.workers.dev"
+        "APP_URL": "https://clickfit-staging.<your-subdomain>.workers.dev",
+        "VAPID_PUBLIC_KEY": "BLsjzLNKQxia_Hj6yAbwq8y9GoJUkEe_uXi-ld1Tj4WQtfa9u8YpTYoT1whEk0qwv9QNBg07042n5T8-UZRfnHQ"
+      },
+      "queues": {
+        "producers": [{ "binding": "REST_TIMER_QUEUE", "queue": "clickfit-rest-timer-staging" }],
+        "consumers": [
+          { "queue": "clickfit-rest-timer-staging", "max_batch_size": 10, "max_batch_timeout": 0, "max_retries": 2 }
+        ]
       },
       "d1_databases": [
         {

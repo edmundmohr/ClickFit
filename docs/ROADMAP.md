@@ -10,7 +10,7 @@ einschließlich der Ergänzungen aus Abschnitt 8.
 | 3 | Ernährung | fertig |
 | 4 | Fortschritt & Dashboard | fertig |
 | 5 | Flexibilität | fertig |
-| 6 | Offline & Export | offen |
+| 6 | Offline & Export | fertig |
 | 7 | Integrationen & optionale KI | offen |
 
 ## Phase 1 – Fundament (fertig)
@@ -107,11 +107,23 @@ Hinweise:
 - Der Verletztenmodus meidet Bewegungsmuster je Körperregion nach einer festen Zuordnung
   (`PATTERNS_TO_AVOID`); er ersetzt keine ärztliche Beratung.
 
-## Phase 6 – Offline & Export
+## Phase 6 – Offline & Export (fertig)
 
-- Vollständige Offline-Synchronisierung (IndexedDB-Queue)
-- Pausentimer-Benachrichtigung im Hintergrund (Web Push, soweit iOS es erlaubt)
-- Export als CSV, Excel und PDF (Training, Gewicht, Ernährung)
+- Offline-Training: Sätze, Notiz und Beenden werden auf dem Gerät gespeichert (IndexedDB) und
+  später übertragen; jeder Vorgang wird auf dem Server höchstens einmal ausgeführt
+- Zuletzt gesehene Seiten bleiben ohne Netz abrufbar; das laufende Training übersteht ein
+  Neuladen ohne Verbindung
+- Pausen-Benachrichtigung per Web Push, wenn die App im Hintergrund ist
+- Export von Training, Gewicht und Ernährung als CSV, Excel und PDF
+
+Grenzen:
+
+- Offline funktioniert das laufende Training. Ein Training starten und alle anderen Bereiche
+  (Ernährung, Gewicht, Cardio, Mobility, Einstellungen) brauchen eine Verbindung.
+- Web Push am iPhone gibt es nur in der installierten App (ab iOS 16.4) nach erteilter
+  Erlaubnis. Geplant wird die Benachrichtigung in dem Moment, in dem die App in den
+  Hintergrund geht; ohne Verbindung in diesem Moment bleibt sie aus.
+- Vibration gibt es am iPhone im Browser weiterhin nicht.
 
 ## Phase 7 – Integrationen & optionale KI
 

@@ -1,0 +1,7 @@
+{
+  "offlineTitle": "Du bist offline",
+  "offlineText": "Eingaben im Training bleiben auf dem Gerät und werden übertragen, sobald du wieder Verbindung hast. Alles andere braucht eine Verbindung.",
+  "pending": "{count, plural, one {# Änderung wartet} other {# Änderungen warten}} auf die Übertragung.",
+  "retry": "Jetzt übertragen",
+  "rejected": "{count, plural, one {Eine Änderung konnte} other {# Änderungen konnten}} nicht übernommen werden, zum Beispiel weil das Training inzwischen gelöscht wurde."
+}

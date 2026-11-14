@@ -69,8 +69,10 @@
     "over": "Pause vorbei – weiter geht's!"
   },
   "sync": {
-    "error": "Einige Eingaben sind noch nicht gespeichert.",
-    "retry": "Erneut speichern"
+    "error": "Keine Verbindung: {count, plural, one {# Eingabe ist} other {# Eingaben sind}} auf dem Gerät gespeichert und {count, plural, one {wird} other {werden}} übertragen, sobald du wieder online bist.",
+    "retry": "Jetzt übertragen",
+    "finishedOfflineTitle": "Training beendet",
+    "finishedOfflineText": "Du bist gerade offline. Das Training ist auf dem Gerät gespeichert und erscheint im Verlauf, sobald die Verbindung zurück ist. Du kannst die App geöffnet lassen oder später wiederkommen."
   },
   "finishDialog": {
     "title": "Training beenden?",
@@ -124,5 +126,8 @@
     "empty": "Nur die Stange, keine Scheiben.",
     "total": "Ergibt zusammen: {weight} {unit}",
     "missing": "Mit deinen Scheiben fehlen {weight} {unit} zum Wunschgewicht."
-  }
+  },
+  "noteSavedOffline": "Notiz auf dem Gerät gespeichert. Sie wird übertragen, sobald du wieder online bist.",
+  "pushTitle": "Pause vorbei",
+  "pushBody": "Weiter geht's mit dem nächsten Satz."
 }

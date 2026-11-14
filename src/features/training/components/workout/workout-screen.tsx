@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useState, useTransition } from "react";
+import { useEffect, useReducer, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -14,7 +14,9 @@ import { afterSetCompleted, groupConsecutive, groupKind, groupRestSeconds } from
 import { estimateRemainingSeconds, isWorkoutForgotten, suggestFinishTime } from "@/domain/training/schedule";
 import { formatDayLong, formatDuration, formatTime } from "@/lib/format";
 import { toDisplayWeight, unitSystemOf, type UnitSystem } from "@/lib/units";
-import { deleteSetAction, deleteWorkoutAction, finishWorkoutAction } from "../../actions";
+import { useRestPush } from "@/features/notifications/use-rest-push";
+import { getSyncEngine, tellServiceWorker } from "@/lib/offline/client";
+import { deleteWorkoutAction } from "../../actions";
 import type { WorkoutView } from "../../services/workout-view";
 import { ConfirmDialog, ExerciseNoteDialog, SetOptionsDialog } from "./dialogs";
 import { ExerciseCard, type InvalidField } from "./exercise-card";
@@ -42,6 +44,8 @@ const WARMUP_REST_SECONDS = 45;
 interface WorkoutScreenProps {
   view: WorkoutView;
   unitSystem: UnitSystem;
+  /** Wem die Offline-Warteschlange auf diesem Gerät gehört. */
+  userId: string;
 }
 
 interface SetRef {
@@ -49,14 +53,17 @@ interface SetRef {
   setId: string;
 }
 
-export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
+export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) {
   const t = useTranslations();
   const router = useRouter();
-  const inProgress = view.status === "in_progress";
+  /** Ohne Netz beendet: Zeitpunkt des Endes, bis der Server es bestätigt hat. */
+  const [localFinish, setLocalFinish] = useState<string | null>(null);
+  const inProgress = view.status === "in_progress" && localFinish === null;
   const [exercises, dispatch] = useReducer(workoutReducer, view.exercises, toDrafts);
   const sync = useSetSync(exercises);
   const alertSignal = useAlertSignal();
   const timer = useRestTimer(alertSignal.signal);
+  useRestPush(inProgress ? timer.endsAt : null);
   const now = useNow(inProgress);
   useWakeLock(inProgress);
 
@@ -74,9 +81,49 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
   );
   const openSets = allSets.filter((set) => !set.completed).length;
   const elapsedSeconds = now === null ? null : (now - startedAt.getTime()) / 1000;
-  const durationMinutes = view.finishedAt
-    ? Math.max(1, Math.round((new Date(view.finishedAt).getTime() - startedAt.getTime()) / 60000))
+  const finishedAt = view.finishedAt ?? localFinish;
+  const durationMinutes = finishedAt
+    ? Math.max(1, Math.round((new Date(finishedAt).getTime() - startedAt.getTime()) / 60000))
     : null;
+
+  // Wartende Änderungen dieses Trainings über den geladenen Stand legen (z. B. nach Neuladen ohne Netz).
+  const exerciseKey = view.exercises.map((exercise) => exercise.id).join(",");
+  useEffect(() => {
+    let cancelled = false;
+    const engine = getSyncEngine();
+    void engine
+      .setUser(userId)
+      .then(() => engine.list())
+      .then((records) => {
+        if (cancelled) return;
+        const exerciseIds = new Set(exerciseKey.split(","));
+        const operations = records.map((record) => record.operation);
+        const saves = operations.flatMap((operation) =>
+          operation.type === "set.save" && exerciseIds.has(operation.payload.workoutExerciseId)
+            ? [operation.payload]
+            : [],
+        );
+        const deletedSetIds = operations.flatMap((operation) =>
+          operation.type === "set.delete" ? [operation.payload.setId] : [],
+        );
+        if (saves.length > 0 || deletedSetIds.length > 0) dispatch({ type: "restore", changes: { saves, deletedSetIds } });
+        const finish = operations.find(
+          (operation) => operation.type === "workout.finish" && operation.payload.sessionId === view.id,
+        );
+        if (finish && view.status === "in_progress") setLocalFinish(finish.at);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, view.id, view.status, exerciseKey]);
+
+  // Ist alles übertragen, merkt sich der Service Worker die Seite für den nächsten Start ohne Netz.
+  useEffect(() => {
+    if (sync.pending > 0) return;
+    tellServiceWorker({ type: "cache-page", url: window.location.pathname });
+    // Ein ohne Netz beendetes Training ist jetzt auch auf dem Server beendet: frischen Stand laden.
+    if (localFinish !== null) router.refresh();
+  }, [sync.pending, localFinish, router]);
 
   const findSet = (ref: SetRef) => {
     const exercise = exercises.find((item) => item.id === ref.exerciseId);
@@ -192,19 +239,22 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
     setOptionsFor(null);
     if (!found) return;
     dispatch({ type: "remove", exerciseId: ref.exerciseId, setId: ref.setId });
-    sync.forget(ref.setId);
+    sync.remove(ref.setId);
     for (const set of found.exercise.sets) if (set.id !== ref.setId) sync.schedule(set.id, true);
-    void deleteSetAction(ref.setId);
   }
 
   function finish(finishedAt?: Date) {
     setConfirm(null);
     timer.stop();
+    const at = finishedAt ?? new Date();
     startTransition(async () => {
       await sync.flushAll();
-      const result = await finishWorkoutAction(view.id, finishedAt?.toISOString());
-      if (result.ok) router.refresh();
-      else toast.error(t(`errors.${result.error}`));
+      const engine = getSyncEngine();
+      await engine.enqueue({ type: "workout.finish", payload: { sessionId: view.id } }, at);
+      // Mit Netz ist das Training sofort beendet; ohne Netz gilt es auf dem Gerät als beendet
+      // und wird nachgetragen, sobald wieder Verbindung besteht.
+      if (await engine.syncNow()) router.refresh();
+      else setLocalFinish(at.toISOString());
     });
   }
 
@@ -301,10 +351,16 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
             </AlertDescription>
           </Alert>
         ) : null}
+        {localFinish !== null ? (
+          <Alert>
+            <AlertTitle>{t("workout.sync.finishedOfflineTitle")}</AlertTitle>
+            <AlertDescription>{t("workout.sync.finishedOfflineText")}</AlertDescription>
+          </Alert>
+        ) : null}
         {sync.failed ? (
-          <Alert variant="destructive" role="alert">
+          <Alert role="status">
             <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
-              {t("workout.sync.error")}
+              {t("workout.sync.error", { count: sync.pending })}
               <Button size="sm" variant="outline" onClick={() => void sync.flushAll()}>
                 {t("workout.sync.retry")}
               </Button>

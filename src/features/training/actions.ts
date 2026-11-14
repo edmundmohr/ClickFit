@@ -10,20 +10,11 @@ import { toLocalDate } from "@/lib/dates";
 import { requireUser } from "@/features/auth/session";
 import type { Exercise } from "@/domain/exercises/types";
 import type { WeightUnit } from "@/domain/training/weights";
-import { onboardingSchema, saveSetSchema } from "./schemas";
+import { onboardingSchema } from "./schemas";
 import { getRecoveryDay } from "./services/recovery-day-service";
 import { saveOnboarding } from "./services/profile-service";
 import { createPlanFromProfile, getSwapOptions, swapPlanExercise } from "./services/plan-service";
-import {
-  deleteSet,
-  deleteWorkout,
-  finishWorkout,
-  saveExerciseNote,
-  saveSessionNote,
-  saveSet,
-  startFreeWorkout,
-  startWorkout,
-} from "./services/workout-service";
+import { deleteWorkout, saveExerciseNote, startFreeWorkout, startWorkout } from "./services/workout-service";
 
 /** Einheit aus den Einstellungen des Nutzers. */
 function unitOf(user: { unitSystem?: string | null }): WeightUnit {
@@ -112,43 +103,6 @@ export async function startRecoveryWorkoutAction(): Promise<void> {
   redirect(`/workout/${sessionId}`);
 }
 
-export async function saveSetAction(input: unknown): Promise<ActionResult> {
-  const user = await requireUser();
-  const parsed = saveSetSchema.safeParse(input);
-  if (!parsed.success) return invalid;
-  try {
-    await saveSet(getDb(), user.id, parsed.data);
-    return ok(undefined);
-  } catch (error) {
-    return fail(error);
-  }
-}
-
-export async function deleteSetAction(setId: string): Promise<ActionResult> {
-  const user = await requireUser();
-  if (!z.uuid().safeParse(setId).success) return invalid;
-  try {
-    await deleteSet(getDb(), user.id, setId);
-    return ok(undefined);
-  } catch (error) {
-    return fail(error);
-  }
-}
-
-export async function finishWorkoutAction(sessionId: string, finishedAtIso?: string): Promise<ActionResult> {
-  const user = await requireUser();
-  if (!idSchema.safeParse(sessionId).success) return invalid;
-  const finishedAt = finishedAtIso ? new Date(finishedAtIso) : new Date();
-  if (Number.isNaN(finishedAt.getTime()) || finishedAt.getTime() > Date.now() + 60_000) return invalid;
-  try {
-    await finishWorkout(getDb(), user.id, sessionId, finishedAt);
-  } catch (error) {
-    return fail(error);
-  }
-  revalidatePath("/", "layout");
-  return ok(undefined);
-}
-
 export async function deleteWorkoutAction(sessionId: string): Promise<ActionResult> {
   const user = await requireUser();
   if (!idSchema.safeParse(sessionId).success) return invalid;
@@ -166,17 +120,6 @@ export async function saveExerciseNoteAction(exerciseId: string, note: string): 
   if (!idSchema.safeParse(exerciseId).success || !noteSchema.safeParse(note).success) return invalid;
   try {
     await saveExerciseNote(getDb(), user.id, exerciseId, note);
-    return ok(undefined);
-  } catch (error) {
-    return fail(error);
-  }
-}
-
-export async function saveSessionNoteAction(sessionId: string, note: string): Promise<ActionResult> {
-  const user = await requireUser();
-  if (!idSchema.safeParse(sessionId).success || !noteSchema.safeParse(note).success) return invalid;
-  try {
-    await saveSessionNote(getDb(), user.id, sessionId, note);
     return ok(undefined);
   } catch (error) {
     return fail(error);

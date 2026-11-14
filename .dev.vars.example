@@ -6,3 +6,7 @@ BETTER_AUTH_SECRET=change-me-to-a-long-random-string
 
 # Öffentliche Basis-URL der App (überschreibt den Wert aus wrangler.jsonc)
 APP_URL=http://localhost:3000
+
+# Privater Schlüssel für Web Push (Pausen-Benachrichtigung). Erzeugen mit
+# `npx tsx scripts/generate-vapid-keys.ts`; das Skript trägt ihn selbst in `.dev.vars` ein.
+VAPID_PRIVATE_KEY=

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { saveSessionNoteAction } from "../../actions";
+import { getSyncEngine } from "@/lib/offline/client";
 
 export function SessionNote({ sessionId, initialNote }: { sessionId: string; initialNote: string }) {
   const t = useTranslations();
@@ -14,9 +14,10 @@ export function SessionNote({ sessionId, initialNote }: { sessionId: string; ini
 
   function save() {
     startTransition(async () => {
-      const result = await saveSessionNoteAction(sessionId, note);
-      if (result.ok) toast.success(t("workout.noteSaved"));
-      else toast.error(t(`errors.${result.error}`));
+      // Über die Warteschlange: So geht die Notiz auch ohne Netz nicht verloren.
+      const engine = getSyncEngine();
+      await engine.enqueue({ type: "workout.note", payload: { sessionId, note } });
+      toast.success(t((await engine.syncNow()) ? "workout.noteSaved" : "workout.noteSavedOffline"));
     });
   }
 

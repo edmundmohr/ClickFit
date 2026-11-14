@@ -90,6 +90,8 @@ export function useAlertSignal(): { prime: () => void; signal: () => void } {
 export interface RestTimer {
   /** Verbleibende Sekunden; `null`, wenn keine Pause läuft. */
   remaining: number | null;
+  /** Zeitpunkt (ms), zu dem die Pause endet; `null`, wenn keine läuft. */
+  endsAt: number | null;
   total: number;
   /** Die Pause ist gerade abgelaufen (kurze Meldung). */
   justFinished: boolean;
@@ -149,5 +151,5 @@ export function useRestTimer(onFinished: () => void): RestTimer {
   const stop = useCallback(() => setEndsAt(null), []);
 
   const remaining = endsAt === null ? null : Math.max(0, Math.ceil((endsAt - now) / 1000));
-  return { remaining, total, justFinished, start, adjust, stop };
+  return { remaining, endsAt, total, justFinished, start, adjust, stop };
 }

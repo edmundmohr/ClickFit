@@ -21,5 +21,5 @@ export default async function WorkoutPage({ params }: PageProps<"/workout/[id]">
   });
   if (!view) notFound();
   // Der Schlüssel sorgt dafür, dass nach dem Beenden der frische Stand geladen wird.
-  return <WorkoutScreen key={`${view.id}-${view.status}`} view={view} unitSystem={user.unitSystem} />;
+  return <WorkoutScreen key={`${view.id}-${view.status}`} view={view} unitSystem={user.unitSystem} userId={user.id} />;
 }

@@ -21,30 +21,44 @@ export interface SessionSummary {
   exerciseCount: number;
 }
 
+const SESSION_CHUNK = 90;
+
+interface SummaryRow {
+  sessionId: string;
+  workoutExerciseId: string;
+  type: string;
+  weightKg: number | null;
+  reps: number | null;
+}
+
 async function summarize(
   db: AppDatabase,
   sessions: (typeof workoutSession.$inferSelect)[],
 ): Promise<SessionSummary[]> {
   if (sessions.length === 0) return [];
-  const rows = await db
-    .select({
-      sessionId: workoutExercise.sessionId,
-      workoutExerciseId: workoutExercise.id,
-      type: workoutSet.type,
-      weightKg: workoutSet.weightKg,
-      reps: workoutSet.reps,
-    })
-    .from(workoutSet)
-    .innerJoin(workoutExercise, eq(workoutSet.workoutExerciseId, workoutExercise.id))
-    .where(
-      and(
-        inArray(
-          workoutExercise.sessionId,
-          sessions.map((session) => session.id),
-        ),
-        isNotNull(workoutSet.completedAt),
-      ),
+  // D1 erlaubt höchstens 100 gebundene Parameter pro Anweisung: Einheiten in Blöcken abfragen.
+  const sessionIds = sessions.map((session) => session.id);
+  const rows: SummaryRow[] = [];
+  for (let index = 0; index < sessionIds.length; index += SESSION_CHUNK) {
+    rows.push(
+      ...(await db
+        .select({
+          sessionId: workoutExercise.sessionId,
+          workoutExerciseId: workoutExercise.id,
+          type: workoutSet.type,
+          weightKg: workoutSet.weightKg,
+          reps: workoutSet.reps,
+        })
+        .from(workoutSet)
+        .innerJoin(workoutExercise, eq(workoutSet.workoutExerciseId, workoutExercise.id))
+        .where(
+          and(
+            inArray(workoutExercise.sessionId, sessionIds.slice(index, index + SESSION_CHUNK)),
+            isNotNull(workoutSet.completedAt),
+          ),
+        )),
     );
+  }
 
   return sessions.map((session) => {
     const own = rows.filter((row) => row.sessionId === session.id);
