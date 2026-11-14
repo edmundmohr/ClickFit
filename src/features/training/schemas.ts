@@ -4,7 +4,7 @@ import { EQUIPMENT, EXERCISE_TYPES, MECHANICS, MOVEMENT_PATTERNS, MUSCLES } from
 import { MAX_CYCLE_LENGTH, MIN_CYCLE_LENGTH } from "@/domain/training/cycle";
 import { VACATION_TYPES } from "@/domain/training/vacation";
 import { WEIGHT_UNITS } from "@/domain/training/weights";
-import { isValidLocalDate } from "@/lib/dates";
+import { isValidLocalDate, toLocalDate } from "@/lib/dates";
 import {
   ACTIVITY_LEVELS,
   BODY_REGIONS,
@@ -35,12 +35,23 @@ const sessionMinutes = z.union([
   z.literal(90),
 ]);
 
-const CURRENT_YEAR = new Date().getUTCFullYear();
+/** Laufendes Jahr in der Zeitzone der App, zum Zeitpunkt der Prüfung (nicht beim Laden des Moduls). */
+function currentYear(): number {
+  return Number(toLocalDate(new Date()).slice(0, 4));
+}
+
+const MAX_AGE_YEARS = 100;
+const MIN_AGE_YEARS = 12;
 
 export const onboardingSchema = z.object({
   goal: z.enum(GOALS),
   experience: z.enum(EXPERIENCE_LEVELS),
-  weekdays: z.array(weekday).min(MIN_TRAINING_DAYS).max(MAX_TRAINING_DAYS),
+  // Doppelte Tage würden die Mindestzahl vortäuschen ([1, 1] wären sonst zwei Trainingstage).
+  weekdays: z
+    .array(weekday)
+    .min(MIN_TRAINING_DAYS)
+    .max(MAX_TRAINING_DAYS)
+    .refine((days) => new Set(days).size === days.length),
   sessionMinutes,
   locationType: z.enum(LOCATION_TYPES),
   equipment: z.array(z.enum(EQUIPMENT)),
@@ -53,8 +64,7 @@ export const onboardingSchema = z.object({
   birthYear: z
     .number()
     .int()
-    .min(CURRENT_YEAR - 100)
-    .max(CURRENT_YEAR - 12),
+    .refine((year) => year >= currentYear() - MAX_AGE_YEARS && year <= currentYear() - MIN_AGE_YEARS),
   heightCm: z.number().min(100).max(250),
   weightKg: z.number().min(30).max(400),
   activityLevel: z.enum(ACTIVITY_LEVELS),

@@ -1,11 +1,12 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { eq } from "drizzle-orm";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { and, eq } from "drizzle-orm";
 import { trainingPlan, workoutSession } from "@/db/schema";
 import { EQUIPMENT } from "@/domain/exercises/types";
 import { AppError } from "@/lib/errors";
 import { addDays, toLocalDate } from "@/lib/dates";
 import { createUserWithPassword } from "@/features/auth/services/user-factory";
-import type { OnboardingInput, SaveSetInput } from "@/features/training/schemas";
+import { setsToPrefill, type SetDraft } from "@/features/training/components/workout/workout-state";
+import { onboardingSchema, type OnboardingInput, type SaveSetInput } from "@/features/training/schemas";
 import { getTrainingStats, listCompletedSessions } from "@/features/training/services/history-service";
 import { plannedWeekdays } from "@/features/training/titles";
 import { createPlanFromProfile, getActivePlan, getSwapOptions, swapPlanExercise } from "@/features/training/services/plan-service";
@@ -16,10 +17,12 @@ import {
   finishWorkout,
   getExerciseNotes,
   getInProgressSession,
+  isOpenWorkoutConflict,
   saveExerciseNote,
   saveSet,
   startWorkout,
 } from "@/features/training/services/workout-service";
+import { getPreviousPerformances } from "@/features/training/services/workout-queries";
 import { getWorkoutView, type WorkoutView } from "@/features/training/services/workout-view";
 import { TEST_PASSWORDS, createTestDatabase, type TestDatabase } from "../helpers/test-db";
 
@@ -74,11 +77,17 @@ function payload(view: WorkoutView, exerciseIndex: number, setIndex: number, val
 }
 
 /** Startet ein Training, loggt alle Sätze der ersten Übung und schließt es ab. */
-async function completeWorkout(userId: string, planDayId: string, reps: number, startedAt: Date): Promise<WorkoutView> {
+async function completeWorkout(
+  userId: string,
+  planDayId: string,
+  reps: number,
+  startedAt: Date,
+  weightKg = 60,
+): Promise<WorkoutView> {
   const sessionId = await startWorkout(testDb.db, userId, planDayId, startedAt);
   const view = await getWorkoutView(testDb.db, userId, sessionId);
   for (let index = 0; index < view.exercises[0].sets.length; index++) {
-    await saveSet(testDb.db, userId, payload(view, 0, index, { reps }));
+    await saveSet(testDb.db, userId, payload(view, 0, index, { reps, weightKg }));
   }
   await finishWorkout(testDb.db, userId, sessionId, new Date(startedAt.getTime() + 50 * 60_000));
   return getWorkoutView(testDb.db, userId, sessionId);
@@ -177,6 +186,33 @@ describe("workout logging", () => {
     expect((await getInProgressSession(testDb.db, annaId))?.id).toBe(first);
   });
 
+  it("keeps a single open workout when two starts arrive at the same time", async () => {
+    const plan = await getActivePlan(testDb.db, annaId);
+    const [first, second] = await Promise.all([
+      startWorkout(testDb.db, annaId, plan!.days[0].id),
+      startWorkout(testDb.db, annaId, plan!.days[1].id),
+    ]);
+    expect(second).toBe(first);
+    const open = await testDb.db.query.workoutSession.findMany({
+      where: and(eq(workoutSession.userId, annaId), eq(workoutSession.status, "in_progress")),
+    });
+    expect(open.map((row) => row.id)).toEqual([first]);
+
+    // Die Datenbank selbst lässt kein zweites offenes Workout zu – der Dienst erkennt den Konflikt.
+    const now = new Date();
+    const duplicate: unknown = await testDb.db
+      .insert(workoutSession)
+      .values({ id: "dup", userId: annaId, date: TODAY, status: "in_progress", startedAt: now, createdAt: now, updatedAt: now })
+      .then(
+        () => null,
+        (error: unknown) => error,
+      );
+    expect(isOpenWorkoutConflict(duplicate)).toBe(true);
+    // Abgeschlossene Workouts und andere Nutzer sind nicht betroffen.
+    await finishWorkout(testDb.db, annaId, first);
+    expect(await startWorkout(testDb.db, annaId, plan!.days[1].id)).not.toBe(first);
+  });
+
   it("saves, edits, adds and deletes sets", async () => {
     const plan = await getActivePlan(testDb.db, annaId);
     const sessionId = await startWorkout(testDb.db, annaId, plan!.days[0].id);
@@ -261,6 +297,40 @@ describe("progression, history and streak", () => {
     expect(next.exercises[1].sets[0].targetWeightKg).toBeNull();
   });
 
+  it("shows previous values and records of an older workout only from workouts before it", async () => {
+    const plan = await getActivePlan(testDb.db, annaId);
+    const day = plan!.days[0];
+    const older = await completeWorkout(annaId, day.id, 10, new Date("2026-11-09T17:00:00Z"), 60);
+    const newer = await completeWorkout(annaId, day.id, 10, new Date("2026-11-11T17:00:00Z"), 70);
+
+    // Regressionstest: Früher zeigte die ältere Einheit Vorwerte und Bestwerte der späteren.
+    const olderView = await getWorkoutView(testDb.db, annaId, older.id);
+    expect(olderView.exercises[0].previous).toBeNull();
+    expect(olderView.exercises[0].bests).toBeNull();
+    const newerView = await getWorkoutView(testDb.db, annaId, newer.id);
+    expect(newerView.exercises[0].previous).toMatchObject({ date: "2026-11-09" });
+    expect(newerView.exercises[0].previous?.sets[0].weightKg).toBe(60);
+    expect(newerView.exercises[0].bests?.maxWeightKg).toBe(60);
+  });
+
+  it("shows a deload workout as the last time but does not progress from it", async () => {
+    const plan = await getActivePlan(testDb.db, annaId);
+    const day = plan!.days[0];
+    const exerciseId = day.exercises[0].exercise.id;
+    await completeWorkout(annaId, day.id, 10, new Date("2026-11-09T17:00:00Z"), 60);
+    const deload = await completeWorkout(annaId, day.id, 8, new Date("2026-11-16T17:00:00Z"), 50);
+    await testDb.db.update(workoutSession).set({ isDeload: true }).where(eq(workoutSession.id, deload.id));
+
+    // Progressionsbasis: die letzte reguläre Einheit.
+    const basis = await getPreviousPerformances(testDb.db, annaId, [exerciseId]);
+    expect(basis.get(exerciseId)).toMatchObject({ date: "2026-11-09" });
+    // Anzeige „Letztes Mal“: wirklich die letzte Einheit, auch wenn sie ein Deload war.
+    const nextId = await startWorkout(testDb.db, annaId, day.id, new Date("2026-11-18T17:00:00Z"));
+    const next = await getWorkoutView(testDb.db, annaId, nextId);
+    expect(next.exercises[0].previous).toMatchObject({ date: "2026-11-16" });
+    expect(next.exercises[0].previous?.sets[0].weightKg).toBe(50);
+  });
+
   it("lists completed workouts with totals and removes deleted ones", async () => {
     const plan = await getActivePlan(testDb.db, annaId);
     const day = plan!.days[0];
@@ -317,5 +387,56 @@ describe("exercise notes", () => {
     await saveExerciseNote(testDb.db, annaId, exerciseId, "   ");
     expect((await getExerciseNotes(testDb.db, annaId, [exerciseId])).size).toBe(0);
     await expectAppError(saveExerciseNote(testDb.db, annaId, "does-not-exist", "x"), "NOT_FOUND");
+  });
+});
+
+describe("onboarding validation", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("rejects duplicate weekdays", () => {
+    expect(onboardingSchema.safeParse({ ...onboarding, weekdays: [1, 1] }).success).toBe(false);
+    expect(onboardingSchema.safeParse({ ...onboarding, weekdays: [1, 3, 3, 5] }).success).toBe(false);
+    expect(onboardingSchema.safeParse(onboarding).success).toBe(true);
+  });
+
+  it("checks the birth year against the current year in the app time zone", () => {
+    // In Berlin ist schon 2027, in UTC noch 2026: Wer 2015 geboren ist, ist dort 12.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-12-31T23:30:00Z"));
+    expect(onboardingSchema.safeParse({ ...onboarding, birthYear: 2015 }).success).toBe(true);
+    expect(onboardingSchema.safeParse({ ...onboarding, birthYear: 2016 }).success).toBe(false);
+    expect(onboardingSchema.safeParse({ ...onboarding, birthYear: 1927 }).success).toBe(true);
+    expect(onboardingSchema.safeParse({ ...onboarding, birthYear: 1926 }).success).toBe(false);
+  });
+});
+
+describe("prefilling sets after a completed one", () => {
+  const draft = (id: string, type: SetDraft["type"], weightText = "", repsText = ""): SetDraft => ({
+    id,
+    type,
+    weightText,
+    repsText,
+    rir: null,
+    note: "",
+    completed: false,
+  });
+
+  it("does not hand the warm-up weight to the work sets", () => {
+    const sets = [draft("w1", "warmup", "20", "8"), draft("w2", "warmup"), draft("a", "work"), draft("b", "work")];
+    expect(setsToPrefill(sets, sets[0]).map((set) => set.id)).toEqual(["w2"]);
+  });
+
+  it("fills only empty, open sets of the same type", () => {
+    const sets = [
+      draft("a", "work", "60", "10"),
+      draft("b", "work"),
+      draft("c", "work", "62,5", ""),
+      { ...draft("d", "work"), completed: true },
+      draft("e", "drop"),
+      draft("f", "work"),
+    ];
+    expect(setsToPrefill(sets, sets[0]).map((set) => set.id)).toEqual(["b", "f"]);
   });
 });

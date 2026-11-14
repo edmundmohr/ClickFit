@@ -3,6 +3,8 @@ import type { BasicFood, FoodItem } from "@/domain/nutrition/types";
 
 export const BASIC_PREFIX = "basic:";
 export const RECIPE_PREFIX = "recipe:";
+/** Zutat als Momentaufnahme eines nicht mehr auflösbaren Rezepts; verweist auf kein Lebensmittel. */
+export const SNAPSHOT_PREFIX = "snapshot:";
 
 export function basicToFoodItem(food: BasicFood): FoodItem {
   return {

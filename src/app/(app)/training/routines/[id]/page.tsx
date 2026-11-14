@@ -40,6 +40,7 @@ export default async function RoutinePage({ params }: PageProps<"/training/routi
     targetRir: entry.targetRir,
     restSeconds: entry.restSeconds,
     groupId: entry.groupId,
+    archived: entry.exercise.archived ?? false,
   }));
   const exercises: PickerExercise[] = catalog.all
     .filter((exercise) => exercise.pattern !== "cardio")

@@ -107,6 +107,7 @@
   },
   "prescription": "{sets} × {repMin}–{repMax}",
   "prescriptionSeconds": "{sets} × {repMin}–{repMax} s",
+  "assistedHint": "Bei dieser Übung trägst du die Unterstützung ein: Weniger Unterstützung ist besser.",
   "plan": {
     "title": "Dein Trainingsplan",
     "noProfileTitle": "Noch kein Trainingsplan",
@@ -159,7 +160,8 @@
     "group": {
       "superset": "Supersatz",
       "circuit": "Zirkel"
-    }
+    },
+    "focusTraining": "Fokus-Training"
   },
   "library": {
     "title": "Übungen",
@@ -228,6 +230,30 @@
     "rest": "Deine Muskeln sind noch nicht erholt. Heute passt eher Pause, Mobility oder lockeres Cardio.",
     "start": "Dieses Training starten",
     "ready": "{percent} % erholt"
+  },
+  "focusTraining": {
+    "title": "Fokus-Training",
+    "description": "Trainiere gezielt einzelne Körperregionen. Die Einheit läuft unabhängig von deinem Wochenplan.",
+    "needsProfile": "Für das Fokus-Training brauchen wir dein Profil mit Erfahrung und Equipment.",
+    "areasLabel": "Körperregionen",
+    "areasHint": "Mehrere Regionen sind möglich. Die Prozentzahl zeigt, wie erholt die Region ist.",
+    "minutesLabel": "Dauer",
+    "minutes": "{minutes} min",
+    "ready": "{percent} % erholt",
+    "chooseArea": "Wähle mindestens eine Körperregion.",
+    "noExercises": "Für diese Auswahl gibt es mit deinem Equipment, deinen Ausschlüssen und Beschwerden keine passende Übung.",
+    "sessionName": "Fokus: {areas}",
+    "start": "Fokus-Training starten",
+    "running": "Du hast schon ein laufendes Training. Beende es, bevor du ein neues startest.",
+    "areas": {
+      "chest": "Brust",
+      "back": "Rücken",
+      "shoulders": "Schultern",
+      "arms": "Arme",
+      "core": "Bauch",
+      "glutes": "Po",
+      "legs": "Beine"
+    }
   },
   "cyclePhases": {
     "menstruation": "Menstruation",

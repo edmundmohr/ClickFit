@@ -143,6 +143,33 @@ describe("deload", () => {
       { weightKg: 90, reps: 8 },
     ]);
   });
+
+  it("gives more assistance to assisted exercises instead of less", () => {
+    // Regression: 30 kg Unterstützung wurden zu 27,5 kg – die Deload-Woche war dadurch schwerer.
+    const [first] = targets([set(30, 10)], { exerciseType: "assisted_bodyweight", isDeload: true });
+    expect(first).toEqual({ weightKg: 32.5, reps: 8 });
+    const [heavy] = targets([set(60, 10)], { exerciseType: "assisted_bodyweight", isDeload: true });
+    expect(heavy.weightKg).toBeCloseTo(67.5, 6);
+    // Ohne Unterstützung gibt es mindestens eine Stufe Hilfe.
+    expect(targets([set(0, 10)], { exerciseType: "assisted_bodyweight", isDeload: true })[0].weightKg).toBe(2.5);
+  });
+
+  it("shortens timed exercises noticeably instead of by two seconds", () => {
+    const plank = { sets: 3, repMin: 30, repMax: 60, targetRir: 2 };
+    const deload = (seconds: number) =>
+      targets([set(null, seconds)], { exerciseType: "duration", prescription: plank, isDeload: true })[0];
+    expect(deload(60)).toEqual({ weightKg: null, reps: 50 });
+    expect(deload(90)).toEqual({ weightKg: null, reps: 70 });
+    expect(deload(30)).toEqual({ weightKg: null, reps: 25 });
+    expect(deload(5)).toEqual({ weightKg: null, reps: 5 });
+  });
+
+  it("keeps the two-rep deload for bodyweight exercises", () => {
+    expect(targets([set(null, 12)], { exerciseType: "bodyweight_reps", isDeload: true })[0]).toEqual({
+      weightKg: null,
+      reps: 10,
+    });
+  });
 });
 
 describe("increments and warm-up", () => {
@@ -167,5 +194,20 @@ describe("increments and warm-up", () => {
       { weightKg: 25, reps: 3 },
     ]);
     expect(warmupSets(20, 2.5, 20)).toEqual([]);
+  });
+
+  it("never goes below the empty bar and stays on its steps", () => {
+    expect(warmupSets(40, 2.5, 20)).toEqual([
+      { weightKg: 20, reps: 8 },
+      { weightKg: 25, reps: 5 },
+      { weightKg: 32.5, reps: 3 },
+    ]);
+    // 7-kg-SZ-Stange: Stufen 7 + n × 2,5 statt Vielfacher von 2,5.
+    expect(warmupSets(30, 2.5, 7)).toEqual([
+      { weightKg: 12, reps: 8 },
+      { weightKg: 17, reps: 5 },
+      { weightKg: 24.5, reps: 3 },
+    ]);
+    for (const warmup of warmupSets(60, 2.5, 20)) expect(warmup.weightKg).toBeGreaterThanOrEqual(20);
   });
 });

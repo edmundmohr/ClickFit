@@ -231,6 +231,28 @@ describe("reducePlayer", () => {
     expect(play([{ type: "next", now: 500_000 }], later)).toMatchObject({ index: 2, phase: "prepare", signals: 1 });
   });
 
+  it("catches up on several countdowns that ran out while the screen was locked", () => {
+    const started = play([{ type: "start", now: 0 }]);
+    // 40 s später: Wechselzeit (5 s) und Übung 1 (30 s) sind vorbei, ebenso die Wechselzeit zu Übung 2.
+    const afterLock = play([{ type: "tick", now: 40_000 }], started);
+    expect(afterLock).toMatchObject({ index: 1, phase: "work", endsAt: null, signals: 1 });
+    // Mitten in Übung 1: Die Restzeit zählt ab dem Ende der Wechselzeit, nicht ab dem Tick.
+    const midway = play([{ type: "tick", now: 20_000 }], started);
+    expect(midway).toMatchObject({ index: 0, phase: "work" });
+    expect(playerRemainingSeconds(midway)).toBe(15);
+  });
+
+  it("finishes during a long lock with the active time up to the last countdown", () => {
+    const atLast = play([
+      { type: "start", now: 0 },
+      { type: "next", now: 10_000 },
+      { type: "next", now: 20_000 },
+    ]);
+    const finished = play([{ type: "tick", now: 600_000 }], atLast);
+    expect(finished).toMatchObject({ status: "finished", signals: 1 });
+    expect(playerElapsedSeconds(finished)).toBe(45);
+  });
+
   it("keeps the remaining time across a pause and does not count the pause as active time", () => {
     const paused = play([
       { type: "start", now: 0 },

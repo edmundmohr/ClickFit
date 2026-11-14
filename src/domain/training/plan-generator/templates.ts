@@ -2,8 +2,8 @@
  * Tagesvorlagen des Plan-Generators. Ein Tag besteht aus Slots in Prioritätsreihenfolge:
  * Die ersten Slots sind die wichtigsten, bei kurzer Einheitendauer fallen die letzten weg.
  */
-import type { MovementPattern, Muscle } from "@/domain/exercises/types";
-import type { DayFocus, Split } from "../types";
+import type { Equipment, MovementPattern, Muscle } from "@/domain/exercises/types";
+import type { DayFocus, Split, TrainingProfile } from "../types";
 
 export interface Slot {
   /** Akzeptierte Bewegungsmuster, das erste ist die bevorzugte Wahl. */
@@ -105,8 +105,16 @@ export const DAY_TEMPLATES: Record<DayFocus, Slot[]> = {
   legs_b: [HINGE, SQUAT, HIP_THRUST, LEG_EXTENSION, CALVES, LEG_CURL, CORE_STABILITY, ADDUCTORS],
 };
 
-/** Welcher Split zu wie vielen Trainingstagen passt und in welcher Reihenfolge die Tage laufen. */
-export const SPLIT_BY_DAYS: Record<number, { split: Split; days: DayFocus[] }> = {
+export interface SplitChoice {
+  split: Split;
+  days: DayFocus[];
+}
+
+/**
+ * Standard-Split je Zahl der Trainingstage, wenn Erfahrung, Dauer und Equipment nichts dagegen
+ * sprechen (Fortgeschrittene und Profis, ab 45 Minuten, mit Zusatzgewichten).
+ */
+export const SPLIT_BY_DAYS: Record<number, SplitChoice> = {
   1: { split: "full_body", days: ["full_body_a"] },
   2: { split: "full_body", days: ["full_body_a", "full_body_b"] },
   3: { split: "full_body", days: ["full_body_a", "full_body_b", "full_body_c"] },
@@ -117,3 +125,47 @@ export const SPLIT_BY_DAYS: Record<number, { split: Split; days: DayFocus[] }> =
     days: ["push_a", "pull_a", "legs_a", "push_b", "pull_b", "legs_b"],
   },
 };
+
+/**
+ * Ober-/Unterkörper im Wechsel für fünf oder sechs Tage. Jede Muskelgruppe kommt zwei- bis
+ * dreimal pro Woche dran, und auch kurze Einheiten decken den halben Körper ab.
+ */
+const UPPER_LOWER_BY_DAYS: Record<number, SplitChoice> = {
+  5: { split: "upper_lower", days: ["upper_a", "lower_a", "upper_b", "lower_b", "upper_a"] },
+  6: { split: "upper_lower", days: ["upper_a", "lower_a", "upper_b", "lower_b", "upper_a", "lower_a"] },
+};
+
+/** Ab dieser Einheitendauer lohnt sich ein feinerer Split mit Push/Pull/Beine. */
+export const PPL_MIN_SESSION_MINUTES = 45;
+
+/** Geräte mit Zusatzgewicht. Ohne sie gibt es zu wenige Varianten für eigene Push-, Pull- und Beintage. */
+const LOADED_EQUIPMENT: readonly Equipment[] = [
+  "barbell",
+  "ez_bar",
+  "dumbbell",
+  "kettlebell",
+  "cable",
+  "machine",
+  "smith_machine",
+];
+
+/**
+ * Wählt den Split passend zu Tagen, Erfahrung, Dauer und Equipment (der Ort steckt im Equipment).
+ * Bis vier Tage gilt immer die Standardtabelle (Ganzkörper bzw. Ober-/Unterkörper). Push/Pull/Beine
+ * gibt es nur für Fortgeschrittene und Profis mit mindestens 45 Minuten und Zusatzgewichten;
+ * sonst wird bei fünf oder sechs Tagen Ober-/Unterkörper im Wechsel geplant. Anfänger und kurze
+ * Einheiten bekommen so keine Tage mit nur drei Übungen für eine einzelne Bewegungsrichtung.
+ */
+export function chooseSplit(
+  dayCount: number,
+  profile: Pick<TrainingProfile, "experience" | "sessionMinutes" | "equipment">,
+): SplitChoice {
+  const standard = SPLIT_BY_DAYS[dayCount];
+  const upperLower = UPPER_LOWER_BY_DAYS[dayCount];
+  if (!upperLower) return standard;
+  const pplFits =
+    profile.experience !== "beginner" &&
+    profile.sessionMinutes >= PPL_MIN_SESSION_MINUTES &&
+    profile.equipment.some((item) => LOADED_EQUIPMENT.includes(item));
+  return pplFits ? standard : upperLower;
+}

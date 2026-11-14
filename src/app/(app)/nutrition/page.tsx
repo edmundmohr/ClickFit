@@ -36,10 +36,15 @@ export default async function NutritionPage({ searchParams }: PageProps<"/nutrit
   const params = await searchParams;
   const date = typeof params.date === "string" && isValidLocalDate(params.date) ? params.date : today;
   const isToday = date === today;
+  // Gewicht und Wasser lassen sich nicht für kommende Tage eintragen.
+  const isFuture = date > today;
   const db = getDb();
 
-  // Das Ziel für heute wird bei Bedarf einmalig aus dem Profil berechnet.
-  const target = isToday ? await ensureTarget(db, user.id, today) : await getCurrentTarget(db, user.id, date);
+  // Das Ziel für heute wird bei Bedarf einmalig aus dem Profil berechnet; ohne Profil gibt es keins.
+  // Ob ein Profil fehlt, hängt daher nicht vom angezeigten Tag ab. Tage vor dem ersten Ziel
+  // zeigen keine Zielwerte.
+  const todayTarget = await ensureTarget(db, user.id, today);
+  const target = isToday ? todayTarget : await getCurrentTarget(db, user.id, date);
   const [day, waterTotal, waterGoal, recommendedWater, supplements, weight, checkIn] = await Promise.all([
     getDay(db, user.id, date),
     getWaterTotal(db, user.id, date),
@@ -55,16 +60,20 @@ export default async function NutritionPage({ searchParams }: PageProps<"/nutrit
       <DateNav date={date} today={today} />
       <div className="grid gap-4">
         <MacroSummary total={day.total} target={target} />
-        {target ? null : (
+        {todayTarget ? null : (
           <OnboardingPrompt title={t("noProfile.title")} text={t("noProfile.text")} action={t("noProfile.action")} />
         )}
         {checkIn?.due ? <CheckInCard checkIn={checkIn} unitSystem={user.unitSystem} compact /> : null}
         {MEALS.map((meal) => (
           <MealCard key={meal} date={date} meal={meal} entries={day.meals[meal]} />
         ))}
-        <WaterCard date={date} totalMl={waterTotal} goalMl={waterGoal ?? recommendedWater ?? DEFAULT_WATER_GOAL_ML} />
+        {isFuture ? null : (
+          <WaterCard date={date} totalMl={waterTotal} goalMl={waterGoal ?? recommendedWater ?? DEFAULT_WATER_GOAL_ML} />
+        )}
         <SupplementsCard date={date} supplements={supplements} />
-        <WeightCard key={`${date}-${weight.today}`} date={date} status={weight} unitSystem={user.unitSystem} />
+        {isFuture ? null : (
+          <WeightCard key={`${date}-${weight.today}`} date={date} status={weight} unitSystem={user.unitSystem} />
+        )}
       </div>
     </>
   );

@@ -1,4 +1,5 @@
-import { sqliteTable, text, integer, real, index, primaryKey } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
+import { sqliteTable, text, integer, real, index, primaryKey, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { user } from "./auth";
 
 /**
@@ -164,6 +165,10 @@ export const workoutSession = sqliteTable(
   (table) => [
     index("workout_session_user_date_idx").on(table.userId, table.date),
     index("workout_session_user_status_idx").on(table.userId, table.status),
+    // Höchstens ein offenes Workout pro Nutzer – auch wenn zwei Starts gleichzeitig ankommen.
+    uniqueIndex("workout_session_one_open_per_user_idx")
+      .on(table.userId)
+      .where(sql`status = 'in_progress'`),
   ],
 );
 
@@ -183,6 +188,9 @@ export const workoutExercise = sqliteTable(
     targetRir: integer().notNull(),
     restSeconds: integer().notNull(),
     groupId: text(),
+    /** Abfrage nach dem letzten Satz: Anstrengung (`EFFORT_LEVELS`) und RIR, beides freiwillig. */
+    effort: text(),
+    effortRir: integer(),
   },
   (table) => [
     index("workout_exercise_session_id_idx").on(table.sessionId),

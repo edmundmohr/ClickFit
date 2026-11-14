@@ -130,8 +130,13 @@ export function reducePlayer(state: PlayerState, event: PlayerEvent, steps: read
     }
     case "tick": {
       if (state.status !== "running") return state;
-      if (state.endsAt !== null && event.now >= state.endsAt) return onCountdownEnd(state, event.now, steps);
-      return { ...state, now: event.now };
+      // Nach längerem Wegschalten (z. B. Sperrbildschirm) können mehrere Countdowns abgelaufen
+      // sein. Jede Phase beginnt am Ende der vorigen, nicht erst beim nächsten Tick.
+      let next = state;
+      while (next.status === "running" && next.endsAt !== null && event.now >= next.endsAt) {
+        next = onCountdownEnd(next, next.endsAt, steps);
+      }
+      return { ...next, now: event.now };
     }
   }
 }

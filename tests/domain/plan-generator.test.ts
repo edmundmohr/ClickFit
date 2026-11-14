@@ -42,7 +42,7 @@ describe("plan generator", () => {
     expect(generatePlan(profile(), EXERCISES)).toEqual(generatePlan(profile(), EXERCISES));
   });
 
-  it("chooses the split from the number of training days", () => {
+  it("uses the standard split per number of days for experienced lifters with time and weights", () => {
     for (const weekdays of WEEKDAY_SETS) {
       const plan = generatePlan(profile({ weekdays }), EXERCISES);
       const expected = SPLIT_BY_DAYS[weekdays.length];
@@ -88,15 +88,34 @@ describe("plan generator", () => {
   });
 
   it("stays within the session duration", () => {
+    // Regression: Drei Übungen wurden auch über das Zeitbudget hinaus geplant (Profi 30 min → 39 min).
     for (const sessionMinutes of SESSION_MINUTES) {
       for (const experience of EXPERIENCE_LEVELS) {
-        for (const day of generatePlan(profile({ sessionMinutes, experience }), EXERCISES).days) {
-          const seconds = estimateSessionSeconds(day.exercises);
-          // Drei Übungen sind das Minimum; nur dann darf die Zeit knapp überschritten werden.
-          if (day.exercises.length > 3) expect(seconds).toBeLessThanOrEqual(sessionMinutes * 60);
+        for (const goal of GOALS) {
+          for (const equipment of [GYM, HOME, NOTHING]) {
+            for (const weekdays of WEEKDAY_SETS) {
+              const plan = generatePlan(profile({ sessionMinutes, experience, goal, equipment, weekdays }), EXERCISES);
+              for (const day of plan.days) {
+                const label = `${experience} ${sessionMinutes} min ${goal} ${day.focus}`;
+                expect(estimateSessionSeconds(day.exercises), label).toBeLessThanOrEqual(sessionMinutes * 60);
+              }
+            }
+          }
         }
       }
     }
+  });
+
+  it("shortens the sets rather than planning fewer than three exercises", () => {
+    const plan = generatePlan(profile({ experience: "advanced", sessionMinutes: 30 }), EXERCISES);
+    for (const day of plan.days) {
+      expect(day.exercises.length).toBeGreaterThanOrEqual(3);
+      expect(estimateSessionSeconds(day.exercises)).toBeLessThanOrEqual(30 * 60);
+      for (const planned of day.exercises) expect(planned.sets).toBeGreaterThanOrEqual(2);
+    }
+    // Mit genug Zeit bleiben die vollen Sätze.
+    const long = generatePlan(profile({ experience: "advanced", sessionMinutes: 90 }), EXERCISES);
+    expect(long.days[0].exercises[0].sets).toBe(4);
   });
 
   it("plans more exercises for longer sessions", () => {
@@ -167,6 +186,53 @@ describe("plan generator", () => {
       const patterns = day.exercises.map((planned) => exerciseOf(planned.exerciseId).pattern);
       expect(patterns.some((pattern) => pattern.endsWith("_push"))).toBe(true);
       expect(patterns.some((pattern) => ["squat", "lunge", "hinge", "hip_thrust"].includes(pattern))).toBe(true);
+    }
+  });
+});
+
+describe("split selection", () => {
+  const SIX_DAYS: Weekday[] = [1, 2, 3, 4, 5, 6];
+  const FIVE_DAYS: Weekday[] = [1, 2, 3, 5, 6];
+
+  it("plans upper/lower instead of push/pull/legs for beginners", () => {
+    // Regression: Anfänger mit 6 Tagen à 30 min bekamen PPL mit nur 3–4 Übungen pro Tag.
+    for (const sessionMinutes of SESSION_MINUTES) {
+      const six = generatePlan(profile({ experience: "beginner", weekdays: SIX_DAYS, sessionMinutes }), EXERCISES);
+      expect(six.split).toBe("upper_lower");
+      expect(six.days.map((day) => day.focus)).toEqual(["upper_a", "lower_a", "upper_b", "lower_b", "upper_a", "lower_a"]);
+      const five = generatePlan(profile({ experience: "beginner", weekdays: FIVE_DAYS, sessionMinutes }), EXERCISES);
+      expect(five.split).toBe("upper_lower");
+      expect(five.days).toHaveLength(5);
+    }
+  });
+
+  it("plans upper/lower for short sessions and without extra weights", () => {
+    expect(generatePlan(profile({ experience: "advanced", weekdays: SIX_DAYS, sessionMinutes: 30 }), EXERCISES).split).toBe(
+      "upper_lower",
+    );
+    expect(generatePlan(profile({ weekdays: SIX_DAYS, equipment: NOTHING }), EXERCISES).split).toBe("upper_lower");
+    expect(generatePlan(profile({ weekdays: FIVE_DAYS, equipment: ["pull_up_bar", "resistance_band"] }), EXERCISES).split).toBe(
+      "upper_lower",
+    );
+  });
+
+  it("keeps push/pull/legs for experienced lifters with time and weights", () => {
+    for (const experience of ["intermediate", "advanced"] as const) {
+      expect(generatePlan(profile({ experience, weekdays: SIX_DAYS, sessionMinutes: 45 }), EXERCISES).split).toBe(
+        "push_pull_legs",
+      );
+      expect(generatePlan(profile({ experience, weekdays: FIVE_DAYS, equipment: HOME }), EXERCISES).split).toBe(
+        "upper_lower_ppl",
+      );
+    }
+  });
+
+  it("keeps full body and upper/lower for up to four days regardless of the profile", () => {
+    for (const experience of EXPERIENCE_LEVELS) {
+      for (const weekdays of WEEKDAY_SETS.slice(0, 4)) {
+        const plan = generatePlan(profile({ experience, weekdays, sessionMinutes: 30, equipment: NOTHING }), EXERCISES);
+        expect(plan.split).toBe(SPLIT_BY_DAYS[weekdays.length].split);
+      }
     }
   });
 });

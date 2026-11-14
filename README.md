@@ -213,6 +213,19 @@ Typprüfung nicht an ihnen scheitert.
 - **Anpassungen:** unter `/training/adjustments`: Verletztenmodus,
   Urlaubsmodus (Pause oder Training unterwegs), erholungsorientierter Modus, Griffkraft-Modul,
   Zusatzsport und zyklusangepasstes Training.
+- **Fokus-Training:** unter `/training/focus` (Knopf auf der Plan-Seite). Man wählt eine oder
+  mehrere Körperregionen (Brust, Rücken, Schultern, Arme, Bauch, Po, Beine) und eine Dauer; die
+  App stellt daraus eine einzelne Einheit zusammen (`src/domain/training/focus-day.ts`). Die
+  Regionen kommen im Wechsel dran, damit bei wenig Zeit jede mindestens eine Übung bekommt;
+  Grundübungen stehen vorne. Equipment des aktiven Orts, Ausschlüsse, Beschwerden und gelernte
+  Vorlieben gelten wie im Wochenplan. Die Einheit ändert den Plan nicht und läuft im Verlauf
+  als „Fokus: …“.
+- **Abfrage nach jeder Übung:** Sind alle Arbeitssätze einer Übung abgehakt, fragt der
+  Trainingsmodus freiwillig nach der Anstrengung (leicht, passend, schwer, am Limit) und dem RIR
+  (0 bis 4+). Gespeichert wird beides an der Übung im Training (`workout_exercise.effort`,
+  `effort_rir`), auch offline über die Warteschlange (`exercise.feedback`). Steht beim letzten
+  Satz kein RIR, nutzt die Progression den RIR aus der Abfrage (`withExerciseRir`). Abschalten
+  lässt sich die Abfrage unter Anpassungen → Trainingsmodi.
 - **Zeitsparmodus:** „Kurz“ auf der Plan-Karte startet eine Variante mit einem Satz weniger,
   Supersätzen aus benachbarten Isolationsübungen und ohne die letzten Übungen.
 - **Wiedereinstieg:** Nach mehr als zehn Tagen ohne Training beginnen die Zielgewichte bei
@@ -277,8 +290,10 @@ Typprüfung nicht an ihnen scheitert.
   Änderungen vor (tauschen, hinzufügen, entfernen, Sätze und Wiederholungen anpassen). Die App
   prüft jeden Vorschlag (`src/domain/ai/plan-changes.ts`): nur Übungen aus dem Katalog, die zu
   Equipment, Beschwerden und Ausschlüssen passen; übernommen wird nur, was man auswählt.
-  Gesendet werden Ziel, Erfahrung, Trainingstage, Equipment, Beschwerden, der Plan und der
-  Wunsch – kein Name, kein Verlauf.
+  Gesendet werden Ziel, Erfahrung, Trainingstage, Equipment, Beschwerden, der Plan, die
+  Rückmeldungen nach Übungen der letzten vier Wochen (Datum, Anstrengung, RIR; siehe
+  `src/domain/ai/feedback-summary.ts`) und der Wunsch – kein Name, keine Gewichte oder
+  Wiederholungen aus dem Verlauf.
 - **Körperfett-Schätzung:** im Foto-Dialog unter Fortschritt → Fotos, nach einer Rückfrage vor
   jedem Foto. Gespeichert wird eine Spanne von mindestens drei Prozentpunkten, überall als grobe
   Schätzung gekennzeichnet. Reicht das Foto nicht aus, gibt es keine Schätzung.

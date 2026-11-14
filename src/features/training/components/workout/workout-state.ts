@@ -3,8 +3,8 @@
  * beim Tippen nicht verloren gehen; erst beim Speichern wird nach kg umgerechnet.
  */
 import type { ExerciseType } from "@/domain/exercises/types";
-import type { LoggedSet } from "@/domain/training/records";
-import type { SetType } from "@/domain/training/types";
+import { isAssisted, type LoggedSet } from "@/domain/training/records";
+import type { ExerciseFeedback, SetType } from "@/domain/training/types";
 import type { WeightUnit } from "@/domain/training/weights";
 import { fromDisplayWeight, parseDecimal, toDisplayWeight, unitSystemOf } from "@/lib/units";
 import type { SaveSetInput } from "../../schemas";
@@ -79,12 +79,19 @@ export function toSavePayload(exercise: ExerciseDraft, set: SetDraft): SaveSetIn
   };
 }
 
+/** Alle Arbeitssätze sind abgehakt: Zeit für die Abfrage nach der Übung. */
+export function isExerciseDone(exercise: Pick<ExerciseDraft, "sets">): boolean {
+  const work = exercise.sets.filter((set) => set.type !== "warmup");
+  return work.length > 0 && work.every((set) => set.completed);
+}
+
 export function toLoggedSet(exercise: ExerciseDraft, set: SetDraft): LoggedSet {
   return {
     type: set.type,
     weightKg: usesWeight(exercise.type) ? parseWeightKg(set, exercise.unit) : null,
     reps: parseReps(set),
     completed: set.completed,
+    assisted: isAssisted(exercise.type),
   };
 }
 
@@ -92,6 +99,13 @@ export function toLoggedSet(exercise: ExerciseDraft, set: SetDraft): LoggedSet {
 export interface PendingChanges {
   saves: SaveSetInput[];
   deletedSetIds: string[];
+  /** Abfragen nach Übungen, je Übung im Training der letzte Stand. */
+  feedback?: (ExerciseFeedback & { workoutExerciseId: string })[];
+}
+
+/** Zweimal „keine Angabe“ zählt wie keine Rückmeldung. */
+export function normalizeFeedback(feedback: ExerciseFeedback): ExerciseFeedback | null {
+  return feedback.effort === null && feedback.rir === null ? null : feedback;
 }
 
 function fromPayload(payload: SaveSetInput, unit: WeightUnit): SetDraft {
@@ -123,7 +137,12 @@ export function applyPendingChanges(state: ExerciseDraft[], changes: PendingChan
       if (index >= 0) sets[index] = draft;
       else sets.splice(Math.min(payload.position, sets.length), 0, draft);
     }
-    return { ...exercise, sets };
+    const feedback = changes.feedback?.find((item) => item.workoutExerciseId === exercise.id);
+    return {
+      ...exercise,
+      sets,
+      feedback: feedback ? normalizeFeedback({ effort: feedback.effort, rir: feedback.rir }) : exercise.feedback,
+    };
   });
 }
 
@@ -133,7 +152,8 @@ export type WorkoutAction =
   | { type: "add"; exerciseId: string; set: SetDraft }
   | { type: "remove"; exerciseId: string; setId: string }
   | { type: "prepend"; exerciseId: string; sets: SetDraft[] }
-  | { type: "note"; catalogExerciseId: string; note: string };
+  | { type: "note"; catalogExerciseId: string; note: string }
+  | { type: "feedback"; exerciseId: string; feedback: ExerciseFeedback };
 
 export function workoutReducer(state: ExerciseDraft[], action: WorkoutAction): ExerciseDraft[] {
   if (action.type === "restore") return applyPendingChanges(state, action.changes);
@@ -156,6 +176,8 @@ export function workoutReducer(state: ExerciseDraft[], action: WorkoutAction): E
         return { ...exercise, sets: exercise.sets.filter((set) => set.id !== action.setId) };
       case "prepend":
         return { ...exercise, sets: [...action.sets, ...exercise.sets] };
+      case "feedback":
+        return { ...exercise, feedback: normalizeFeedback(action.feedback) };
     }
   });
 }
@@ -171,6 +193,20 @@ export function newSetFrom(last: SetDraft | undefined, id: string): SetDraft {
     note: "",
     completed: false,
   };
+}
+
+/**
+ * Folgesätze, die nach dem Abhaken von `completed` dessen Werte übernehmen: noch offen, ganz leer
+ * und von derselben Satzart. Ein Aufwärmsatz gibt sein leichtes Gewicht so nicht an Arbeitssätze weiter.
+ */
+export function setsToPrefill(sets: readonly SetDraft[], completed: SetDraft): SetDraft[] {
+  const index = sets.findIndex((set) => set.id === completed.id);
+  if (index < 0) return [];
+  return sets
+    .slice(index + 1)
+    .filter(
+      (later) => !later.completed && later.type === completed.type && later.weightText === "" && later.repsText === "",
+    );
 }
 
 /** Laufende Nummer eines Satzes unter den Nicht-Aufwärmsätzen (1-basiert). */

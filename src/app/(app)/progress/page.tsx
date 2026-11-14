@@ -8,7 +8,7 @@ import { WeightCard } from "@/features/nutrition/components/weight-card";
 import { getWeights } from "@/features/nutrition/services/tracking-service";
 import { MeasurementPanel } from "@/features/progress/components/measurement-panel";
 import { getMeasurements } from "@/features/progress/services/progress-service";
-import { weightTrend } from "@/domain/nutrition/adaptive";
+import { trendChangeOver, weightTrend } from "@/domain/nutrition/adaptive";
 import { addDays, toLocalDate } from "@/lib/dates";
 import { formatDayShort, formatNumber } from "@/lib/format";
 import { getDb } from "@/lib/server/context";
@@ -21,6 +21,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const CHART_DAYS = 180;
 const CHANGE_DAYS = 30;
+/** So weit darf die Vergleichsmessung vom Tag vor 30 Tagen (und die jüngste von heute) entfernt sein. */
+const CHANGE_TOLERANCE_DAYS = 7;
 
 export default async function ProgressBodyPage() {
   const user = await requireUser();
@@ -33,10 +35,11 @@ export default async function ProgressBodyPage() {
   ]);
   const trend = weightTrend(weights);
   const latest = trend.at(-1) ?? null;
-  const reference = trend.filter((point) => point.date <= addDays(today, -CHANGE_DAYS)).at(-1) ?? trend[0];
+  // Ohne Messung um den Tag vor 30 Tagen bleibt die Veränderung ausgeblendet.
+  const trendChange = trendChangeOver(trend, today, CHANGE_DAYS, CHANGE_TOLERANCE_DAYS);
   const unit = t(`training.units.${weightUnitKey(user.unitSystem)}`);
   const display = (kg: number) => toDisplayWeight(kg, user.unitSystem);
-  const change = latest && reference ? display(latest.trendKg) - display(reference.trendKg) : null;
+  const change = trendChange ? display(trendChange.to.trendKg) - display(trendChange.from.trendKg) : null;
 
   return (
     <div className="grid gap-4">
@@ -49,7 +52,7 @@ export default async function ProgressBodyPage() {
             <>
               <p className="text-sm">
                 {t("progress.body.current", { value: formatNumber(display(latest.trendKg)), unit })}
-                {change !== null && trend.length > 1
+                {change !== null
                   ? ` · ${t("progress.body.change", { value: `${change > 0 ? "+" : ""}${formatNumber(change)}`, unit })}`
                   : ""}
               </p>

@@ -67,28 +67,53 @@ export function roundMacros(macros: Macros): Macros {
 export interface RecipeIngredientAmount extends Macros {
   amount: number;
   amountUnit: AmountUnit;
+  /** Gewicht einer Portion in g (bzw. ml) bei Zutaten nach Portionen; `null`/fehlend, wenn unbekannt. */
+  servingWeightG?: number | null;
 }
 
 export interface RecipeSummary {
   total: Macros;
   perServing: Macros;
-  /** Gesamtgewicht in g, wenn alle Zutaten in g oder ml angegeben sind; sonst `null`. */
+  /** Gesamtgewicht in g, wenn das Gewicht jeder Zutat bekannt ist; sonst `null`. */
   totalWeightG: number | null;
 }
 
+/** Gewicht einer Zutat in g; ml zählt näherungsweise als g. `null`, wenn unbekannt. */
+function ingredientWeightG(item: RecipeIngredientAmount): number | null {
+  if (item.amountUnit !== "serving") return item.amount;
+  return item.servingWeightG && item.servingWeightG > 0 ? item.amount * item.servingWeightG : null;
+}
+
 /**
- * Wertet ein Rezept aus. Das Gesamtgewicht ist nur bekannt, wenn jede Zutat in g oder ml
- * vorliegt (ml zählt näherungsweise als g); erst dann lässt sich nach Gramm eintragen.
+ * Wertet ein Rezept aus. Das Gesamtgewicht ist bekannt, wenn jede Zutat in g oder ml vorliegt
+ * oder nach Portionen mit bekanntem Portionsgewicht (1 Ei = 60 g); erst dann lässt sich auch
+ * nach Gramm eintragen.
  */
 export function summarizeRecipe(ingredients: readonly RecipeIngredientAmount[], servings: number): RecipeSummary {
   const total = sumMacros(ingredients);
   const safeServings = servings > 0 ? servings : 1;
-  const weighable = ingredients.length > 0 && ingredients.every((item) => item.amountUnit !== "serving");
+  const weights = ingredients.map(ingredientWeightG);
+  const weighable = weights.length > 0 && weights.every((weight) => weight !== null);
   return {
     total,
     perServing: scaleMacros(total, 1 / safeServings),
-    totalWeightG: weighable ? ingredients.reduce((sum, item) => sum + item.amount, 0) : null,
+    totalWeightG: weighable ? weights.reduce<number>((sum, weight) => sum + (weight ?? 0), 0) : null,
   };
+}
+
+/**
+ * Welcher Anteil des ganzen Rezepts eine eingetragene Menge ist (1 = das ganze Rezept).
+ * `null`, wenn sich die Menge nicht umrechnen lässt (z. B. Gramm ohne bekanntes Gewicht).
+ */
+export function recipeShare(summary: RecipeSummary, servings: number, amount: number, unit: AmountUnit): number | null {
+  if (!Number.isFinite(amount) || amount < 0) return null;
+  if (unit === "serving") return amount / (servings > 0 ? servings : 1);
+  return summary.totalWeightG && summary.totalWeightG > 0 ? amount / summary.totalWeightG : null;
+}
+
+/** Zutaten eines Rezepts, anteilig auf eine Menge umgerechnet (Mengen und Nährwerte). */
+export function scaleIngredients<T extends RecipeIngredientAmount>(ingredients: readonly T[], share: number): T[] {
+  return ingredients.map((item) => ({ ...item, ...scaleMacros(item, share), amount: item.amount * share }));
 }
 
 /** Ein Rezept als „Lebensmittel“: pro 100 g, wenn das Gewicht bekannt ist, sonst pro Portion. */

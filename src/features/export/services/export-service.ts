@@ -12,7 +12,7 @@ import { formatGermanDate } from "@/domain/export/format";
 import type { ExportColumn, ExportDocument, ExportRow, ExportTable } from "@/domain/export/types";
 import { weightTrend } from "@/domain/nutrition/adaptive";
 import { AMOUNT_UNITS, MEALS, isMeal, type AmountUnit, type Meal } from "@/domain/nutrition/types";
-import { sessionTotals, type LoggedSet } from "@/domain/training/records";
+import { isAssisted, sessionTotals, type LoggedSet } from "@/domain/training/records";
 import { DAY_FOCUSES, SET_TYPES, isOneOf, type DayFocus, type SetType } from "@/domain/training/types";
 import { listActivities } from "@/features/cardio/services/activity-service";
 import { getWeights } from "@/features/nutrition/services/tracking-service";
@@ -169,13 +169,14 @@ export async function buildTrainingExport(
   const setNumbers = new Map<string, number>();
   const setTableRows: ExportRow[] = setRows.map((row) => {
     const type: SetType = isOneOf(SET_TYPES, row.type) ? row.type : "work";
+    const exercise = catalog.find(row.exerciseId);
     const logged = setsBySession.get(row.sessionId) ?? [];
-    logged.push({ type, weightKg: row.weightKg, reps: row.reps, completed: true });
+    // Unterstützung (z. B. Klimmzug-Maschine) ist keine bewegte Last und zählt nicht zum Volumen.
+    logged.push({ type, weightKg: row.weightKg, reps: row.reps, completed: true, assisted: isAssisted(exercise?.type) });
     setsBySession.set(row.sessionId, logged);
     const number = (setNumbers.get(row.workoutExerciseId) ?? 0) + 1;
     setNumbers.set(row.workoutExerciseId, number);
 
-    const exercise = catalog.find(row.exerciseId);
     // Bei Halteübungen steht die Dauer in `reps`; `durationSeconds` hat Vorrang, falls gesetzt.
     const timed = exercise?.type === "duration";
     return {

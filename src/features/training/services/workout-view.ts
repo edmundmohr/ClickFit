@@ -6,7 +6,15 @@ import type { AppDatabase } from "@/db/client";
 import { workoutExercise, workoutSet } from "@/db/schema";
 import type { ExerciseType } from "@/domain/exercises/types";
 import type { ExerciseBests } from "@/domain/training/records";
-import { DAY_FOCUSES, SET_TYPES, isOneOf, type DayFocus, type SetType } from "@/domain/training/types";
+import {
+  DAY_FOCUSES,
+  EFFORT_LEVELS,
+  SET_TYPES,
+  isOneOf,
+  type DayFocus,
+  type ExerciseFeedback,
+  type SetType,
+} from "@/domain/training/types";
 import { ladderFor, usesPlates, type BarSetup, type WeightUnit } from "@/domain/training/weights";
 import type { LocalDate } from "@/lib/dates";
 import { getUserCatalog } from "./exercise-service";
@@ -42,6 +50,8 @@ export interface WorkoutExerciseView {
   /** Einheit, in der diese Übung am Trainingsort geloggt wird (kg und lbs können gemischt sein). */
   unit: WeightUnit;
   incrementKg: number;
+  /** Kleinstes einstellbares Gewicht (z. B. leere Stange); Untergrenze der Aufwärmsätze. Fehlt es, gilt 0. */
+  minWeightKg?: number;
   /** Stange und Scheiben für den Scheiben-Rechner; `null` bei Übungen ohne Scheiben. */
   bar: BarSetup | null;
   note: string;
@@ -50,6 +60,8 @@ export interface WorkoutExerciseView {
   mistakes: string[];
   previous: PreviousPerformance | null;
   bests: ExerciseBests | null;
+  /** Abfrage nach der Übung; `null`, solange nichts angegeben ist. */
+  feedback: ExerciseFeedback | null;
   sets: WorkoutSetView[];
 }
 
@@ -80,8 +92,10 @@ export async function getWorkoutView(
     orderBy: asc(workoutExercise.position),
   });
   const exerciseIds = [...new Set(exerciseRows.map((row) => row.exerciseId))];
+  const anchor = { id: session.id, date: session.date, startedAt: session.startedAt };
+  const catalogRequest = getUserCatalog(db, userId);
   const [catalog, gyms, setRows, previous, bests, notes] = await Promise.all([
-    getUserCatalog(db, userId),
+    catalogRequest,
     listGyms(db, userId),
     exerciseRows.length === 0
       ? Promise.resolve([])
@@ -92,8 +106,11 @@ export async function getWorkoutView(
           ),
           orderBy: asc(workoutSet.position),
         }),
-    getPreviousPerformances(db, userId, exerciseIds, sessionId),
-    getExerciseBests(db, userId, exerciseIds, sessionId),
+    // Vorwerte und Rekorde beziehen sich nur auf Einheiten vor dieser – auch im Verlauf.
+    getPreviousPerformances(db, userId, exerciseIds, { before: anchor, includeDeload: true }),
+    catalogRequest.then((userCatalog) =>
+      getExerciseBests(db, userId, exerciseIds, anchor, (exerciseId) => userCatalog.find(exerciseId)?.type),
+    ),
     getExerciseNotes(db, userId, exerciseIds),
   ]);
 
@@ -129,12 +146,17 @@ export async function getWorkoutView(
           groupId: row.groupId,
           unit: ladder.unit,
           incrementKg: ladder.incrementKg,
+          minWeightKg: ladder.minWeightKg,
           bar: usesPlates(exercise.equipment) ? barSetupOf(gym, ladder.unit) : null,
           note: notes.get(row.exerciseId) ?? "",
           cues: exercise.cues,
           mistakes: exercise.mistakes,
           previous: previous.get(row.exerciseId) ?? null,
           bests: bests.get(row.exerciseId) ?? null,
+          feedback:
+            row.effort === null && row.effortRir === null
+              ? null
+              : { effort: isOneOf(EFFORT_LEVELS, row.effort) ? row.effort : null, rir: row.effortRir },
           sets: setRows
             .filter((set) => set.workoutExerciseId === row.id)
             .map((set) => ({

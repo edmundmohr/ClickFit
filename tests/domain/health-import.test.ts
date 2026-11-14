@@ -476,7 +476,8 @@ describe("parseCsv", () => {
     expect(result.errors).toEqual([]);
     expect(result.data.workouts).toEqual([
       {
-        externalId: "auto:yoga:2026-11-12T11:00:00.000Z",
+        externalId: "auto:yoga:2026-11-12:1800s:-m",
+        legacyExternalId: "auto:yoga:2026-11-12T11:00:00.000Z",
         type: "yoga",
         start: new Date("2026-11-12T11:00:00Z"),
         durationSeconds: 1800,
@@ -484,7 +485,8 @@ describe("parseCsv", () => {
         avgHeartRate: null,
       },
       {
-        externalId: "auto:running:2026-11-13T11:00:00.000Z",
+        externalId: "auto:running:2026-11-13:2700s:7500m",
+        legacyExternalId: "auto:running:2026-11-13T11:00:00.000Z",
         type: "running",
         start: new Date("2026-11-13T11:00:00Z"),
         durationSeconds: 2700,
@@ -492,6 +494,15 @@ describe("parseCsv", () => {
         avgHeartRate: 152,
       },
     ]);
+  });
+
+  it("keeps several activities of the same day without a time apart and stays stable on re-import", () => {
+    const text = "Datum;Art;Dauer (min);Distanz (km)\r\n13.11.2026;Laufen;30;5\r\n13.11.2026;Laufen;45;7,5\r\n13.11.2026;Yoga;30;\r\n13.11.2026;Yoga;30;\r\n";
+    const ids = () => parseCsv(text, "activities", NOW).data.workouts.map((workout) => workout.externalId);
+    expect(new Set(ids()).size).toBe(4);
+    expect(ids().filter((id) => id.startsWith("auto:yoga"))).toEqual(["auto:yoga:2026-11-13:1800s:-m", "auto:yoga:2026-11-13:1800s:-m:2"]);
+    // Dieselbe Datei noch einmal: dieselben Kennungen, also keine Verdopplung beim Speichern.
+    expect(ids()).toEqual(ids());
   });
 
   it("reads English activity headers with a start time", () => {

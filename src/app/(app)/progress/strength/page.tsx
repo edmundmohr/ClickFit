@@ -13,7 +13,7 @@ import { getUserCatalog } from "@/features/training/services/exercise-service";
 import { getProfile } from "@/features/training/services/profile-service";
 import { mostUsedExercises } from "@/domain/progress/muscle-load";
 import { LIFT_EXERCISE_IDS, STRENGTH_LIFTS, detectPlateau, exerciseSeries, rateStrength } from "@/domain/progress/strength";
-import { bestsOf } from "@/domain/training/records";
+import { bestsOf, isAssisted } from "@/domain/training/records";
 import { SEXES, isOneOf } from "@/domain/training/types";
 import { addDays, toLocalDate } from "@/lib/dates";
 import { formatDayShort, formatNumber } from "@/lib/format";
@@ -50,12 +50,17 @@ export default async function ProgressStrengthPage({ searchParams }: PageProps<"
   const params = await searchParams;
   const requested = typeof params.exercise === "string" ? params.exercise : "";
   const selected = usage.find((entry) => entry.exerciseId === requested) ?? usage[0];
-  const series = exerciseSeries(sets, selected.exerciseId);
+  // Bei unterstützten Übungen ist das Gewicht die Unterstützung: Verlauf und Rekord sind umgekehrt.
+  const exerciseType = findExercise(selected.exerciseId)?.type ?? "weight_reps";
+  const assisted = isAssisted(exerciseType);
+  const series = exerciseSeries(sets, selected.exerciseId, exerciseType);
   const hasWeight = series.some((point) => point.oneRepMaxKg !== null);
+  const hasAssistance = assisted && series.some((point) => point.minAssistanceKg !== null);
   const bests = bestsOf(
     sets
       .filter((set) => set.exerciseId === selected.exerciseId)
       .map((set) => ({ type: set.type, weightKg: set.weightKg, reps: set.reps, completed: true })),
+    exerciseType,
   );
   const plateau = detectPlateau(series);
 
@@ -70,6 +75,15 @@ export default async function ProgressStrengthPage({ searchParams }: PageProps<"
     { key: "setVolume", value: weightValue(bests.maxSetVolumeKg), show: bests.maxSetVolumeKg !== null },
     { key: "reps", value: t("progress.strength.recordReps", { value: bests.maxReps ?? 0 }), show: bests.maxReps !== null },
   ] as const;
+  const recordItems = [
+    ...records.map((record) => ({ ...record, label: t(`progress.strength.records.${record.key}`) })),
+    {
+      key: "assistance",
+      label: t("workout.records.assistance"),
+      value: weightValue(bests.minAssistanceKg),
+      show: bests.minAssistanceKg !== null,
+    },
+  ];
 
   const bodyWeightKg = weights.at(-1)?.weightKg ?? stored?.profile.weightKg ?? null;
   const sex = isOneOf(SEXES, stored?.profile.sex) ? stored.profile.sex : "male";
@@ -113,6 +127,21 @@ export default async function ProgressStrengthPage({ searchParams }: PageProps<"
                 />
               </div>
             </>
+          ) : hasAssistance ? (
+            <div className="grid gap-2">
+              <h2 className="text-sm font-medium">{`${t("workout.records.assistance")} (${unit})`}</h2>
+              <p className="text-muted-foreground text-sm">{t("training.assistedHint")}</p>
+              <SeriesChart
+                kind="line"
+                ariaLabel={t("progress.strength.chartLabel", { name: selected.name })}
+                valueLabel={t("workout.records.assistance")}
+                unit={unit}
+                data={series.map((point) => ({
+                  label: label(point.date),
+                  value: point.minAssistanceKg === null ? null : display(point.minAssistanceKg),
+                }))}
+              />
+            </div>
           ) : (
             <div className="grid gap-2">
               <h2 className="text-sm font-medium">{t("progress.strength.bestReps")}</h2>
@@ -138,11 +167,11 @@ export default async function ProgressStrengthPage({ searchParams }: PageProps<"
           <div>
             <h2 className="mb-2 text-sm font-medium">{t("progress.strength.recordsTitle")}</h2>
             <dl className="grid grid-cols-2 gap-2">
-              {records
+              {recordItems
                 .filter((record) => record.show)
                 .map((record) => (
                   <div key={record.key} className="bg-secondary rounded-lg px-3 py-2">
-                    <dt className="text-muted-foreground text-xs">{t(`progress.strength.records.${record.key}`)}</dt>
+                    <dt className="text-muted-foreground text-xs">{record.label}</dt>
                     <dd className="font-semibold tabular-nums">{record.value}</dd>
                   </div>
                 ))}

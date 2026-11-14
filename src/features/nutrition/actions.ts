@@ -51,6 +51,7 @@ import {
   setWaterGoal,
   undoLastWater,
 } from "./services/tracking-service";
+import { resolveTrackingDate } from "./tracking-date";
 
 const NUTRITION_PATH = "/nutrition";
 const mealSchema = z.enum(MEALS);
@@ -211,18 +212,21 @@ export async function applyPlanDayAction(weekday: number, date: string): Promise
   return result;
 }
 
-export async function addWaterAction(date: string, amountMl: number): Promise<ActionResult> {
+/** `date` = `null` bucht auf „heute“ zum Zeitpunkt des Klicks; zukünftige Tage sind gesperrt. */
+export async function addWaterAction(date: string | null, amountMl: number): Promise<ActionResult> {
   const user = await requireUser();
-  if (!localDateSchema.safeParse(date).success || !waterAmountSchema.safeParse(amountMl).success) return invalid;
-  const result = await attempt(() => addWater(getDb(), user.id, date, amountMl));
+  const day = resolveTrackingDate(date, toLocalDate(new Date()));
+  if (!day || !waterAmountSchema.safeParse(amountMl).success) return invalid;
+  const result = await attempt(() => addWater(getDb(), user.id, day, amountMl));
   refresh();
   return result;
 }
 
-export async function undoWaterAction(date: string): Promise<ActionResult> {
+export async function undoWaterAction(date: string | null): Promise<ActionResult> {
   const user = await requireUser();
-  if (!localDateSchema.safeParse(date).success) return invalid;
-  const result = await attempt(() => undoLastWater(getDb(), user.id, date));
+  const day = resolveTrackingDate(date, toLocalDate(new Date()));
+  if (!day) return invalid;
+  const result = await attempt(() => undoLastWater(getDb(), user.id, day));
   refresh();
   return result;
 }
@@ -260,10 +264,12 @@ export async function toggleSupplementAction(supplementId: string, date: string,
   return result;
 }
 
-export async function saveWeightAction(date: string, weightKg: number): Promise<ActionResult> {
+/** `date` = `null` speichert für „heute“ zum Zeitpunkt des Klicks; zukünftige Tage sind gesperrt. */
+export async function saveWeightAction(date: string | null, weightKg: number): Promise<ActionResult> {
   const user = await requireUser();
-  if (!localDateSchema.safeParse(date).success || !weightSchema.safeParse(weightKg).success) return invalid;
-  const result = await attempt(() => saveWeight(getDb(), user.id, date, weightKg));
+  const day = resolveTrackingDate(date, toLocalDate(new Date()));
+  if (!day || !weightSchema.safeParse(weightKg).success) return invalid;
+  const result = await attempt(() => saveWeight(getDb(), user.id, day, weightKg));
   refresh();
   return result;
 }

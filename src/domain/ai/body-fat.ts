@@ -33,8 +33,9 @@ export function normalizeBodyFatEstimate(raw: RawBodyFatEstimate): BodyFatRange 
   // Eine zu schmale Spanne täuscht Genauigkeit vor: auf die Mindestbreite aufweiten.
   if (high - low < MIN_RANGE_WIDTH) {
     const middle = (low + high) / 2;
-    low = Math.max(MIN_PERCENT, Math.floor(middle - MIN_RANGE_WIDTH / 2));
-    high = Math.min(MAX_PERCENT, low + MIN_RANGE_WIDTH);
+    // Am Rand des erlaubten Bereichs nach innen verschieben, damit die Breite erhalten bleibt.
+    low = Math.min(MAX_PERCENT - MIN_RANGE_WIDTH, Math.max(MIN_PERCENT, Math.floor(middle - MIN_RANGE_WIDTH / 2)));
+    high = low + MIN_RANGE_WIDTH;
   }
   return { lowPercent: low, highPercent: high, note: raw.note.trim().slice(0, MAX_NOTE_LENGTH) };
 }

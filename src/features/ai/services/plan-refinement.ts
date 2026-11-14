@@ -2,7 +2,10 @@
  * Plan-Feinschliff mit KI: Das Modell schlägt Änderungen am Wochenplan vor, die App prüft sie
  * und übernimmt nur, was der Nutzer auswählt. Der regelbasierte Generator bleibt die Grundlage.
  */
+import { and, desc, eq, gte, isNotNull, or } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
+import { workoutExercise, workoutSession } from "@/db/schema";
+import { FEEDBACK_LOOKBACK_DAYS, summarizeFeedback, type FeedbackEntry } from "@/domain/ai/feedback-summary";
 import {
   applyPlanChanges,
   validatePlanChanges,
@@ -12,12 +15,12 @@ import {
   type RawPlanChange,
 } from "@/domain/ai/plan-changes";
 import { filterCandidates } from "@/domain/training/plan-generator";
-import type { TrainingProfile } from "@/domain/training/types";
+import { EFFORT_LEVELS, isOneOf, type TrainingProfile } from "@/domain/training/types";
 import { getTrainingContext } from "@/features/training/services/context-service";
 import { listFolders, type PlanView } from "@/features/training/services/plan-service";
 import { saveRoutine } from "@/features/training/services/routine-service";
 import { AppError } from "@/lib/errors";
-import type { LocalDate } from "@/lib/dates";
+import { addDays, type LocalDate } from "@/lib/dates";
 import type { LlmProvider } from "@/lib/llm";
 import { PLAN_SYSTEM_PROMPT, planChangesSchema } from "../prompts";
 import { claimAiRequest, unwrapLlmResult } from "./ai-service";
@@ -36,6 +39,40 @@ interface PlanBasis {
   candidates: Map<string, CandidateExercise>;
   /** Kandidaten mit den Angaben, die das Modell für die Auswahl braucht. */
   catalogLines: string[];
+  /** Rückmeldungen nach Übungen der letzten Wochen, eine Zeile je Übung. */
+  feedbackLines: string[];
+}
+
+/** Rückmeldungen nach Übungen aus abgeschlossenen Einheiten der letzten Wochen. */
+async function loadFeedback(
+  db: AppDatabase,
+  userId: string,
+  today: LocalDate,
+  nameOf: (exerciseId: string) => string | undefined,
+): Promise<FeedbackEntry[]> {
+  const rows = await db
+    .select({
+      exerciseId: workoutExercise.exerciseId,
+      date: workoutSession.date,
+      effort: workoutExercise.effort,
+      rir: workoutExercise.effortRir,
+    })
+    .from(workoutExercise)
+    .innerJoin(workoutSession, eq(workoutExercise.sessionId, workoutSession.id))
+    .where(
+      and(
+        eq(workoutExercise.userId, userId),
+        eq(workoutSession.status, "completed"),
+        gte(workoutSession.date, addDays(today, -FEEDBACK_LOOKBACK_DAYS)),
+        or(isNotNull(workoutExercise.effort), isNotNull(workoutExercise.effortRir)),
+      ),
+    )
+    .orderBy(desc(workoutSession.date));
+  return rows.flatMap((row): FeedbackEntry[] => {
+    const name = nameOf(row.exerciseId);
+    if (!name) return [];
+    return [{ exerciseId: row.exerciseId, name, date: row.date, effort: isOneOf(EFFORT_LEVELS, row.effort) ? row.effort : null, rir: row.rir }];
+  });
 }
 
 /** Lädt den gespeicherten Wochenplan (ohne Tagesanpassung) und die erlaubten Übungen. */
@@ -44,7 +81,9 @@ async function loadBasis(db: AppDatabase, userId: string, today: LocalDate): Pro
   const plan = folders.find((folder) => folder.status === "active");
   if (!context.profile || !plan) throw new AppError("PROFILE_REQUIRED");
   const allowed = filterCandidates(context.profile, context.catalog.all);
+  const feedback = await loadFeedback(db, userId, today, (exerciseId) => context.catalog.find(exerciseId)?.name);
   return {
+    feedbackLines: summarizeFeedback(feedback),
     plan,
     profile: context.profile,
     days: plan.days.map((day, index) => ({
@@ -71,7 +110,11 @@ async function loadBasis(db: AppDatabase, userId: string, today: LocalDate): Pro
 }
 
 /** Der Text, der an das Modell geht. Enthält Trainingsdaten, aber weder Name noch Benutzername. */
-export function buildPlanPrompt(basis: Pick<PlanBasis, "days" | "profile" | "catalogLines">, wish: string): string {
+export function buildPlanPrompt(
+  basis: Pick<PlanBasis, "days" | "profile" | "catalogLines"> & Partial<Pick<PlanBasis, "feedbackLines">>,
+  wish: string,
+): string {
+  const feedback = basis.feedbackLines ?? [];
   const { profile } = basis;
   const days = basis.days
     .map(
@@ -87,6 +130,9 @@ export function buildPlanPrompt(basis: Pick<PlanBasis, "days" | "profile" | "cat
     `Equipment: ${profile.equipment.length > 0 ? profile.equipment.join(", ") : "keines"}.`,
     `Beschwerden (Körperregionen): ${profile.injuries.length > 0 ? profile.injuries.join(", ") : "keine"}.`,
     `Aktueller Plan:\n${days}`,
+    `Rückmeldungen nach Übungen der letzten ${FEEDBACK_LOOKBACK_DAYS} Tage (Kennung | Name: Datum Anstrengung, RIR = Wiederholungen in Reserve):\n${
+      feedback.length > 0 ? feedback.join("\n") : "keine"
+    }`,
     `Erlaubte Übungen (Kennung | Name | Art | Bewegungsmuster | Hauptmuskeln):\n${basis.catalogLines.join("\n")}`,
     `Wunsch der Person:\n"""${wish}"""`,
   ].join("\n\n");

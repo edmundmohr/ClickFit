@@ -112,11 +112,16 @@ export interface WeightLadder {
   unit: WeightUnit;
   /** Kleinster Sprung in kg (für Anzeige und Aufwärm-Rechner). */
   incrementKg: number;
-  /** Nächste Stufe über dem Gewicht. */
+  /**
+   * Kleinstes einstellbares Gewicht in kg: die leere Stange, das leichteste Gewicht der festen
+   * Liste, sonst 0. Untergrenze z. B. für die Aufwärmsätze.
+   */
+  minWeightKg: number;
+  /** Nächste Stufe über dem Gewicht; liegt es schon über der höchsten Stufe, bleibt es. */
   up: (weightKg: number) => number;
-  /** Nächste Stufe unter dem Gewicht (nie unter 0). */
+  /** Nächste Stufe unter dem Gewicht; liegt es schon unter der kleinsten Stufe, bleibt es. */
   down: (weightKg: number) => number;
-  /** Nächstliegende vorhandene Stufe. */
+  /** Nächstliegende vorhandene Stufe (nie unter dem Mindestgewicht). */
   nearest: (weightKg: number) => number;
 }
 
@@ -135,7 +140,7 @@ export interface LadderInput {
 export function createLadder(input: LadderInput): WeightLadder {
   const { unit } = input;
   const step = input.increment > 0 ? input.increment : 1;
-  const min = input.min ?? 0;
+  const min = Math.max(input.min ?? 0, 0);
   const fixed = [...new Set(input.values ?? [])].filter((value) => value >= 0).sort((a, b) => a - b);
   const kg = (value: number) => clean(toKg(value, unit));
   const native = (weightKg: number) => fromKg(weightKg, unit);
@@ -143,12 +148,21 @@ export function createLadder(input: LadderInput): WeightLadder {
   if (fixed.length > 0) {
     const nearestFixed = (value: number) =>
       fixed.reduce((best, candidate) => (Math.abs(candidate - value) < Math.abs(best - value) ? candidate : best));
+    const lowest = kg(fixed[0]);
+    const highest = kg(fixed[fixed.length - 1]);
     return {
       unit,
       incrementKg: kg(fixed.length > 1 ? Math.min(...fixed.slice(1).map((value, index) => value - fixed[index])) : step),
-      up: (weightKg) => kg(fixed.find((value) => toKg(value, unit) > weightKg + EPSILON_KG) ?? fixed[fixed.length - 1]),
-      down: (weightKg) =>
-        kg([...fixed].reverse().find((value) => toKg(value, unit) < weightKg - EPSILON_KG) ?? fixed[0]),
+      minWeightKg: lowest,
+      // Über der höchsten bzw. unter der kleinsten Stufe gibt es keine weitere: Gewicht halten.
+      up: (weightKg) => {
+        const next = fixed.find((value) => toKg(value, unit) > weightKg + EPSILON_KG);
+        return next === undefined ? Math.max(highest, weightKg) : kg(next);
+      },
+      down: (weightKg) => {
+        const next = [...fixed].reverse().find((value) => toKg(value, unit) < weightKg - EPSILON_KG);
+        return next === undefined ? Math.min(lowest, weightKg) : kg(next);
+      },
       nearest: (weightKg) => kg(nearestFixed(native(weightKg))),
     };
   }
@@ -156,11 +170,19 @@ export function createLadder(input: LadderInput): WeightLadder {
   // Stufen sind `min + n × step`, damit z. B. eine 20-kg-Stange mit 2,5-kg-Sprüngen aufgeht.
   const snap = (value: number, round: (n: number) => number) =>
     Math.max(min, clean(min + round((value - min) / step) * step));
+  const minKg = kg(min);
   return {
     unit,
     incrementKg: kg(step),
-    up: (weightKg) => kg(snap(native(weightKg + EPSILON_KG), Math.floor) + step),
-    down: (weightKg) => kg(Math.max(min, snap(native(weightKg - EPSILON_KG), Math.ceil) - step)),
+    minWeightKg: minKg,
+    // Unter dem Mindestgewicht (z. B. leichter als die leere Stange) ist die nächste Stufe das Mindestgewicht.
+    up: (weightKg) =>
+      weightKg < minKg - EPSILON_KG ? minKg : kg(snap(native(weightKg + EPSILON_KG), Math.floor) + step),
+    // Am Mindestgewicht geht es nicht weiter nach unten; darunter wird nicht erhöht.
+    down: (weightKg) =>
+      weightKg <= minKg + EPSILON_KG
+        ? Math.min(minKg, weightKg)
+        : kg(Math.max(min, snap(native(weightKg - EPSILON_KG), Math.ceil) - step)),
     nearest: (weightKg) => kg(snap(native(weightKg), Math.round)),
   };
 }
@@ -200,11 +222,17 @@ export function ladderFor(equipment: readonly Equipment[], context: WeightContex
   const rule = context.rules.find((entry) => entry.equipment === item);
   if (rule) {
     const increment = rule.increment ?? DEFAULT_INCREMENT[rule.equipment]?.[rule.unit] ?? FALLBACK_INCREMENT[rule.unit];
-    return createLadder({ unit: rule.unit, increment, values: rule.values });
+    // Auch mit eigenen Stufen ist die leere Stange die unterste Stufe (in der Einheit der Regel).
+    const barMin =
+      PLATE_LOADED.includes(rule.equipment) && context.bar
+        ? clean(fromKg(toKg(context.bar.barWeight, context.bar.unit), rule.unit))
+        : undefined;
+    return createLadder({ unit: rule.unit, increment, values: rule.values, min: barMin });
   }
   if (item && PLATE_LOADED.includes(item) && context.bar) {
     const increment = plateIncrement(context.bar) ?? FALLBACK_INCREMENT[context.bar.unit];
-    return createLadder({ unit: context.bar.unit, increment });
+    // Leichter als die leere Stange geht nicht: Sie ist die unterste Stufe.
+    return createLadder({ unit: context.bar.unit, increment, min: context.bar.barWeight });
   }
   const unit = context.defaultUnit;
   return createLadder({ unit, increment: (item && DEFAULT_INCREMENT[item]?.[unit]) ?? FALLBACK_INCREMENT[unit] });
@@ -215,11 +243,28 @@ export function usesPlates(equipment: readonly Equipment[]): boolean {
   return equipment.some((item) => PLATE_LOADED.includes(item));
 }
 
-/** Liest eine Liste wie „2, 4, 6,5 8“ in Zahlen; ungültige Teile entfallen. */
+/**
+ * Liest eine Liste vorhandener Gewichte in Zahlen; ungültige Teile entfallen.
+ *
+ * Regeln (eindeutig, auch für das deutsche Dezimalkomma):
+ * 1. Leerzeichen und Semikolons trennen immer.
+ * 2. Ein Komma mit folgendem Leerzeichen trennt immer („2, 4“).
+ * 3. In einem übrigen Teil ohne Leerzeichen gilt ein einzelnes Komma als Dezimalkomma
+ *    („6,5“ = 6,5). Enthält der Teil mehrere Kommas oder zusätzlich einen Punkt, trennen
+ *    die Kommas („2,4,6,8“, „2.5,5,7.5“).
+ *
+ * Beispiele: „2, 4, 6,5 8“ → 2, 4, 6,5, 8 · „2,4,6,8“ → 2, 4, 6, 8 · „2;4;6“ → 2, 4, 6.
+ */
 export function parseWeightList(input: string): number[] {
   const values = input
     .split(/[\s;]+|,(?=\s)/)
-    .map((part) => Number(part.trim().replace(",", ".")))
+    .flatMap((part) => {
+      const commas = part.split(",").length - 1;
+      return commas > 1 || (commas === 1 && part.includes(".")) ? part.split(",") : [part.replace(",", ".")];
+    })
+    .map((part) => part.trim())
+    .filter((part) => part !== "")
+    .map(Number)
     .filter((value) => Number.isFinite(value) && value > 0);
   return [...new Set(values)].sort((a, b) => a - b);
 }

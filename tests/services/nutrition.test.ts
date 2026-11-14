@@ -4,7 +4,7 @@ import { EQUIPMENT } from "@/domain/exercises/types";
 import { AppError } from "@/lib/errors";
 import { addDays } from "@/lib/dates";
 import { createUserWithPassword } from "@/features/auth/services/user-factory";
-import { RECIPE_PREFIX } from "@/features/nutrition/food-catalog";
+import { RECIPE_PREFIX, SNAPSHOT_PREFIX } from "@/features/nutrition/food-catalog";
 import type { CustomFoodInput } from "@/features/nutrition/schemas";
 import {
   addLogEntry,
@@ -53,6 +53,7 @@ import {
   setWaterGoal,
   undoLastWater,
 } from "@/features/nutrition/services/tracking-service";
+import { resolveTrackingDate } from "@/features/nutrition/tracking-date";
 import type { OnboardingInput } from "@/features/training/schemas";
 import { saveOnboarding } from "@/features/training/services/profile-service";
 import { newId } from "@/lib/tokens";
@@ -288,6 +289,87 @@ describe("recipes and weekly plan", () => {
     await expectAppError(createRecipeFromMeal(testDb.db, annaId, { date: TODAY, meal: "dinner", name: "Leer" }), "NOT_FOUND");
   });
 
+  it("knows the weight of a recipe with ingredients added by servings", async () => {
+    // Regressionsfall: 1 Ei (60 g) + 10 g Butter ließ sich nur nach Portionen eintragen.
+    const recipeId = await createRecipe(testDb.db, annaId, { name: "Rührei", servings: 1 });
+    for (const input of [
+      { foodRef: "basic:egg-whole", amount: 1, amountUnit: "serving" as const },
+      { foodRef: "basic:butter", amount: 10, amountUnit: "g" as const },
+    ]) {
+      const item = await getFood(testDb.db, annaId, input.foodRef);
+      const factor = input.amountUnit === "serving" ? 0.6 : 0.1;
+      await addRecipeIngredient(testDb.db, annaId, recipeId, {
+        ...input,
+        name: item?.name ?? "",
+        kcal: (item?.per.kcal ?? 0) * factor,
+        proteinG: (item?.per.proteinG ?? 0) * factor,
+        carbsG: (item?.per.carbsG ?? 0) * factor,
+        fatG: (item?.per.fatG ?? 0) * factor,
+      });
+    }
+    const view = await getRecipe(testDb.db, annaId, recipeId);
+    expect(view.summary.totalWeightG).toBe(70);
+    const asFood = await getFood(testDb.db, annaId, `${RECIPE_PREFIX}${recipeId}`);
+    expect(asFood).toMatchObject({ basis: "g", servingSize: 70 });
+    await addLogEntry(testDb.db, annaId, {
+      date: TODAY,
+      meal: "breakfast",
+      foodRef: `${RECIPE_PREFIX}${recipeId}`,
+      amount: 35,
+      amountUnit: "g",
+    });
+    expect((await getDay(testDb.db, annaId, TODAY)).total.kcal).toBeCloseTo(view.summary.total.kcal / 2, 5);
+  });
+
+  it("does not put a recipe into a recipe", async () => {
+    const outer = await createRecipe(testDb.db, annaId, { name: "Außen", servings: 1 });
+    const inner = await createRecipe(testDb.db, annaId, { name: "Innen", servings: 1 });
+    const input = { foodRef: `${RECIPE_PREFIX}${inner}`, name: "Innen", amount: 1, amountUnit: "serving" as const };
+    await expectAppError(
+      addRecipeIngredient(testDb.db, annaId, outer, { ...input, kcal: 100, proteinG: 1, carbsG: 1, fatG: 1 }),
+      "VALIDATION",
+    );
+    expect((await getRecipe(testDb.db, annaId, outer)).ingredients).toEqual([]);
+  });
+
+  it("resolves a logged recipe into its ingredients when saving a meal", async () => {
+    const porridge = await createRecipe(testDb.db, annaId, { name: "Porridge", servings: 2 });
+    const oats = await getFood(testDb.db, annaId, OATS);
+    await addRecipeIngredient(testDb.db, annaId, porridge, {
+      foodRef: OATS,
+      name: "Haferflocken",
+      amount: 200,
+      amountUnit: "g",
+      kcal: (oats?.per.kcal ?? 0) * 2,
+      proteinG: (oats?.per.proteinG ?? 0) * 2,
+      carbsG: (oats?.per.carbsG ?? 0) * 2,
+      fatG: (oats?.per.fatG ?? 0) * 2,
+    });
+    await addLogEntry(testDb.db, annaId, { date: TODAY, meal: "lunch", foodRef: `${RECIPE_PREFIX}${porridge}`, amount: 1, amountUnit: "serving" });
+    await addLogEntry(testDb.db, annaId, { date: TODAY, meal: "lunch", foodRef: OATS, amount: 20, amountUnit: "g" });
+    const lunch = (await getDay(testDb.db, annaId, TODAY)).meals.lunch;
+    const lunchKcal = lunch.reduce((sum, entry) => sum + entry.kcal, 0);
+
+    const fromMeal = await createRecipeFromMeal(testDb.db, annaId, { date: TODAY, meal: "lunch", name: "Mittag" });
+    const resolved = await getRecipe(testDb.db, annaId, fromMeal);
+    expect(resolved.ingredients.map((item) => [item.foodRef, item.amount])).toEqual([
+      [OATS, 100],
+      [OATS, 20],
+    ]);
+    expect(resolved.summary.total.kcal).toBeCloseTo(lunchKcal, 5);
+
+    // Ist das Rezept gelöscht, bleibt der Eintrag als Momentaufnahme ohne Rezeptverweis erhalten.
+    await deleteRecipe(testDb.db, annaId, porridge);
+    const snapshot = await getRecipe(
+      testDb.db,
+      annaId,
+      await createRecipeFromMeal(testDb.db, annaId, { date: TODAY, meal: "lunch", name: "Mittag 2" }),
+    );
+    expect(snapshot.ingredients[0]).toMatchObject({ foodRef: `${SNAPSHOT_PREFIX}${porridge}`, amount: 1, amountUnit: "serving" });
+    expect(snapshot.ingredients.some((item) => item.foodRef.startsWith(RECIPE_PREFIX))).toBe(false);
+    expect(snapshot.summary.total.kcal).toBeCloseTo(lunchKcal, 5);
+  });
+
   it("plans a weekday and copies it into the diary", async () => {
     await addPlanEntry(testDb.db, annaId, { weekday: 1, meal: "breakfast", foodRef: OATS, amount: 80, amountUnit: "g" });
     await addPlanEntry(testDb.db, annaId, { weekday: 1, meal: "dinner", foodRef: OATS, amount: 40, amountUnit: "g" });
@@ -390,6 +472,17 @@ describe("water, supplements and weight", () => {
     await expectAppError(deleteSupplement(testDb.db, eddiId, creatine.id), "NOT_FOUND");
     await deleteSupplement(testDb.db, annaId, creatine.id);
     expect(await listSupplements(testDb.db, annaId, TODAY)).toEqual([]);
+  });
+
+  it("books weight and water only for today or earlier", () => {
+    // Regressionsfall: Gewicht und Wasser ließen sich für kommende Tage speichern; ohne Datum
+    // (Heute-Seite) gilt der Tag zum Zeitpunkt der Aktion.
+    expect(resolveTrackingDate(null, TODAY)).toBe(TODAY);
+    expect(resolveTrackingDate(undefined, TODAY)).toBe(TODAY);
+    expect(resolveTrackingDate(addDays(TODAY, -3), TODAY)).toBe(addDays(TODAY, -3));
+    expect(resolveTrackingDate(addDays(TODAY, 1), TODAY)).toBeNull();
+    expect(resolveTrackingDate("2026-02-30", TODAY)).toBeNull();
+    expect(resolveTrackingDate(42, TODAY)).toBeNull();
   });
 
   it("stores one weight per day and reports the trend", async () => {

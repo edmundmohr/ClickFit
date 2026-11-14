@@ -7,6 +7,7 @@
   "summary": "{count, plural, =0 {keine Übungen} one {# Übung} other {# Übungen}} · ca. {minutes} min",
   "start": "Starten",
   "startLabel": "{name} starten",
+  "startEmpty": "Diese Routine enthält keine Übung, die sich trainieren lässt (z. B. nur gelöschte Übungen). Bearbeite die Routine und füge Übungen hinzu.",
   "edit": "Bearbeiten",
   "editLabel": "{name} bearbeiten",
   "newFolder": "Neuer Ordner",
@@ -74,7 +75,9 @@
     "deleteText": "Die Routine wird aus dem Ordner entfernt. Dein Trainingsverlauf bleibt erhalten.",
     "deleted": "Routine gelöscht.",
     "invalidRange": "Bei „{name}“ ist der untere Wert größer als der obere.",
-    "summarySeconds": "{sets} × {min}–{max} s"
+    "summarySeconds": "{sets} × {min}–{max} s",
+    "archived": "Gelöscht – wird nicht mehr trainiert",
+    "archivedNotice": "{count, plural, one {Die Übung {names} wurde gelöscht. Sie wird beim Training übersprungen und beim nächsten Speichern aus der Routine entfernt.} other {Die Übungen {names} wurden gelöscht. Sie werden beim Training übersprungen und beim nächsten Speichern aus der Routine entfernt.}}"
   },
   "newRoutineIn": "Routine in „{name}“ hinzufügen"
 }

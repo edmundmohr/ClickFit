@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/page-header";
 import { requireUser } from "@/features/auth/session";
-import { startWorkoutAction } from "@/features/training/actions";
 import { FolderActions, NewFolderButton } from "@/features/training/components/routines/folder-actions";
+import { StartWorkoutForm } from "@/features/training/components/start-workout-form";
 import { listFolders } from "@/features/training/services/plan-service";
 import { getInProgressSession } from "@/features/training/services/workout-service";
 import { folderTitle, routineTitle } from "@/features/training/titles";
@@ -69,8 +69,7 @@ export default async function RoutinesPage() {
                           </Link>
                         </Button>
                         {!running && day.exercises.length > 0 ? (
-                          <form action={startWorkoutAction}>
-                            <input type="hidden" name="planDayId" value={day.id} />
+                          <StartWorkoutForm planDayId={day.id}>
                             <Button
                               type="submit"
                               variant="outline"
@@ -80,7 +79,7 @@ export default async function RoutinesPage() {
                             >
                               <PlayIcon aria-hidden />
                             </Button>
-                          </form>
+                          </StartWorkoutForm>
                         ) : null}
                       </li>
                     );

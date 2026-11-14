@@ -21,8 +21,13 @@ export interface ImportedRestingHeartRate {
 }
 
 export interface ImportedWorkout {
-  /** Kennung der Quelle oder stabil aus Art und Startzeit abgeleitet. */
+  /** Kennung der Quelle oder stabil aus Art und Startzeit (bzw. Tag, Dauer und Distanz) abgeleitet. */
   externalId: string;
+  /**
+   * Kennung, unter der ältere Versionen diese Einheit ohne Uhrzeit gespeichert haben (nur Art und
+   * Tag). Ein so gespeicherter Eintrag mit gleicher Dauer und Distanz erhält die neue Kennung.
+   */
+  legacyExternalId?: string;
   type: ActivityType;
   start: Date;
   durationSeconds: number;

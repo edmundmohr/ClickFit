@@ -7,10 +7,13 @@ import { z } from "zod";
 import { getDb } from "@/lib/server/context";
 import { fail, invalid, ok, type ActionResult } from "@/lib/action-result";
 import { toLocalDate } from "@/lib/dates";
+import { AppError, type ActionState, type ErrorCode } from "@/lib/errors";
 import { requireUser } from "@/features/auth/session";
 import type { Exercise } from "@/domain/exercises/types";
 import type { WeightUnit } from "@/domain/training/weights";
 import { onboardingSchema } from "./schemas";
+import { parseFocusAreas, parseFocusMinutes } from "@/domain/training/focus-day";
+import { getFocusDay } from "./services/focus-day-service";
 import { getRecoveryDay } from "./services/recovery-day-service";
 import { saveOnboarding } from "./services/profile-service";
 import { createPlanFromProfile, getSwapOptions, swapPlanExercise } from "./services/plan-service";
@@ -78,16 +81,42 @@ export async function swapExerciseAction(planExerciseId: string, newExerciseId: 
   return ok(undefined);
 }
 
-/** Startet das Training eines Plantags (oder setzt ein laufendes fort) und öffnet den Trainingsmodus. */
-export async function startWorkoutAction(formData: FormData): Promise<void> {
+/** Startet das Training aus dem Formular; erwartete Fehler (z. B. keine trainierbare Übung) als Ergebnis. */
+async function startFromForm(formData: FormData): Promise<{ sessionId: string } | { error: ErrorCode; planDayId: string | null }> {
   const user = await requireUser();
   const planDayId = idSchema.safeParse(formData.get("planDayId"));
-  if (!planDayId.success) redirect("/training");
-  const sessionId = await startWorkout(getDb(), user.id, planDayId.data, new Date(), {
-    short: formData.get("short") === "1",
-    defaultUnit: unitOf(user),
-  });
-  redirect(`/workout/${sessionId}`);
+  if (!planDayId.success) return { error: "VALIDATION", planDayId: null };
+  try {
+    const sessionId = await startWorkout(getDb(), user.id, planDayId.data, new Date(), {
+      short: formData.get("short") === "1",
+      defaultUnit: unitOf(user),
+    });
+    return { sessionId };
+  } catch (error) {
+    if (!(error instanceof AppError)) throw error;
+    return { error: error.code, planDayId: planDayId.data };
+  }
+}
+
+/**
+ * Startet das Training eines Plantags (oder setzt ein laufendes fort) und öffnet den Trainingsmodus.
+ * Für `useActionState`: Lässt sich nichts starten (z. B. nur gelöschte Übungen), kommt der Fehler
+ * als Ergebnis zurück, statt die Fehlerseite zu zeigen.
+ */
+export async function startWorkoutFormAction(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  const result = await startFromForm(formData);
+  if ("error" in result) return { status: "error", error: result.error };
+  redirect(`/workout/${result.sessionId}`);
+}
+
+/**
+ * Einfache Formular-Variante ohne Rückgabewert. Schlägt der Start fehl, geht es zur Routine,
+ * damit sich die Ursache beheben lässt. Mit Fehlermeldung: `StartWorkoutForm`.
+ */
+export async function startWorkoutAction(formData: FormData): Promise<void> {
+  const result = await startFromForm(formData);
+  if ("error" in result) redirect(result.planDayId ? `/training/routines/${result.planDayId}` : "/training");
+  redirect(`/workout/${result.sessionId}`);
 }
 
 /** Erholungsorientierter Modus: startet das Training aus den heute frischesten Muskelgruppen. */
@@ -98,6 +127,24 @@ export async function startRecoveryWorkoutAction(): Promise<void> {
   if (!day || day.exercises.length === 0) redirect("/training");
   const t = await getTranslations("training.recoveryMode");
   const sessionId = await startFreeWorkout(db, user.id, t("sessionName"), day.exercises, new Date(), {
+    defaultUnit: unitOf(user),
+  });
+  redirect(`/workout/${sessionId}`);
+}
+
+/** Fokus-Training: startet die Einheit für die gewählten Körperregionen. */
+export async function startFocusWorkoutAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const areas = parseFocusAreas(formData.get("areas"));
+  if (areas.length === 0) redirect("/training/focus");
+  const db = getDb();
+  const day = await getFocusDay(db, user.id, areas, parseFocusMinutes(formData.get("minutes")));
+  if (!day || day.exercises.length === 0) redirect(`/training/focus?areas=${areas.join(",")}`);
+  const t = await getTranslations();
+  const name = t("training.focusTraining.sessionName", {
+    areas: areas.map((area) => t(`training.focusTraining.areas.${area}`)).join(", "),
+  });
+  const sessionId = await startFreeWorkout(db, user.id, name, day.exercises, new Date(), {
     defaultUnit: unitOf(user),
   });
   redirect(`/workout/${sessionId}`);

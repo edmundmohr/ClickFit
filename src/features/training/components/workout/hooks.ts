@@ -136,6 +136,11 @@ export function useRestTimer(onFinished: () => void): RestTimer {
   }, [justFinished]);
 
   const start = useCallback((seconds: number) => {
+    // Ohne Pause (0 s) gibt es nichts herunterzuzählen – und keinen Signalton, keine Mitteilung.
+    if (seconds <= 0) {
+      setEndsAt(null);
+      return;
+    }
     const current = Date.now();
     setNow(current);
     setTotal(seconds);

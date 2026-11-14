@@ -2,7 +2,9 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { workoutSession } from "@/db/schema";
 import { EQUIPMENT, type Equipment } from "@/domain/exercises/types";
+import { dayStatus } from "@/domain/training/calendar";
 import { avoidedPatterns, isExerciseAvailable } from "@/domain/training/plan-generator";
+import { detectRecords } from "@/domain/training/records";
 import { toKg } from "@/domain/training/weights";
 import { AppError } from "@/lib/errors";
 import { addDays, toLocalDate } from "@/lib/dates";
@@ -12,6 +14,7 @@ import { getTrainingContext } from "@/features/training/services/context-service
 import { archiveCustomExercise, createCustomExercise, getUserCatalog, updateCustomExercise } from "@/features/training/services/exercise-service";
 import { createGym, deleteGym, getGym, listGyms, setActiveGym, updateGym } from "@/features/training/services/gym-service";
 import { createPlanFromProfile, getActivePlan, getRoutine, listFolders } from "@/features/training/services/plan-service";
+import { listCompletedSessions } from "@/features/training/services/history-service";
 import { saveOnboarding } from "@/features/training/services/profile-service";
 import { activateFolder, createFolder, createRoutine, deleteFolder, deleteRoutine, duplicateRoutine, renameFolder, saveRoutine } from "@/features/training/services/routine-service";
 import { saveInjuries, saveTrainingSettings, setExerciseExcluded } from "@/features/training/services/settings-service";
@@ -303,10 +306,69 @@ describe("custom exercises", () => {
     expect(catalog.all.some((exercise) => exercise.id === id)).toBe(false);
     expect(catalog.find(id)).toMatchObject({ name: "Y-Raise am Kabel", archived: true });
     expect((await getWorkoutView(testDb.db, annaId, sessionId)).exercises[0].name).toBe("Y-Raise am Kabel");
-    await expectAppError(
-      saveRoutine(testDb.db, annaId, routine, { name: "Schultern", weekday: 0, folderId: folder, exercises: [routineExercise(id)] }),
-      "NOT_FOUND",
-    );
+  });
+
+  it("skips a deleted exercise when the routine is trained and removes it on save", async () => {
+    const id = await createCustomExercise(testDb.db, annaId, customInput);
+    const folder = await createFolder(testDb.db, annaId, "Eigenes", TODAY);
+    const routine = await createRoutine(testDb.db, annaId, folder, "Schultern");
+    const save = (exercises: RoutineInput["exercises"]) =>
+      saveRoutine(testDb.db, annaId, routine, { name: "Schultern", weekday: 0, folderId: folder, exercises });
+    await save([routineExercise(id), routineExercise("push-up")]);
+    await archiveCustomExercise(testDb.db, annaId, id);
+
+    // Die Routine zeigt die gelöschte Übung noch (der Editor kennzeichnet sie) …
+    const before = await getRoutine(testDb.db, annaId, routine);
+    expect(before.day.exercises.map((entry) => [entry.exercise.id, entry.exercise.archived ?? false])).toEqual([
+      [id, true],
+      ["push-up", false],
+    ]);
+    // … das Training übernimmt sie aber nicht.
+    const sessionId = await startWorkout(testDb.db, annaId, routine, NOW);
+    expect((await getWorkoutView(testDb.db, annaId, sessionId)).exercises.map((exercise) => exercise.exerciseId)).toEqual([
+      "push-up",
+    ]);
+    await finishWorkout(testDb.db, annaId, sessionId, NOW);
+
+    // Speichern scheitert nicht, sondern entfernt die gelöschte Übung.
+    await save([routineExercise(id, "g1"), routineExercise("push-up", "g1")]);
+    const after = await getRoutine(testDb.db, annaId, routine);
+    expect(after.day.exercises.map((entry) => [entry.exercise.id, entry.groupId])).toEqual([["push-up", null]]);
+    await expectAppError(save([routineExercise("gibt-es-nicht")]), "NOT_FOUND");
+  });
+
+  it("refuses to start a routine that only has deleted exercises", async () => {
+    const id = await createCustomExercise(testDb.db, annaId, customInput);
+    const folder = await createFolder(testDb.db, annaId, "Eigenes", TODAY);
+    const routine = await createRoutine(testDb.db, annaId, folder, "Schultern");
+    await saveRoutine(testDb.db, annaId, routine, { name: "Schultern", weekday: 0, folderId: folder, exercises: [routineExercise(id)] });
+    await archiveCustomExercise(testDb.db, annaId, id);
+    await expectAppError(startWorkout(testDb.db, annaId, routine, NOW), "PLAN_EMPTY");
+  });
+});
+
+describe("assisted exercises", () => {
+  const ASSISTED = "assisted-pull-up-machine";
+
+  it("keeps assistance out of the volume and rates less assistance as better", async () => {
+    const folder = await createFolder(testDb.db, annaId, "Rücken", TODAY);
+    const routine = await createRoutine(testDb.db, annaId, folder, "Klimmzüge");
+    await saveRoutine(testDb.db, annaId, routine, { name: "Klimmzüge", weekday: 0, folderId: folder, exercises: [routineExercise(ASSISTED)] });
+
+    const first = await startWorkout(testDb.db, annaId, routine, NOW);
+    await completeFirstExercise(annaId, first, 30, 8, NOW);
+    const [summary] = await listCompletedSessions(testDb.db, annaId);
+    expect(summary).toMatchObject({ id: first, completedSets: 3, volumeKg: 0 });
+
+    const later = new Date(NOW.getTime() + 2 * 86_400_000);
+    const second = await startWorkout(testDb.db, annaId, routine, later);
+    const view = await getWorkoutView(testDb.db, annaId, second);
+    expect(view.exercises[0].bests).toMatchObject({ maxWeightKg: null, maxSetVolumeKg: null, minAssistanceKg: 30 });
+    // Gewertet wird wie in der Oberfläche: weniger Unterstützung ist ein Rekord, mehr nicht.
+    const record = (weightKg: number) =>
+      detectRecords([{ type: "work", weightKg, reps: 8, completed: true }], view.exercises[0].bests, view.exercises[0].type);
+    expect(record(25)).toEqual([{ type: "assistance", value: 25 }]);
+    expect(record(35)).toEqual([]);
   });
 });
 
@@ -343,6 +405,24 @@ describe("plan builder", () => {
   it("makes the first own folder the weekly plan when there is none", async () => {
     const folder = await createFolder(testDb.db, eddiId, "Start", TODAY);
     expect((await listFolders(testDb.db, eddiId))[0]).toMatchObject({ id: folder, status: "active" });
+  });
+
+  it("starts the weekly plan on the day it is activated", async () => {
+    const created = "2026-10-01";
+    const folder = await createFolder(testDb.db, annaId, "Mein Plan", created);
+    const routine = await createRoutine(testDb.db, annaId, folder, "Push");
+    await saveRoutine(testDb.db, annaId, routine, input(folder));
+    await activateFolder(testDb.db, annaId, folder, NOW);
+
+    const plan = await getActivePlan(testDb.db, annaId, TODAY);
+    expect(plan).toMatchObject({ id: folder, startDate: TODAY });
+    // Regressionstest: Dienstage seit dem Anlegen des Ordners gelten nicht rückwirkend als verpasst.
+    const schedule = { startDate: plan!.startDate, weekdays: plannedWeekdays(plan!.days) };
+    expect(dayStatus("2026-10-06", new Set(), schedule, TODAY)).toBe("rest");
+    expect(dayStatus(addDays(TODAY, 1), new Set(), schedule, TODAY)).toBe("planned");
+    // Erneutes Aktivieren des schon aktiven Plans verschiebt den Start nicht.
+    await activateFolder(testDb.db, annaId, folder, new Date(NOW.getTime() + 7 * 86_400_000));
+    expect((await getActivePlan(testDb.db, annaId, TODAY))?.startDate).toBe(TODAY);
   });
 
   it("switches the weekly plan and never deletes it", async () => {

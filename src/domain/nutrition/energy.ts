@@ -57,15 +57,21 @@ export const GOAL_FACTORS: Record<Goal, number> = {
   maintain: 1,
 };
 
-/** Eiweiß in g pro kg Körpergewicht. */
+/** Eiweiß in g pro kg Referenzgewicht. */
 const PROTEIN_PER_KG: Record<Goal, number> = {
   muscle_gain: 1.8,
   fat_loss: 2.2,
   recomposition: 2.2,
   maintain: 1.6,
 };
+/** Fett-Untergrenze in g pro kg Referenzgewicht. */
 const FAT_PER_KG = 0.9;
+/** Fett liefert mindestens ein Fünftel der Kalorien. */
 const MIN_FAT_SHARE = 0.2;
+/** Kohlenhydrate liefern mindestens diesen Anteil der Kalorien. */
+const MIN_CARB_SHARE = 0.15;
+/** BMI, bis zu dem das tatsächliche Gewicht als Referenz dient. */
+const REFERENCE_BMI = 25;
 /** Untergrenzen, damit Diätziele nicht ungesund niedrig ausfallen. */
 const MIN_KCAL: Record<Sex, number> = { male: 1500, female: 1200 };
 
@@ -77,11 +83,44 @@ function roundTo(value: number, step: number): number {
   return Math.round(value / step) * step;
 }
 
-/** Kalorien- und Makroziele aus Tagesverbrauch, Ziel und Körpergewicht. */
-export function targetsFromTdee(tdeeKcal: number, goal: Goal, body: Pick<BodyData, "sex" | "weightKg">): NutritionTargets {
+/**
+ * Gewicht, auf das sich Eiweiß und Fett beziehen: das tatsächliche Gewicht, höchstens aber
+ * das Gewicht bei BMI 25 für die angegebene Größe. Bei Übergewicht bestimmt vor allem die
+ * Magermasse den Eiweißbedarf, nicht das gesamte Körpergewicht.
+ */
+export function referenceWeightKg(body: Pick<BodyData, "heightCm" | "weightKg">): number {
+  const heightM = body.heightCm / 100;
+  const bmi25Weight = REFERENCE_BMI * heightM * heightM;
+  return heightM > 0 ? Math.min(body.weightKg, bmi25Weight) : body.weightKg;
+}
+
+/**
+ * Kalorien- und Makroziele aus Tagesverbrauch, Ziel und Körperdaten.
+ *
+ * 1. Kalorien = Verbrauch × Zielfaktor, mindestens die sichere Untergrenze.
+ * 2. Eiweiß = g/kg je Ziel × Referenzgewicht (siehe `referenceWeightKg`).
+ * 3. Fett = max(0,9 g/kg × Referenzgewicht, 20 % der Kalorien).
+ * 4. Eiweiß und Fett dürfen zusammen höchstens 85 % der Kalorien ausmachen, damit
+ *    mindestens 15 % für Kohlenhydrate bleiben. Reicht das nicht, sinkt zuerst das Fett
+ *    bis auf seine 20 %, danach das Eiweiß.
+ * 5. Kohlenhydrate füllen den Rest, so dass die Makros die Kalorien ergeben (bis auf Rundung).
+ */
+export function targetsFromTdee(
+  tdeeKcal: number,
+  goal: Goal,
+  body: Pick<BodyData, "sex" | "weightKg" | "heightCm">,
+): NutritionTargets {
   const kcal = Math.max(roundTo(tdeeKcal * GOAL_FACTORS[goal], 10), MIN_KCAL[body.sex]);
-  const proteinG = Math.round(PROTEIN_PER_KG[goal] * body.weightKg);
-  const fatG = Math.round(Math.max(FAT_PER_KG * body.weightKg, (kcal * MIN_FAT_SHARE) / KCAL_PER_G.fat));
+  const reference = referenceWeightKg(body);
+  let proteinKcal = PROTEIN_PER_KG[goal] * reference * KCAL_PER_G.protein;
+  let fatKcal = Math.max(FAT_PER_KG * reference * KCAL_PER_G.fat, kcal * MIN_FAT_SHARE);
+  const budget = kcal * (1 - MIN_CARB_SHARE);
+  if (proteinKcal + fatKcal > budget) {
+    fatKcal = Math.max(kcal * MIN_FAT_SHARE, budget - proteinKcal);
+    proteinKcal = budget - fatKcal;
+  }
+  const proteinG = Math.round(proteinKcal / KCAL_PER_G.protein);
+  const fatG = Math.round(fatKcal / KCAL_PER_G.fat);
   const remaining = kcal - proteinG * KCAL_PER_G.protein - fatG * KCAL_PER_G.fat;
   const carbsG = Math.max(0, Math.round(remaining / KCAL_PER_G.carbs));
   return { kcal, proteinG, carbsG, fatG, tdeeKcal: Math.round(tdeeKcal) };

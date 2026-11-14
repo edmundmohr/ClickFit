@@ -106,3 +106,33 @@ export function estimateSessionSeconds(
 ): number {
   return exercises.reduce((total, planned) => total + estimateExerciseSeconds(planned), WARMUP_SECONDS);
 }
+
+/** So wenige Übungen sollte ein Trainingstag mindestens haben. */
+export const MIN_EXERCISES_PER_DAY = 3;
+/** Weniger Sätze pro Übung plant der Generator nicht, auch nicht bei knapper Zeit. */
+export const MIN_SETS_PER_EXERCISE = 2;
+/** Um höchstens so viele Sätze pro Übung wird gekürzt, damit genug Übungen in die Zeit passen. */
+const MAX_SET_REDUCTION = 2;
+
+/** Dieselbe Vorgabe mit `by` Sätzen weniger, aber nicht unter `MIN_SETS_PER_EXERCISE`. */
+export function reduceSets<T extends Pick<PlannedExercise, "sets">>(entry: T, by: number): T {
+  if (by <= 0) return entry;
+  return { ...entry, sets: Math.min(entry.sets, Math.max(MIN_SETS_PER_EXERCISE, entry.sets - by)) };
+}
+
+/**
+ * Zeitbudget einhalten, ohne den Tag zu dünn zu machen: `fill` stellt den Tag mit
+ * `reduceBy` Sätzen weniger pro Übung zusammen und darf das Budget nie überschreiten.
+ * Zuerst gelten die vollen Sätze; reicht die Zeit dann nicht für `minCount` Übungen, wird
+ * schrittweise gekürzt. Erreicht keine Variante `minCount`, gewinnt die mit den meisten
+ * Übungen (bei Gleichstand die mit mehr Sätzen).
+ */
+export function fillWithinBudget<T>(fill: (reduceBy: number) => T[], minCount = MIN_EXERCISES_PER_DAY): T[] {
+  let best: T[] = [];
+  for (let reduceBy = 0; reduceBy <= MAX_SET_REDUCTION; reduceBy++) {
+    const result = fill(reduceBy);
+    if (result.length >= minCount) return result;
+    if (result.length > best.length) best = result;
+  }
+  return best;
+}

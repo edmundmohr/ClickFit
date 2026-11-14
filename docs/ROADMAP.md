@@ -146,3 +146,10 @@ Grenzen:
 - Die Körperfett-Schätzung ist eine Einschätzung nach Augenschein und kann deutlich
   danebenliegen. Das Modell kann eine Schätzung auch ablehnen.
 - Schritte und Ruhepuls werden angezeigt, fließen aber nicht in Kalorienziel oder Erholung ein.
+
+## Erweiterungen nach Phase 7
+
+- Fokus-Training: eine einzelne Einheit für ausgewählte Körperregionen und eine wählbare Dauer
+  (20–90 Minuten), unabhängig vom Wochenplan; zeigt die Erholung je Region an.
+- Abfrage nach jeder Übung: Anstrengung und RIR nach dem letzten Satz, freiwillig und
+  abschaltbar; fließt in die Progression und in „Plan verfeinern“ ein.

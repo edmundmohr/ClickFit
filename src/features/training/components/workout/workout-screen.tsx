@@ -10,6 +10,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { warmupSets } from "@/domain/training/progression";
+import { isAssisted } from "@/domain/training/records";
+import type { ExerciseFeedback } from "@/domain/training/types";
 import { afterSetCompleted, groupConsecutive, groupKind, groupRestSeconds } from "@/domain/training/supersets";
 import { estimateRemainingSeconds, isWorkoutForgotten, suggestFinishTime } from "@/domain/training/schedule";
 import { formatDayLong, formatDuration, formatTime } from "@/lib/format";
@@ -30,6 +32,7 @@ import {
   newSetFrom,
   parseReps,
   parseWeightKg,
+  setsToPrefill,
   toDrafts,
   toGroupMember,
   toInputText,
@@ -46,6 +49,8 @@ interface WorkoutScreenProps {
   unitSystem: UnitSystem;
   /** Wem die Offline-Warteschlange auf diesem Gerät gehört. */
   userId: string;
+  /** Abfrage nach jeder Übung (Einstellung unter Anpassungen). */
+  checkIn: boolean;
 }
 
 interface SetRef {
@@ -53,7 +58,7 @@ interface SetRef {
   setId: string;
 }
 
-export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) {
+export function WorkoutScreen({ view, unitSystem, userId, checkIn }: WorkoutScreenProps) {
   const t = useTranslations();
   const router = useRouter();
   /** Ohne Netz beendet: Zeitpunkt des Endes, bis der Server es bestätigt hat. */
@@ -77,10 +82,10 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
   const [pending, startTransition] = useTransition();
 
   const startedAt = new Date(view.startedAt);
-  const allSets = exercises.flatMap((exercise) =>
-    exercise.sets.map((set) => ({ completed: set.completed, restSeconds: exercise.restSeconds })),
+  const openSets = exercises.reduce(
+    (total, exercise) => total + exercise.sets.filter((set) => !set.completed).length,
+    0,
   );
-  const openSets = allSets.filter((set) => !set.completed).length;
   const elapsedSeconds = now === null ? null : (now - startedAt.getTime()) / 1000;
   const finishedAt = view.finishedAt ?? localFinish;
   const durationMinutes = finishedAt
@@ -107,7 +112,12 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
         const deletedSetIds = operations.flatMap((operation) =>
           operation.type === "set.delete" ? [operation.payload.setId] : [],
         );
-        if (saves.length > 0 || deletedSetIds.length > 0) dispatch({ type: "restore", changes: { saves, deletedSetIds } });
+        const feedback = operations.flatMap((operation) =>
+          operation.type === "exercise.feedback" ? [operation.payload] : [],
+        );
+        if (saves.length > 0 || deletedSetIds.length > 0 || feedback.length > 0) {
+          dispatch({ type: "restore", changes: { saves, deletedSetIds, feedback } });
+        }
         const finish = operations.find(
           (operation) => operation.type === "workout.finish" && operation.payload.sessionId === view.id,
         );
@@ -131,6 +141,15 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
     const set = exercise?.sets.find((item) => item.id === ref.setId);
     return exercise && set ? { exercise, set } : null;
   };
+
+  /** Abfrage nach der Übung: über die Warteschlange, damit sie auch ohne Netz ankommt. */
+  function saveFeedback(exerciseId: string, feedback: ExerciseFeedback) {
+    dispatch({ type: "feedback", exerciseId, feedback });
+    const engine = getSyncEngine();
+    void engine
+      .enqueue({ type: "exercise.feedback", payload: { workoutExerciseId: exerciseId, ...feedback } })
+      .then(() => engine.syncNow());
+  }
 
   function edit(exerciseId: string, setId: string, patch: Partial<SetDraft>) {
     dispatch({ type: "edit", exerciseId, setId, patch });
@@ -159,9 +178,8 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
     sync.schedule(setId, true);
     setInvalid(null);
     if (set.completed) return;
-    // Noch leere Folgesätze übernehmen die Werte: So genügt danach ein Tipp pro Satz.
-    for (const later of exercise.sets.slice(exercise.sets.indexOf(set) + 1)) {
-      if (later.completed || later.weightText !== "" || later.repsText !== "") continue;
+    // Noch leere Folgesätze gleicher Art übernehmen die Werte: So genügt danach ein Tipp pro Satz.
+    for (const later of setsToPrefill(exercise.sets, set)) {
       dispatch({
         type: "edit",
         exerciseId,
@@ -208,6 +226,11 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
   function addWarmup(exerciseId: string) {
     const exercise = exercises.find((item) => item.id === exerciseId);
     if (!exercise) return;
+    // Bei Unterstützung (z. B. Klimmzug-Maschine) wären 40–80 % des Werts weniger Hilfe, also schwerer.
+    if (isAssisted(exercise.type)) {
+      toast.info(t("workout.warmupAssisted"));
+      return;
+    }
     const firstWork = exercise.sets.find((set) => set.type !== "warmup");
     const workWeightKg = firstWork ? parseWeightKg(firstWork, exercise.unit) : null;
     if (workWeightKg === null || workWeightKg <= 0) {
@@ -215,7 +238,7 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
       return;
     }
     const hasWarmup = exercise.sets.some((set) => set.type === "warmup");
-    const suggested = hasWarmup ? [] : warmupSets(workWeightKg, exercise.incrementKg);
+    const suggested = hasWarmup ? [] : warmupSets(workWeightKg, exercise.incrementKg, exercise.minWeightKg);
     if (suggested.length === 0) {
       toast.info(t("workout.warmupNotNeeded"));
       return;
@@ -299,6 +322,8 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
       onEditNote={() => setNoteFor(exercise.exerciseId)}
       onOpenInfo={() => setInfoFor(exercise.id)}
       onOpenPlates={exercise.bar ? () => setPlatesFor(exercise.id) : undefined}
+      checkIn={checkIn && inProgress}
+      onFeedback={(feedback) => saveFeedback(exercise.id, feedback)}
     />
   );
 
@@ -322,7 +347,7 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
               {inProgress
                 ? t("workout.status", {
                     elapsed: elapsedSeconds === null ? "–" : formatDuration(elapsedSeconds),
-                    minutes: Math.ceil(estimateRemainingSeconds(allSets) / 60),
+                    minutes: Math.ceil(estimateRemainingSeconds(exercises) / 60),
                   })
                 : formatDayLong(view.date)}
             </p>

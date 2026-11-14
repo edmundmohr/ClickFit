@@ -34,6 +34,7 @@
   "warmupAdded": "Aufwärmsätze hinzugefügt.",
   "warmupNeedsWeight": "Trage zuerst das Gewicht des ersten Arbeitssatzes ein.",
   "warmupNotNeeded": "Bei diesem Gewicht sind keine Aufwärmsätze nötig.",
+  "warmupAssisted": "Bei Übungen mit Unterstützung trägst du Aufwärmsätze selbst ein – mit mehr Unterstützung als im Arbeitssatz.",
   "complete": "Satz {number} abhaken",
   "uncomplete": "Satz {number} wieder öffnen",
   "setOptions": "Optionen für Satz {number}",
@@ -59,7 +60,8 @@
     "weight": "Schwerstes Gewicht",
     "one_rep_max": "Bestes geschätztes 1RM",
     "reps": "Meiste Wiederholungen",
-    "set_volume": "Höchstes Satz-Volumen"
+    "set_volume": "Höchstes Satz-Volumen",
+    "assistance": "Geringste Unterstützung"
   },
   "timer": {
     "title": "Pause",
@@ -129,5 +131,22 @@
   },
   "noteSavedOffline": "Notiz auf dem Gerät gespeichert. Sie wird übertragen, sobald du wieder online bist.",
   "pushTitle": "Pause vorbei",
-  "pushBody": "Weiter geht's mit dem nächsten Satz."
+  "pushBody": "Weiter geht's mit dem nächsten Satz.",
+  "checkIn": {
+    "title": "Wie war die Übung?",
+    "effortLabel": "Anstrengung",
+    "effort": {
+      "easy": "Leicht",
+      "right": "Passend",
+      "hard": "Schwer",
+      "max": "Am Limit"
+    },
+    "rirLabel": "Wie viele Wiederholungen wären noch gegangen (RIR)?",
+    "rirSummary": "RIR {rir}",
+    "skip": "Überspringen",
+    "close": "Fertig",
+    "skipped": "Ohne Bewertung",
+    "rate": "Bewerten",
+    "edit": "Ändern"
+  }
 }

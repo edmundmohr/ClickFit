@@ -1,7 +1,7 @@
 /**
  * Schreibt einen geprüften Health-Import in die Datenbank und liest importierte Tageswerte.
  */
-import { and, asc, eq, gte, lte, ne, sql } from "drizzle-orm";
+import { and, asc, eq, gte, isNull, lte, ne, sql } from "drizzle-orm";
 import type { BatchItem } from "drizzle-orm/batch";
 import type { AppDatabase } from "@/db/client";
 import { activity, bodyWeightEntry, healthMetric, userProfile } from "@/db/schema";
@@ -81,6 +81,32 @@ function metricStatements(db: AppDatabase, userId: string, data: HealthImport, s
   );
 }
 
+/**
+ * Frühere Versionen kennzeichneten Einheiten ohne Uhrzeit nur nach Art und Tag. Ein so
+ * gespeicherter Eintrag mit gleicher Dauer und Distanz bekommt die neue Kennung (Notiz bleibt),
+ * damit ein erneuter Import derselben Datei nichts verdoppelt.
+ */
+function legacyIdStatements(db: AppDatabase, userId: string, data: HealthImport): Statement[] {
+  return data.workouts.flatMap((row) => {
+    if (!row.legacyExternalId) return [];
+    const taken = sql`not exists (select 1 from ${activity} as existing where existing.user_id = ${userId} and existing.external_id = ${row.externalId})`;
+    return [
+      db
+        .update(activity)
+        .set({ externalId: row.externalId })
+        .where(
+          and(
+            eq(activity.userId, userId),
+            eq(activity.externalId, row.legacyExternalId),
+            eq(activity.durationSeconds, row.durationSeconds),
+            row.distanceMeters === null ? isNull(activity.distanceMeters) : eq(activity.distanceMeters, row.distanceMeters),
+            taken,
+          ),
+        ),
+    ];
+  });
+}
+
 function activityStatements(db: AppDatabase, userId: string, data: HealthImport, maxBpm: number | null, now: Date): Statement[] {
   return chunk(data.workouts, ACTIVITY_ROWS).map((rows) =>
     db
@@ -142,7 +168,12 @@ export async function applyHealthImport(
 ): Promise<ImportResult> {
   const maxBpm = data.workouts.length > 0 ? await getMaxHeartRate(db, userId, now) : null;
   const weights = weightStatements(db, userId, data, now);
-  const statements = [...weights, ...metricStatements(db, userId, data, source, now), ...activityStatements(db, userId, data, maxBpm, now)];
+  const statements = [
+    ...weights,
+    ...metricStatements(db, userId, data, source, now),
+    ...legacyIdStatements(db, userId, data),
+    ...activityStatements(db, userId, data, maxBpm, now),
+  ];
 
   const results: unknown[] = [];
   for (const block of chunk(statements, BATCH_STATEMENTS)) {

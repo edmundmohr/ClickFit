@@ -87,7 +87,8 @@ export async function WaterWidget({ userId, today }: { userId: string; today: Lo
   const { waterTotal, waterGoal, waterStreak } = await loadToday(userId, today);
   return (
     <div className="grid gap-2">
-      <WaterCard date={today} totalMl={waterTotal} goalMl={waterGoal} />
+      {/* Ohne Datum bucht der Server auf „heute“ zum Zeitpunkt des Klicks. */}
+      <WaterCard date={null} totalMl={waterTotal} goalMl={waterGoal} />
       <p className="text-muted-foreground text-sm">{t("home.streakWater", { count: waterStreak })}</p>
     </div>
   );

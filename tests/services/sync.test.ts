@@ -184,11 +184,37 @@ describe("offline sync", () => {
   });
 
   it("forgets processed operations only after they can no longer come back", async () => {
-    await processOperations(testDb.db, annaId, [saveOp(0, 8)], NOW);
+    const operation = saveOp(0, 8);
+    await processOperations(testDb.db, annaId, [operation], NOW);
     await pruneProcessedOperations(testDb.db, new Date(NOW.getTime() + 7 * 86_400_000));
     expect(await testDb.db.select().from(syncOperation)).toHaveLength(1);
-    await pruneProcessedOperations(testDb.db, new Date(NOW.getTime() + 60 * 86_400_000));
+    // Spätere Korrektur, danach kommt der alte Vorgang nach dem Vergessen noch einmal.
+    await processOperations(testDb.db, annaId, [saveOp(0, 12)], NOW);
+    const later = new Date(NOW.getTime() + 61 * 86_400_000);
+    await pruneProcessedOperations(testDb.db, later);
     expect(await testDb.db.select().from(syncOperation)).toHaveLength(0);
+    expect((await processOperations(testDb.db, annaId, [operation], later))[0].status).toBe("rejected");
+    expect((await getWorkoutView(testDb.db, annaId, sessionId)).exercises[0].sets[0].reps).toBe(12);
+  });
+
+  it("rejects stale set changes but still finishes a long forgotten workout at the chosen time", async () => {
+    const serverNow = new Date(NOW.getTime() + 40 * 86_400_000);
+    const lastSet = new Date(NOW.getTime() + 70 * 60_000);
+    expect((await processOperations(testDb.db, annaId, [saveOp(0, 8, lastSet)], serverNow))[0].status).toBe("rejected");
+    // Vorgeschlagenes Ende: letzter Satz plus Nachlauf, Wochen später bestätigt.
+    const suggestedEnd = new Date(lastSet.getTime() + 5 * 60_000);
+    const finish: SyncOperation = { id: opId(), at: suggestedEnd.toISOString(), type: "workout.finish", payload: { sessionId } };
+    expect((await processOperations(testDb.db, annaId, [finish], serverNow))[0].status).toBe("ok");
+    const after = await getWorkoutView(testDb.db, annaId, sessionId);
+    expect(after.status).toBe("completed");
+    expect(after.finishedAt).toBe(suggestedEnd.toISOString());
+  });
+
+  it("never ends a workout before its start", async () => {
+    const before = new Date(NOW.getTime() - 3 * 86_400_000);
+    const finish: SyncOperation = { id: opId(), at: before.toISOString(), type: "workout.finish", payload: { sessionId } };
+    expect((await processOperations(testDb.db, annaId, [finish], NOW))[0].status).toBe("ok");
+    expect((await getWorkoutView(testDb.db, annaId, sessionId)).finishedAt).toBe(NOW.toISOString());
   });
 });
 

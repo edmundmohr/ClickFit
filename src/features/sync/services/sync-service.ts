@@ -6,13 +6,20 @@ import { and, eq, lt } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
 import { syncOperation } from "@/db/schema";
 import {
-  MAX_OPERATION_AGE_MS,
+  PROCESSED_RETENTION_MS,
+  isExpiredOperation,
   operationTime,
   syncOperationSchema,
   type SyncOperation,
   type SyncResult,
 } from "@/domain/sync/operations";
-import { deleteSet, finishWorkout, saveSessionNote, saveSet } from "@/features/training/services/workout-service";
+import {
+  deleteSet,
+  finishWorkout,
+  saveExerciseFeedback,
+  saveSessionNote,
+  saveSet,
+} from "@/features/training/services/workout-service";
 import { AppError } from "@/lib/errors";
 
 async function apply(db: AppDatabase, userId: string, operation: SyncOperation, now: Date): Promise<void> {
@@ -26,6 +33,8 @@ async function apply(db: AppDatabase, userId: string, operation: SyncOperation, 
       return finishWorkout(db, userId, operation.payload.sessionId, at);
     case "workout.note":
       return saveSessionNote(db, userId, operation.payload.sessionId, operation.payload.note);
+    case "exercise.feedback":
+      return saveExerciseFeedback(db, userId, operation.payload.workoutExerciseId, operation.payload);
   }
 }
 
@@ -57,6 +66,11 @@ export async function processOperations(
       results.push({ id: operation.id, status: "duplicate" });
       continue;
     }
+    if (isExpiredOperation(operation, now)) {
+      // Zu alt: ob er schon angewendet wurde, ist nicht mehr bekannt. Das Gerät verwirft ihn.
+      results.push({ id: operation.id, status: "rejected" });
+      continue;
+    }
     try {
       await apply(db, userId, operation, now);
       await db.insert(syncOperation).values({ userId, id: operation.id, processedAt: now }).onConflictDoNothing();
@@ -74,7 +88,10 @@ export async function processOperations(
   return results;
 }
 
-/** Entfernt Merker für Vorgänge, die so alt sind, dass kein Gerät sie mehr erneut schickt. */
+/**
+ * Entfernt Merker für Vorgänge, die so alt sind, dass der Server sie ohnehin als zu alt ablehnt
+ * (siehe `isExpiredOperation`).
+ */
 export async function pruneProcessedOperations(db: AppDatabase, now = new Date()): Promise<void> {
-  await db.delete(syncOperation).where(lt(syncOperation.processedAt, new Date(now.getTime() - 2 * MAX_OPERATION_AGE_MS)));
+  await db.delete(syncOperation).where(lt(syncOperation.processedAt, new Date(now.getTime() - PROCESSED_RETENTION_MS)));
 }

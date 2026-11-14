@@ -8,9 +8,9 @@ import { estimateDaySeconds, shortenDay } from "@/domain/training/adaptation";
 import { groupConsecutive, groupKind } from "@/domain/training/supersets";
 import { formatClock } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { startWorkoutAction } from "../actions";
 import type { PlanDayView, PlanExerciseView } from "../services/plan-service";
 import { routineTitle } from "../titles";
+import { StartWorkoutForm } from "./start-workout-form";
 import { SwapExerciseDialog } from "./swap-exercise-dialog";
 
 interface PlanDayCardProps {
@@ -105,21 +105,18 @@ export async function PlanDayCard({ day, isToday, canStart, allowSwap = true }: 
         <div className="grid gap-2">
           {canStart && day.exercises.length > 0 ? (
             <div className="grid grid-cols-[1fr_auto] gap-2">
-              <form action={startWorkoutAction}>
-                <input type="hidden" name="planDayId" value={day.id} />
+              <StartWorkoutForm planDayId={day.id}>
                 <Button type="submit" size="lg" className="w-full" variant={isToday ? "default" : "outline"}>
                   <PlayIcon aria-hidden />
                   {t("plan.start")}
                 </Button>
-              </form>
-              <form action={startWorkoutAction}>
-                <input type="hidden" name="planDayId" value={day.id} />
-                <input type="hidden" name="short" value="1" />
+              </StartWorkoutForm>
+              <StartWorkoutForm planDayId={day.id} short>
                 <Button type="submit" size="lg" variant="outline">
                   <TimerIcon aria-hidden />
                   {t("plan.startShort", { minutes: shortMinutes(day) })}
                 </Button>
-              </form>
+              </StartWorkoutForm>
             </div>
           ) : null}
           <Button asChild variant="ghost" className="justify-self-start">

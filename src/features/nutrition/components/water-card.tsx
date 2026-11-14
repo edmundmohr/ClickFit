@@ -11,8 +11,8 @@ import { addWaterAction, undoWaterAction } from "../actions";
 
 const QUICK_AMOUNTS_ML = [250, 330, 500];
 
-/** Wassertracker mit Schnell-Buttons. */
-export function WaterCard({ date, totalMl, goalMl }: { date: LocalDate; totalMl: number; goalMl: number }) {
+/** Wassertracker mit Schnell-Buttons. `date` = `null` bucht auf „heute“ zum Zeitpunkt des Klicks. */
+export function WaterCard({ date, totalMl, goalMl }: { date: LocalDate | null; totalMl: number; goalMl: number }) {
   const t = useTranslations("nutrition");
   const { run, pending } = useActionRunner();
   const share = Math.min(totalMl / goalMl, 1);

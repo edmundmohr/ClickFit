@@ -6,7 +6,7 @@ import type { AppDatabase } from "@/db/client";
 import { planDay, planExercise, trainingPlan } from "@/db/schema";
 import { normalizeGroups } from "@/domain/training/supersets";
 import { AppError } from "@/lib/errors";
-import type { LocalDate } from "@/lib/dates";
+import { toLocalDate, type LocalDate } from "@/lib/dates";
 import { newId } from "@/lib/tokens";
 import type { RoutineInput } from "../schemas";
 import { getUserCatalog } from "./exercise-service";
@@ -64,15 +64,23 @@ export async function deleteFolder(db: AppDatabase, userId: string, folderId: st
   await db.delete(trainingPlan).where(eq(trainingPlan.id, folderId));
 }
 
-/** Macht einen Ordner zum Wochenplan; der bisherige bleibt als Ordner erhalten. */
+/**
+ * Macht einen Ordner zum Wochenplan; der bisherige bleibt als Ordner erhalten.
+ * Der Plan beginnt am Tag der Aktivierung: Sonst gälten Tage seit dem Anlegen des Ordners im
+ * Kalender rückwirkend als verpasst, und die Deload-Wochen zählten ab dem falschen Tag.
+ */
 export async function activateFolder(db: AppDatabase, userId: string, folderId: string, now = new Date()): Promise<void> {
-  await getOwnedFolder(db, userId, folderId);
+  const folder = await getOwnedFolder(db, userId, folderId);
+  if (folder.status === "active") return;
   await db.batch([
     db
       .update(trainingPlan)
       .set({ status: "saved", updatedAt: now })
       .where(and(eq(trainingPlan.userId, userId), eq(trainingPlan.status, "active"))),
-    db.update(trainingPlan).set({ status: "active", updatedAt: now }).where(eq(trainingPlan.id, folderId)),
+    db
+      .update(trainingPlan)
+      .set({ status: "active", startDate: toLocalDate(now), updatedAt: now })
+      .where(eq(trainingPlan.id, folderId)),
   ]);
 }
 
@@ -98,22 +106,24 @@ export async function createRoutine(db: AppDatabase, userId: string, folderId: s
 /**
  * Speichert eine Routine vollständig: Name, Wochentag, Ordner und die Übungen in ihrer Reihenfolge.
  * Fliegt eine Übung aus einem erzeugten Plan, merkt sich das der Generator.
+ * Gelöschte eigene Übungen werden dabei entfernt (der Editor kündigt das an); unbekannte Übungen
+ * sind ein Fehler.
  */
 export async function saveRoutine(db: AppDatabase, userId: string, planDayId: string, input: RoutineInput): Promise<void> {
   const { day, plan } = await getOwnedDay(db, userId, planDayId);
   const targetFolder = input.folderId === plan.id ? plan : await getOwnedFolder(db, userId, input.folderId);
   const catalog = await getUserCatalog(db, userId);
   for (const entry of input.exercises) {
-    const exercise = catalog.find(entry.exerciseId);
-    if (!exercise || exercise.archived) throw new AppError("NOT_FOUND");
+    if (!catalog.find(entry.exerciseId)) throw new AppError("NOT_FOUND");
     if (entry.repMin > entry.repMax) throw new AppError("VALIDATION");
   }
+  const exercises = input.exercises.filter((entry) => !catalog.find(entry.exerciseId)?.archived);
 
   const before = await db.query.planExercise.findMany({
     columns: { exerciseId: true },
     where: eq(planExercise.planDayId, planDayId),
   });
-  const rows = normalizeGroups(input.exercises).map((entry, position) => ({
+  const rows = normalizeGroups(exercises).map((entry, position) => ({
     id: newId(),
     planDayId,
     position,
@@ -137,6 +147,7 @@ export async function saveRoutine(db: AppDatabase, userId: string, planDayId: st
   ]);
 
   if (plan.source === "generated") {
+    // Nur bewusst entfernte Übungen lernen, nicht automatisch entfernte gelöschte.
     const kept = new Set(input.exercises.map((entry) => entry.exerciseId));
     const removed = [...new Set(before.map((row) => row.exerciseId))].filter((id) => !kept.has(id));
     for (const exerciseId of removed) await recordRejection(db, userId, exerciseId, "removed");

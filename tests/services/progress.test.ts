@@ -17,6 +17,7 @@ import {
 } from "@/features/progress/services/photo-service";
 import {
   deleteMeasurement,
+  getLastTrainedDates,
   getMeasurements,
   getPeriodSessions,
   getRecoveryOverrides,
@@ -111,6 +112,21 @@ describe("set history", () => {
 
     const sessions = await getPeriodSessions(testDb.db, annaId, "2026-11-01", "2026-11-30");
     expect(sessions).toEqual([{ id: sessionId, date: TODAY, durationMinutes: 45 }]);
+  });
+});
+
+describe("last training per exercise", () => {
+  it("finds the last training date beyond the eight-week window", async () => {
+    // Regressionsfall: Ein Muskel, der vor neun Wochen trainiert wurde, galt als „noch nie trainiert“.
+    await saveOnboarding(testDb.db, annaId, onboarding);
+    await createPlanFromProfile(testDb.db, annaId, "2026-09-01");
+    await trainOnce(annaId, new Date("2026-09-07T17:00:00Z"));
+    const [{ exerciseId }] = await getTrainedSets(testDb.db, annaId);
+    expect((await getLastTrainedDates(testDb.db, annaId)).get(exerciseId)).toBe("2026-09-07");
+
+    await trainOnce(annaId, new Date("2026-11-16T17:00:00Z"));
+    expect((await getLastTrainedDates(testDb.db, annaId)).get(exerciseId)).toBe(TODAY);
+    expect((await getLastTrainedDates(testDb.db, eddiId)).size).toBe(0);
   });
 });
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ClipboardListIcon, MapPinIcon, PlayIcon, SlidersHorizontalIcon } from "lucide-react";
+import { ClipboardListIcon, CrosshairIcon, MapPinIcon, PlayIcon, SlidersHorizontalIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -79,6 +79,12 @@ export default async function TrainingPage() {
             <Link href="/training/adjustments">
               <SlidersHorizontalIcon aria-hidden />
               {t("adjustments")}
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/training/focus">
+              <CrosshairIcon aria-hidden />
+              {t("focusTraining")}
             </Link>
           </Button>
         </div>

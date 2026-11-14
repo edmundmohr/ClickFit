@@ -5,6 +5,7 @@ import { SlidersHorizontalIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/page-header";
 import { requireUser } from "@/features/auth/session";
+import { DayChangeRefresh } from "@/features/dashboard/day-change-refresh";
 import { QuickActions } from "@/features/dashboard/quick-actions";
 import {
   RecoveryWidget,
@@ -94,10 +95,11 @@ export default async function TodayPage() {
     <>
       <PageHeader title={t("home.greeting", { name: user.name })} />
       <div className="grid gap-4">
+        <DayChangeRefresh today={today} />
+        {/* Ohne Datum: Die Eingabeseite nimmt „heute“ beim Öffnen, auch nach Mitternacht. */}
         <QuickActions
-          today={today}
           trainingHref={running ? `/workout/${running.id}` : "/training"}
-          mealHref={`/nutrition/add?target=log&date=${today}&meal=${mealForNow(now)}`}
+          mealHref={`/nutrition/add?target=log&meal=${mealForNow(now)}`}
         />
         {plan ? null : (
           <OnboardingPrompt

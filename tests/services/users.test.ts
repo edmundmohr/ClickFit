@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
-import { apiToken, bodyWeightEntry, session } from "@/db/schema";
+import { aiUsage, apiToken, bodyWeightEntry, session } from "@/db/schema";
 import { AppError } from "@/lib/errors";
 import type { Actor } from "@/domain/permissions/user-management";
 import { createUserWithPassword } from "@/features/auth/services/user-factory";
@@ -16,6 +16,7 @@ import {
   updatePreferences,
 } from "@/features/users/services/account-service";
 import { newId } from "@/lib/tokens";
+import { PASSWORD_CHECK_LIMIT } from "@/lib/auth/attempt-limit";
 import { TEST_PASSWORDS, createTestDatabase, type TestDatabase } from "../helpers/test-db";
 
 let testDb: TestDatabase;
@@ -122,6 +123,25 @@ describe("changing the own password", () => {
     expect(await sessionTokens(admin.id)).toEqual(["admin-session"]);
   });
 
+  it("limits guessing the current password and counts only until the next success", async () => {
+    const attempt = (currentPassword: string, now: Date) =>
+      changeOwnPassword(
+        testDb.db,
+        { userId: anna.id, currentPassword, newPassword: TEST_PASSWORDS.replacement, keepSessionToken: "current" },
+        now,
+      );
+    const start = new Date("2026-11-14T10:00:00Z");
+    for (let index = 0; index < PASSWORD_CHECK_LIMIT.max; index++) await expectAppError(attempt("falsch", start), "WRONG_PASSWORD");
+    // Auch das richtige Passwort hilft im laufenden Fenster nicht mehr.
+    await expectAppError(attempt(TEST_PASSWORDS.anna, start), "TOO_MANY_REQUESTS");
+    expect(await verifyUserPassword(testDb.db, anna.id, TEST_PASSWORDS.anna)).toBe(true);
+
+    const later = new Date(start.getTime() + PASSWORD_CHECK_LIMIT.windowMs);
+    await expectAppError(attempt("falsch", later), "WRONG_PASSWORD");
+    await attempt(TEST_PASSWORDS.anna, later);
+    expect(await verifyUserPassword(testDb.db, anna.id, TEST_PASSWORDS.replacement)).toBe(true);
+  });
+
   it("rejects a new password that is too short", async () => {
     await expectAppError(
       changeOwnPassword(testDb.db, {
@@ -214,6 +234,15 @@ describe("user list, profile and export", () => {
     expect(serialized).not.toContain("geheimer-hash");
     expect(serialized).not.toContain(admin.id);
     expect((await exportOwnData(testDb.db, admin.id)).data.body.weights[0]).toMatchObject({ weightKg: 90 });
+  });
+
+  it("exports the AI usage per day", async () => {
+    await testDb.db.insert(aiUsage).values([
+      { userId: anna.id, date: "2026-11-13", count: 3 },
+      { userId: admin.id, date: "2026-11-13", count: 7 },
+    ]);
+    const exported = await exportOwnData(testDb.db, anna.id);
+    expect(exported.data.app.aiUsage).toEqual([{ userId: anna.id, date: "2026-11-13", count: 3 }]);
   });
 
   it("never includes password hashes in the export", async () => {

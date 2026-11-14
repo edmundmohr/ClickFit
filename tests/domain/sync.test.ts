@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  MAX_OPERATION_AGE_MS,
   MAX_OPERATIONS_PER_REQUEST,
+  PROCESSED_RETENTION_MS,
+  isExpiredOperation,
   operationTime,
   queueKey,
   syncOperationSchema,
@@ -54,14 +57,28 @@ describe("sync operations", () => {
     expect(queueKey(saved)).not.toBe(queueKey(syncOperationSchema.parse({ id: SET_B, at, ...save(SET_B, 8) })));
   });
 
-  it("uses the device time unless it is in the future or very old", () => {
+  it("uses the device time unless it is in the future or invalid", () => {
     const now = new Date("2026-11-14T12:00:00Z");
     expect(operationTime("2026-11-14T09:30:00Z", now).toISOString()).toBe("2026-11-14T09:30:00.000Z");
     expect(operationTime("2026-11-14T13:00:00Z", now)).toEqual(now);
-    expect(operationTime("2026-09-01T09:30:00Z", now)).toEqual(now);
+    // Ein alter Zeitpunkt (z. B. Ende eines vor Wochen vergessenen Trainings) bleibt erhalten.
+    expect(operationTime("2026-09-01T09:30:00Z", now).toISOString()).toBe("2026-09-01T09:30:00.000Z");
     expect(operationTime("garbage", now)).toEqual(now);
     // Wenige Minuten Vorlauf der Geräteuhr werden auf die Serverzeit begrenzt.
     expect(operationTime("2026-11-14T12:02:00Z", now)).toEqual(now);
+  });
+
+  it("expires old operations except finishing a workout, before the server forgets them", () => {
+    const now = new Date("2026-11-14T12:00:00Z");
+    const old = new Date(now.getTime() - MAX_OPERATION_AGE_MS - 60_000).toISOString();
+    const recent = new Date(now.getTime() - MAX_OPERATION_AGE_MS + 60_000).toISOString();
+    const saveAt = (at: string) => syncOperationSchema.parse({ id: SET_A, at, ...save(SET_A, 8) });
+    expect(isExpiredOperation(saveAt(old), now)).toBe(true);
+    expect(isExpiredOperation(saveAt(recent), now)).toBe(false);
+    const finish = syncOperationSchema.parse({ id: SET_B, at: old, type: "workout.finish", payload: { sessionId: "s1" } });
+    expect(isExpiredOperation(finish, now)).toBe(false);
+    // Merker bleiben länger als die Annahmefrist plus Uhrtoleranz.
+    expect(PROCESSED_RETENTION_MS).toBeGreaterThan(MAX_OPERATION_AGE_MS + 60 * 60_000);
   });
 });
 
@@ -203,6 +220,7 @@ describe("restoring pending changes in the workout", () => {
     mistakes: [],
     previous: null,
     bests: null,
+    feedback: null,
     sets: [
       { id: SET_A, type: "work", weightText: "", repsText: "", rir: null, note: "", completed: false },
       { id: SET_B, type: "work", weightText: "", repsText: "", rir: null, note: "", completed: false },

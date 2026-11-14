@@ -198,6 +198,8 @@ describe("plateau detection", () => {
     bestReps: 8,
     sets: 4,
     avgRir: 2,
+    minAssistanceKg: null,
+    repsAtMinAssistance: null,
     ...extra,
   });
   const stalled = (extra: Partial<SessionPoint> = {}) => [0, 7, 14, 21, 28, 35].map((day) => point(day, 100, extra));
@@ -220,6 +222,49 @@ describe("plateau detection", () => {
   it("suggests a deload after hard sessions and more volume after few sets", () => {
     expect(detectPlateau(stalled({ avgRir: 0.5 }))?.suggestion).toBe("deload");
     expect(detectPlateau(stalled({ sets: 2 }))?.suggestion).toBe("volume");
+  });
+
+  describe("assisted exercises", () => {
+    const assisted = (kgs: number[], reps = 8) =>
+      [0, 7, 14, 21, 28, 35].map((day, index) =>
+        point(day, 0, { oneRepMaxKg: null, minAssistanceKg: kgs[index], repsAtMinAssistance: reps }),
+      );
+
+    it("treats less assistance as progress", () => {
+      expect(detectPlateau(assisted([40, 40, 40, 35, 35, 30]))).toBeNull();
+    });
+
+    it("finds a stall or a step back when assistance stays or rises", () => {
+      expect(detectPlateau(assisted([30, 30, 30, 30, 30, 30]))).toEqual({ days: 35, suggestion: "variation" });
+      // Regressionstest: Mehr Unterstützung ist kein Fortschritt.
+      expect(detectPlateau(assisted([30, 30, 30, 35, 40, 45]))).not.toBeNull();
+    });
+
+    it("counts more reps at the same assistance as progress", () => {
+      const series = assisted([30, 30, 30, 30, 30, 30]);
+      series[5] = { ...series[5], repsAtMinAssistance: 10 };
+      expect(detectPlateau(series)).toBeNull();
+    });
+  });
+});
+
+describe("assisted exercise series", () => {
+  const ASSISTED = "assisted-pull-up-machine";
+
+  it("records the least assistance and no load or volume", () => {
+    const data = [
+      set({ exerciseId: ASSISTED, weightKg: 35, reps: 10 }),
+      set({ exerciseId: ASSISTED, weightKg: 30, reps: 6 }),
+      set({ exerciseId: ASSISTED, weightKg: 30, reps: 8 }),
+    ];
+    const [point] = exerciseSeries(data, ASSISTED, "assisted_bodyweight");
+    expect(point).toMatchObject({
+      oneRepMaxKg: null,
+      volumeKg: 0,
+      bestWeightKg: null,
+      minAssistanceKg: 30,
+      repsAtMinAssistance: 8,
+    });
   });
 });
 
@@ -251,6 +296,22 @@ describe("period report", () => {
       busiestMonth: 11,
     });
     expect(report.topExercises[0]).toEqual({ exerciseId: BENCH, sets: 2, sessions: 2 });
+  });
+
+  it("leaves assistance out of the volume and counts less assistance as an improvement", () => {
+    const ASSISTED = "assisted-pull-up-machine";
+    const all = [
+      set({ date: "2026-10-20", sessionId: "a", exerciseId: ASSISTED, weightKg: 30, reps: 8 }),
+      set({ date: "2026-11-03", sessionId: "b", exerciseId: ASSISTED, weightKg: 25, reps: 8 }),
+      set({ date: "2026-11-03", sessionId: "b", weightKg: 80, reps: 5 }),
+    ];
+    const sessions = [{ id: "b", date: "2026-11-03", durationMinutes: 60 }];
+    const report = periodReport(sessions, all, "2026-11-01", "2026-11-30", lookup);
+    expect(report.volumeKg).toBe(80 * 5);
+    expect(report.improvedExercises).toEqual([ASSISTED]);
+    // Mehr Unterstützung ist keine Verbesserung.
+    const worse = all.map((item) => (item.sessionId === "b" && item.exerciseId === ASSISTED ? { ...item, weightKg: 40 } : item));
+    expect(periodReport(sessions, worse, "2026-11-01", "2026-11-30", lookup).improvedExercises).toEqual([]);
   });
 
   it("is empty for a period without training", () => {

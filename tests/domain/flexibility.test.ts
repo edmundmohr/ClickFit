@@ -5,6 +5,7 @@ import { adaptDay, estimateDaySeconds, shortenDay, type DayEntry } from "@/domai
 import { dayStatus } from "@/domain/training/calendar";
 import { cycleStatus } from "@/domain/training/cycle";
 import { avoidedPatterns, generatePlan, isExerciseAvailable, type ExercisePreference } from "@/domain/training/plan-generator";
+import { estimateSessionSeconds } from "@/domain/training/plan-generator/prescription";
 import { nextSetTargets } from "@/domain/training/progression";
 import { buildRecoveryDay, readiness } from "@/domain/training/recovery-day";
 import { trainingStreak } from "@/domain/training/schedule";
@@ -357,6 +358,41 @@ describe("recovery-oriented day", () => {
   it("recommends rest when nothing is recovered", () => {
     const day = buildRecoveryDay(all(30), profile(), EXERCISES);
     expect(day.restRecommended).toBe(true);
+  });
+
+  it("does not stop at a tired muscle while fresh ones are still left", () => {
+    // Regression: Beine hinten 65 %, oberer Rücken 72 % – Kreuzheben (nicht bereit) beendete die
+    // Auswahl, bevor das Rudern (bereit) an der Reihe war.
+    const recovery = {
+      ...all(30),
+      chest: 100,
+      abs: 100,
+      hamstrings: 65,
+      glutes: 65,
+      lower_back: 65,
+      upper_back: 72,
+      lats: 72,
+    };
+    const day = buildRecoveryDay(recovery, profile(), EXERCISES);
+    const ids = day.exercises.map((planned) => planned.exerciseId);
+    expect(ids).toContain("barbell-row");
+    expect(ids).not.toContain("deadlift");
+    for (const id of ids) expect(readiness(lookup(id)!, recovery)).toBeGreaterThanOrEqual(70);
+  });
+
+  it("does not recommend rest while a muscle group is ready", () => {
+    // Regression: Die erste Option (69 %) entschied, obwohl eine andere bei 74 % lag.
+    const recovery = { ...all(30), quads: 69, glutes: 69, lats: 74, upper_back: 74 };
+    expect(buildRecoveryDay(recovery, profile(), EXERCISES).restRecommended).toBe(false);
+    expect(buildRecoveryDay({ ...recovery, lats: 69, upper_back: 69 }, profile(), EXERCISES).restRecommended).toBe(true);
+  });
+
+  it("stays within the session duration", () => {
+    for (const experience of ["beginner", "intermediate", "advanced"] as const) {
+      const day = buildRecoveryDay(all(100), profile({ experience, sessionMinutes: 30 }), EXERCISES);
+      expect(day.exercises.length).toBeGreaterThanOrEqual(3);
+      expect(estimateSessionSeconds(day.exercises)).toBeLessThanOrEqual(30 * 60);
+    }
   });
 
   it("is deterministic and respects equipment", () => {
