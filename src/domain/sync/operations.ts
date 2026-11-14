@@ -3,7 +3,7 @@
  * sobald wieder eine Verbindung besteht. Reine Typen und Regeln ohne Framework.
  */
 import { z } from "zod";
-import { SET_TYPES } from "@/domain/training/types";
+import { EFFORT_LEVELS, MAX_FEEDBACK_RIR, SET_TYPES } from "@/domain/training/types";
 
 const id = z.string().min(1).max(80);
 const isoInstant = z.iso.datetime();
@@ -21,6 +21,13 @@ export const setPayloadSchema = z.object({
   completed: z.boolean(),
 });
 
+/** Abfrage nach einer Übung; zweimal `null` löscht die Angaben wieder. */
+export const exerciseFeedbackPayloadSchema = z.object({
+  workoutExerciseId: id,
+  effort: z.enum(EFFORT_LEVELS).nullable(),
+  rir: z.number().int().min(0).max(MAX_FEEDBACK_RIR).nullable(),
+});
+
 const base = { id: z.uuid(), at: isoInstant };
 
 export const syncOperationSchema = z.discriminatedUnion("type", [
@@ -32,6 +39,7 @@ export const syncOperationSchema = z.discriminatedUnion("type", [
     type: z.literal("workout.note"),
     payload: z.object({ sessionId: id, note: z.string().max(500) }),
   }),
+  z.object({ ...base, type: z.literal("exercise.feedback"), payload: exerciseFeedbackPayloadSchema }),
 ]);
 export type SyncOperation = z.infer<typeof syncOperationSchema>;
 export type SyncOperationType = SyncOperation["type"];
@@ -68,6 +76,8 @@ export function queueKey(operation: SyncOperation): string {
       return `note:${operation.payload.sessionId}`;
     case "workout.finish":
       return `finish:${operation.payload.sessionId}`;
+    case "exercise.feedback":
+      return `feedback:${operation.payload.workoutExerciseId}`;
   }
 }
 

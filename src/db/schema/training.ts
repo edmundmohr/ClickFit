@@ -188,6 +188,9 @@ export const workoutExercise = sqliteTable(
     targetRir: integer().notNull(),
     restSeconds: integer().notNull(),
     groupId: text(),
+    /** Abfrage nach dem letzten Satz: Anstrengung (`EFFORT_LEVELS`) und RIR, beides freiwillig. */
+    effort: text(),
+    effortRir: integer(),
   },
   (table) => [
     index("workout_exercise_session_id_idx").on(table.sessionId),

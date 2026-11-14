@@ -6,7 +6,15 @@ import type { AppDatabase } from "@/db/client";
 import { workoutExercise, workoutSet } from "@/db/schema";
 import type { ExerciseType } from "@/domain/exercises/types";
 import type { ExerciseBests } from "@/domain/training/records";
-import { DAY_FOCUSES, SET_TYPES, isOneOf, type DayFocus, type SetType } from "@/domain/training/types";
+import {
+  DAY_FOCUSES,
+  EFFORT_LEVELS,
+  SET_TYPES,
+  isOneOf,
+  type DayFocus,
+  type ExerciseFeedback,
+  type SetType,
+} from "@/domain/training/types";
 import { ladderFor, usesPlates, type BarSetup, type WeightUnit } from "@/domain/training/weights";
 import type { LocalDate } from "@/lib/dates";
 import { getUserCatalog } from "./exercise-service";
@@ -49,6 +57,8 @@ export interface WorkoutExerciseView {
   note: string;
   previous: PreviousPerformance | null;
   bests: ExerciseBests | null;
+  /** Abfrage nach der Übung; `null`, solange nichts angegeben ist. */
+  feedback: ExerciseFeedback | null;
   sets: WorkoutSetView[];
 }
 
@@ -138,6 +148,10 @@ export async function getWorkoutView(
           note: notes.get(row.exerciseId) ?? "",
           previous: previous.get(row.exerciseId) ?? null,
           bests: bests.get(row.exerciseId) ?? null,
+          feedback:
+            row.effort === null && row.effortRir === null
+              ? null
+              : { effort: isOneOf(EFFORT_LEVELS, row.effort) ? row.effort : null, rir: row.effortRir },
           sets: setRows
             .filter((set) => set.workoutExerciseId === row.id)
             .map((set) => ({

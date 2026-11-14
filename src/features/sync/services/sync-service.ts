@@ -13,7 +13,13 @@ import {
   type SyncOperation,
   type SyncResult,
 } from "@/domain/sync/operations";
-import { deleteSet, finishWorkout, saveSessionNote, saveSet } from "@/features/training/services/workout-service";
+import {
+  deleteSet,
+  finishWorkout,
+  saveExerciseFeedback,
+  saveSessionNote,
+  saveSet,
+} from "@/features/training/services/workout-service";
 import { AppError } from "@/lib/errors";
 
 async function apply(db: AppDatabase, userId: string, operation: SyncOperation, now: Date): Promise<void> {
@@ -27,6 +33,8 @@ async function apply(db: AppDatabase, userId: string, operation: SyncOperation, 
       return finishWorkout(db, userId, operation.payload.sessionId, at);
     case "workout.note":
       return saveSessionNote(db, userId, operation.payload.sessionId, operation.payload.note);
+    case "exercise.feedback":
+      return saveExerciseFeedback(db, userId, operation.payload.workoutExerciseId, operation.payload);
   }
 }
 

@@ -6,10 +6,19 @@ import { CircleDotIcon, FlameIcon, InfoIcon, PlusIcon, StickyNoteIcon } from "lu
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { detectRecords } from "@/domain/training/records";
+import type { ExerciseFeedback } from "@/domain/training/types";
 import { formatClock, formatDayShort, formatNumber } from "@/lib/format";
 import { toDisplayWeight, unitSystemOf } from "@/lib/units";
+import { ExerciseCheckIn } from "./exercise-check-in";
 import { SetRow } from "./set-row";
-import { toLoggedSet, usesWeight, workSetNumber, type ExerciseDraft, type SetDraft } from "./workout-state";
+import {
+  isExerciseDone,
+  toLoggedSet,
+  usesWeight,
+  workSetNumber,
+  type ExerciseDraft,
+  type SetDraft,
+} from "./workout-state";
 
 export interface InvalidField {
   setId: string;
@@ -27,6 +36,9 @@ interface ExerciseCardProps {
   onEditNote: () => void;
   /** Öffnet den Scheiben-Rechner; nur bei Übungen mit Scheiben vorhanden. */
   onOpenPlates?: () => void;
+  /** Nach dem letzten Satz nach Anstrengung und RIR fragen. */
+  checkIn: boolean;
+  onFeedback: (feedback: ExerciseFeedback) => void;
 }
 
 export function ExerciseCard({
@@ -39,12 +51,15 @@ export function ExerciseCard({
   onAddWarmup,
   onEditNote,
   onOpenPlates,
+  checkIn,
+  onFeedback,
 }: ExerciseCardProps) {
   const t = useTranslations();
   const showWeight = usesWeight(exercise.type);
   const unitSystem = unitSystemOf(exercise.unit);
   const unit = t(`training.units.${exercise.unit}`);
   const isTimed = exercise.type === "duration";
+  const done = isExerciseDone(exercise);
 
   const weightColumn =
     exercise.type === "weighted_bodyweight"
@@ -123,6 +138,9 @@ export function ExerciseCard({
             onOpenOptions={() => onOpenOptions(set.id)}
           />
         ))}
+        {done || exercise.feedback ? (
+          <ExerciseCheckIn feedback={exercise.feedback} ask={checkIn && done} onChange={onFeedback} />
+        ) : null}
         <div className="flex flex-wrap gap-2 pt-1">
           <Button variant="outline" size="sm" onClick={onAddSet}>
             <PlusIcon aria-hidden />

@@ -11,6 +11,17 @@ export interface PerformedSet {
   rir: number | null;
 }
 
+/**
+ * Ergänzt den RIR aus der Abfrage nach der Übung: Er beschreibt, wie viel nach dem letzten Satz
+ * noch übrig war, und gilt deshalb nur für den letzten Satz – und nur, wenn dort nichts
+ * eingetragen ist. Eingetragene Satz-Werte haben immer Vorrang.
+ */
+export function withExerciseRir<T extends PerformedSet>(sets: readonly T[], exerciseRir: number | null): T[] {
+  const last = sets.length - 1;
+  if (exerciseRir === null || last < 0 || sets[last].rir !== null) return [...sets];
+  return sets.map((set, index) => (index === last ? { ...set, rir: exerciseRir } : set));
+}
+
 export interface SetTarget {
   weightKg: number | null;
   reps: number | null;

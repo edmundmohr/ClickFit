@@ -37,6 +37,8 @@ export const trainingSettings = sqliteTable("training_settings", {
     .references(() => user.id, { onDelete: "cascade" }),
   recoveryMode: integer({ mode: "boolean" }).notNull().default(false),
   gripModule: integer({ mode: "boolean" }).notNull().default(false),
+  /** Abfrage nach jeder Übung im Trainingsmodus (Anstrengung und RIR). */
+  exerciseCheckIn: integer({ mode: "boolean" }).notNull().default(true),
   vacation: text({ mode: "json" }).$type<StoredVacation>(),
   cycle: text({ mode: "json" }).$type<StoredCycle>(),
   extraSports: text({ mode: "json" }).$type<StoredExtraSport[]>(),

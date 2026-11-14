@@ -218,6 +218,7 @@ describe("restoring pending changes in the workout", () => {
     note: "",
     previous: null,
     bests: null,
+    feedback: null,
     sets: [
       { id: SET_A, type: "work", weightText: "", repsText: "", rir: null, note: "", completed: false },
       { id: SET_B, type: "work", weightText: "", repsText: "", rir: null, note: "", completed: false },

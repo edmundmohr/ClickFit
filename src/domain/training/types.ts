@@ -66,6 +66,18 @@ export type DayFocus = (typeof DAY_FOCUSES)[number];
 export const SET_TYPES = ["warmup", "work", "failure", "drop"] as const;
 export type SetType = (typeof SET_TYPES)[number];
 
+/** Wie sich eine Übung angefühlt hat (Abfrage nach dem letzten Satz). */
+export const EFFORT_LEVELS = ["easy", "right", "hard", "max"] as const;
+export type EffortLevel = (typeof EFFORT_LEVELS)[number];
+/** Höchster wählbarer RIR-Wert bei der Abfrage; er steht für „4 oder mehr“. */
+export const MAX_FEEDBACK_RIR = 4;
+
+/** Rückmeldung zu einer Übung im Training. Beide Angaben sind freiwillig. */
+export interface ExerciseFeedback {
+  effort: EffortLevel | null;
+  rir: number | null;
+}
+
 export interface CardioPreference {
   wanted: boolean;
   types: CardioType[];

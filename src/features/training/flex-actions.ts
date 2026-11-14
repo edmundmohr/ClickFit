@@ -176,7 +176,11 @@ export async function saveInjuriesAction(input: unknown): Promise<ActionResult> 
   return result;
 }
 
-const modesSchema = z.object({ recoveryMode: z.boolean().optional(), gripModule: z.boolean().optional() });
+const modesSchema = z.object({
+  recoveryMode: z.boolean().optional(),
+  gripModule: z.boolean().optional(),
+  exerciseCheckIn: z.boolean().optional(),
+});
 
 export async function saveModesAction(input: unknown): Promise<ActionResult> {
   const user = await requireUser();

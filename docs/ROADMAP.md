@@ -151,3 +151,5 @@ Grenzen:
 
 - Fokus-Training: eine einzelne Einheit für ausgewählte Körperregionen und eine wählbare Dauer
   (20–90 Minuten), unabhängig vom Wochenplan; zeigt die Erholung je Region an.
+- Abfrage nach jeder Übung: Anstrengung und RIR nach dem letzten Satz, freiwillig und
+  abschaltbar; fließt in die Progression und in „Plan verfeinern“ ein.

@@ -46,6 +46,8 @@
     "recoveryText": "Zusätzlich zum Wochenplan schlägt die App täglich ein Training aus den frischesten Muskelgruppen vor.",
     "gripTitle": "Griffkraft-Modul",
     "gripText": "Ergänzt an zwei Tagen pro Woche eine Griff- bzw. Unterarmübung. Gilt ab dem nächsten neu erstellten Plan.",
+    "checkInTitle": "Abfrage nach jeder Übung",
+    "checkInText": "Nach dem letzten Satz fragt die App kurz, wie anstrengend die Übung war und wie viele Wiederholungen noch gegangen wären. Die Angabe ist freiwillig und fließt in die Progression und – falls eingeschaltet – in „Plan verfeinern“ ein.",
     "on": "An",
     "off": "Aus"
   },

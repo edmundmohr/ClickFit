@@ -48,7 +48,11 @@ export default async function AdjustmentsPage() {
           today={today}
           gyms={gyms.map((gym) => ({ id: gym.id, name: gym.name ?? t(`training.locations.${gym.type}`) }))}
         />
-        <ModesCard recoveryMode={settings.recoveryMode} gripModule={settings.gripModule} />
+        <ModesCard
+          recoveryMode={settings.recoveryMode}
+          gripModule={settings.gripModule}
+          exerciseCheckIn={settings.exerciseCheckIn}
+        />
         <ExtraSportsCard sports={settings.extraSports} />
         <ExcludedCard exercises={excluded} />
         <CycleCard cycle={settings.cycle} today={today} />

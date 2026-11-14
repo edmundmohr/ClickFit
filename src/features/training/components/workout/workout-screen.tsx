@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { warmupSets } from "@/domain/training/progression";
 import { isAssisted } from "@/domain/training/records";
+import type { ExerciseFeedback } from "@/domain/training/types";
 import { afterSetCompleted, groupConsecutive, groupKind, groupRestSeconds } from "@/domain/training/supersets";
 import { estimateRemainingSeconds, isWorkoutForgotten, suggestFinishTime } from "@/domain/training/schedule";
 import { formatDayLong, formatDuration, formatTime } from "@/lib/format";
@@ -48,6 +49,8 @@ interface WorkoutScreenProps {
   unitSystem: UnitSystem;
   /** Wem die Offline-Warteschlange auf diesem Gerät gehört. */
   userId: string;
+  /** Abfrage nach jeder Übung (Einstellung unter Anpassungen). */
+  checkIn: boolean;
 }
 
 interface SetRef {
@@ -55,7 +58,7 @@ interface SetRef {
   setId: string;
 }
 
-export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) {
+export function WorkoutScreen({ view, unitSystem, userId, checkIn }: WorkoutScreenProps) {
   const t = useTranslations();
   const router = useRouter();
   /** Ohne Netz beendet: Zeitpunkt des Endes, bis der Server es bestätigt hat. */
@@ -108,7 +111,12 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
         const deletedSetIds = operations.flatMap((operation) =>
           operation.type === "set.delete" ? [operation.payload.setId] : [],
         );
-        if (saves.length > 0 || deletedSetIds.length > 0) dispatch({ type: "restore", changes: { saves, deletedSetIds } });
+        const feedback = operations.flatMap((operation) =>
+          operation.type === "exercise.feedback" ? [operation.payload] : [],
+        );
+        if (saves.length > 0 || deletedSetIds.length > 0 || feedback.length > 0) {
+          dispatch({ type: "restore", changes: { saves, deletedSetIds, feedback } });
+        }
         const finish = operations.find(
           (operation) => operation.type === "workout.finish" && operation.payload.sessionId === view.id,
         );
@@ -132,6 +140,15 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
     const set = exercise?.sets.find((item) => item.id === ref.setId);
     return exercise && set ? { exercise, set } : null;
   };
+
+  /** Abfrage nach der Übung: über die Warteschlange, damit sie auch ohne Netz ankommt. */
+  function saveFeedback(exerciseId: string, feedback: ExerciseFeedback) {
+    dispatch({ type: "feedback", exerciseId, feedback });
+    const engine = getSyncEngine();
+    void engine
+      .enqueue({ type: "exercise.feedback", payload: { workoutExerciseId: exerciseId, ...feedback } })
+      .then(() => engine.syncNow());
+  }
 
   function edit(exerciseId: string, setId: string, patch: Partial<SetDraft>) {
     dispatch({ type: "edit", exerciseId, setId, patch });
@@ -302,6 +319,8 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
       onAddWarmup={() => addWarmup(exercise.id)}
       onEditNote={() => setNoteFor(exercise.exerciseId)}
       onOpenPlates={exercise.bar ? () => setPlatesFor(exercise.id) : undefined}
+      checkIn={checkIn && inProgress}
+      onFeedback={(feedback) => saveFeedback(exercise.id, feedback)}
     />
   );
 

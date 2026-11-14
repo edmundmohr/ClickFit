@@ -169,8 +169,14 @@ function SwitchRow({ title, text, checked, disabled, onChange }: SwitchRowProps)
   );
 }
 
-/** Schalter für den erholungsorientierten Modus und das Griffkraft-Modul. */
-export function ModesCard({ recoveryMode, gripModule }: { recoveryMode: boolean; gripModule: boolean }) {
+interface ModesCardProps {
+  recoveryMode: boolean;
+  gripModule: boolean;
+  exerciseCheckIn: boolean;
+}
+
+/** Schalter für den erholungsorientierten Modus, das Griffkraft-Modul und die Abfrage nach jeder Übung. */
+export function ModesCard({ recoveryMode, gripModule, exerciseCheckIn }: ModesCardProps) {
   const t = useTranslations("adjustments");
   const { run, pending } = useActionRunner();
   return (
@@ -192,6 +198,15 @@ export function ModesCard({ recoveryMode, gripModule }: { recoveryMode: boolean;
           checked={gripModule}
           disabled={pending}
           onChange={(checked) => run(() => saveModesAction({ gripModule: checked }), () => toast.success(t("saved")))}
+        />
+        <SwitchRow
+          title={t("modes.checkInTitle")}
+          text={t("modes.checkInText")}
+          checked={exerciseCheckIn}
+          disabled={pending}
+          onChange={(checked) =>
+            run(() => saveModesAction({ exerciseCheckIn: checked }), () => toast.success(t("saved")))
+          }
         />
       </CardContent>
     </Card>

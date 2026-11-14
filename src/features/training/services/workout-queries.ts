@@ -5,7 +5,7 @@ import { and, asc, desc, eq, inArray, isNotNull, lt, ne, or, type SQL } from "dr
 import type { AppDatabase } from "@/db/client";
 import { workoutExercise, workoutSession, workoutSet } from "@/db/schema";
 import type { ExerciseType } from "@/domain/exercises/types";
-import type { PerformedSet } from "@/domain/training/progression";
+import { withExerciseRir, type PerformedSet } from "@/domain/training/progression";
 import { bestsOf, type ExerciseBests, type LoggedSet } from "@/domain/training/records";
 import { SET_TYPES, isOneOf } from "@/domain/training/types";
 import { AppError } from "@/lib/errors";
@@ -68,6 +68,7 @@ export async function getPreviousPerformances(
       weightKg: workoutSet.weightKg,
       reps: workoutSet.reps,
       rir: workoutSet.rir,
+      exerciseRir: workoutExercise.effortRir,
     })
     .from(workoutSet)
     .innerJoin(workoutExercise, eq(workoutSet.workoutExerciseId, workoutExercise.id))
@@ -87,15 +88,21 @@ export async function getPreviousPerformances(
 
   // Die Zeilen sind nach Datum absteigend sortiert: Pro Übung zählt nur die erste Einheit.
   const sessionByExercise = new Map<string, string>();
+  const exerciseRirs = new Map<string, number | null>();
   for (const row of rows) {
     const chosen = sessionByExercise.get(row.exerciseId);
     if (chosen === undefined) {
       sessionByExercise.set(row.exerciseId, row.sessionId);
       result.set(row.exerciseId, { date: row.date, sets: [] });
+      exerciseRirs.set(row.exerciseId, row.exerciseRir);
     } else if (chosen !== row.sessionId) {
       continue;
     }
     result.get(row.exerciseId)?.sets.push({ weightKg: row.weightKg, reps: row.reps, rir: row.rir });
+  }
+  // Der RIR aus der Abfrage nach der Übung ergänzt den letzten Satz, wenn dort keiner steht.
+  for (const [exerciseId, performance] of result) {
+    performance.sets = withExerciseRir(performance.sets, exerciseRirs.get(exerciseId) ?? null);
   }
   return result;
 }

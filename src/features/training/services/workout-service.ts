@@ -7,7 +7,7 @@ import { exerciseNote, planExercise, workoutExercise, workoutSession, workoutSet
 import { adaptDay, shortenDay } from "@/domain/training/adaptation";
 import { cycleStatus } from "@/domain/training/cycle";
 import { isDeloadWeek, nextSetTargets } from "@/domain/training/progression";
-import type { PlannedExercise } from "@/domain/training/types";
+import type { ExerciseFeedback, PlannedExercise } from "@/domain/training/types";
 import { reentryFactor } from "@/domain/training/vacation";
 import { ladderFor, type WeightUnit } from "@/domain/training/weights";
 import { AppError } from "@/lib/errors";
@@ -303,6 +303,20 @@ export async function saveSet(
   } else {
     await db.insert(workoutSet).values({ id: input.id, workoutExerciseId: input.workoutExerciseId, ...values });
   }
+}
+
+/** Speichert die Abfrage nach einer Übung (Anstrengung und RIR); auch nachträglich möglich. */
+export async function saveExerciseFeedback(
+  db: AppDatabase,
+  userId: string,
+  workoutExerciseId: string,
+  feedback: ExerciseFeedback,
+): Promise<void> {
+  await getOwnedWorkoutExercise(db, userId, workoutExerciseId);
+  await db
+    .update(workoutExercise)
+    .set({ effort: feedback.effort, effortRir: feedback.rir })
+    .where(eq(workoutExercise.id, workoutExerciseId));
 }
 
 export async function deleteSet(db: AppDatabase, userId: string, setId: string): Promise<void> {

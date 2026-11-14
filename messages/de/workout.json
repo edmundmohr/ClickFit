@@ -131,5 +131,22 @@
   },
   "noteSavedOffline": "Notiz auf dem Gerät gespeichert. Sie wird übertragen, sobald du wieder online bist.",
   "pushTitle": "Pause vorbei",
-  "pushBody": "Weiter geht's mit dem nächsten Satz."
+  "pushBody": "Weiter geht's mit dem nächsten Satz.",
+  "checkIn": {
+    "title": "Wie war die Übung?",
+    "effortLabel": "Anstrengung",
+    "effort": {
+      "easy": "Leicht",
+      "right": "Passend",
+      "hard": "Schwer",
+      "max": "Am Limit"
+    },
+    "rirLabel": "Wie viele Wiederholungen wären noch gegangen (RIR)?",
+    "rirSummary": "RIR {rir}",
+    "skip": "Überspringen",
+    "close": "Fertig",
+    "skipped": "Ohne Bewertung",
+    "rate": "Bewerten",
+    "edit": "Ändern"
+  }
 }

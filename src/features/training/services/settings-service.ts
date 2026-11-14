@@ -27,6 +27,8 @@ export interface ExtraSport {
 export interface TrainingSettings {
   recoveryMode: boolean;
   gripModule: boolean;
+  /** Abfrage nach jeder Übung im Trainingsmodus. */
+  exerciseCheckIn: boolean;
   vacation: Vacation | null;
   cycle: CycleSettings | null;
   extraSports: ExtraSport[];
@@ -35,6 +37,7 @@ export interface TrainingSettings {
 export const DEFAULT_SETTINGS: TrainingSettings = {
   recoveryMode: false,
   gripModule: false,
+  exerciseCheckIn: true,
   vacation: null,
   cycle: null,
   extraSports: [],
@@ -48,6 +51,7 @@ export async function getTrainingSettings(db: AppDatabase, userId: string): Prom
   return {
     recoveryMode: row.recoveryMode,
     gripModule: row.gripModule,
+    exerciseCheckIn: row.exerciseCheckIn,
     vacation:
       vacation && isOneOf(VACATION_TYPES, vacation.type) && isValidLocalDate(vacation.from) && isValidLocalDate(vacation.until)
         ? { type: vacation.type, from: vacation.from, until: vacation.until, gymProfileId: vacation.gymProfileId }
