@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { UnitSystem } from "@/lib/units";
 import { saveSetAction } from "../../actions";
 import { toSavePayload, type ExerciseDraft } from "./workout-state";
 
@@ -21,7 +20,7 @@ export interface SetSync {
  * Speichert geänderte Sätze im Hintergrund. Schlägt ein Speichern fehl (z. B. kein Netz),
  * bleibt der Satz vorgemerkt und kann erneut gesendet werden.
  */
-export function useSetSync(exercises: ExerciseDraft[], unitSystem: UnitSystem): SetSync {
+export function useSetSync(exercises: ExerciseDraft[]): SetSync {
   const exercisesRef = useRef(exercises);
   const dirty = useRef(new Set<string>());
   const timers = useRef(new Map<string, number>());
@@ -40,7 +39,7 @@ export function useSetSync(exercises: ExerciseDraft[], unitSystem: UnitSystem): 
         dirty.current.delete(setId);
         return;
       }
-      const saved = await saveSetAction(toSavePayload(exercise, set, unitSystem)).then(
+      const saved = await saveSetAction(toSavePayload(exercise, set)).then(
         (result) => result.ok,
         () => false,
       );
@@ -49,7 +48,7 @@ export function useSetSync(exercises: ExerciseDraft[], unitSystem: UnitSystem): 
       if (!saved) setFailed(true);
       else if (dirty.current.size === 0) setFailed(false);
     },
-    [unitSystem],
+    [],
   );
 
   const schedule = useCallback(

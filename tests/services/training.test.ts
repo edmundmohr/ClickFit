@@ -7,6 +7,7 @@ import { addDays, toLocalDate } from "@/lib/dates";
 import { createUserWithPassword } from "@/features/auth/services/user-factory";
 import type { OnboardingInput, SaveSetInput } from "@/features/training/schemas";
 import { getTrainingStats, listCompletedSessions } from "@/features/training/services/history-service";
+import { plannedWeekdays } from "@/features/training/titles";
 import { createPlanFromProfile, getActivePlan, getSwapOptions, swapPlanExercise } from "@/features/training/services/plan-service";
 import { getProfile, saveOnboarding } from "@/features/training/services/profile-service";
 import {
@@ -288,7 +289,7 @@ describe("progression, history and streak", () => {
 
   it("counts the training streak from completed workouts only", async () => {
     const plan = await getActivePlan(testDb.db, annaId);
-    const weekdays = plan!.days.map((day) => day.weekday);
+    const weekdays = plannedWeekdays(plan!.days);
     expect((await getTrainingStats(testDb.db, annaId, weekdays, TODAY)).streak).toBe(0);
 
     await startWorkout(testDb.db, annaId, plan!.days[0].id);

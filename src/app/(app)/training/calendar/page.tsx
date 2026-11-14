@@ -8,6 +8,9 @@ import { SessionList } from "@/features/training/components/session-list";
 import { getDailyTotals } from "@/features/nutrition/services/diary-service";
 import { listSessionsBetween } from "@/features/training/services/history-service";
 import { getActivePlan } from "@/features/training/services/plan-service";
+import { getTrainingSettings } from "@/features/training/services/settings-service";
+import { plannedWeekdays } from "@/features/training/titles";
+import { pauseDates } from "@/domain/training/vacation";
 import { dayStatus, type DayStatus } from "@/domain/training/calendar";
 import { WEEKDAYS } from "@/domain/training/types";
 import { buildCalendarMonth, shiftMonth, toLocalDate } from "@/lib/dates";
@@ -50,13 +53,16 @@ export default async function CalendarPage({ searchParams }: PageProps<"/trainin
 
   const db = getDb();
   const [plan, sessions, foodDays] = await Promise.all([
-    getActivePlan(db, user.id),
+    getActivePlan(db, user.id, today),
     listSessionsBetween(db, user.id, days[0], days[days.length - 1]),
     getDailyTotals(db, user.id, days[0], days[days.length - 1]),
   ]);
   const foodLogged = new Set(foodDays.map((row) => row.date));
   const completed = new Set(sessions.map((session) => session.date));
-  const schedule = plan ? { startDate: plan.startDate, weekdays: plan.days.map((day) => day.weekday) } : null;
+  const settings = await getTrainingSettings(db, user.id);
+  const schedule = plan
+    ? { startDate: plan.startDate, weekdays: plannedWeekdays(plan.days), pausedDates: pauseDates(settings.vacation) }
+    : null;
 
   return (
     <>

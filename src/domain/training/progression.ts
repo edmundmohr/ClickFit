@@ -39,7 +39,7 @@ const INCREMENT_BY_EQUIPMENT: Partial<Record<Equipment, number>> = {
 };
 const DEFAULT_INCREMENT_KG = 2.5;
 
-/** Kleinster sinnvoller Gewichtssprung für eine Übung. Eigene Stufen pro Gerät folgen in Phase 5. */
+/** Üblicher Gewichtssprung für eine Übung in kg. Eigene Stufen je Trainingsort: siehe weights.ts. */
 export function defaultIncrementKg(exercise: Pick<Exercise, "equipment">): number {
   for (const item of exercise.equipment) {
     const increment = INCREMENT_BY_EQUIPMENT[item];
@@ -71,23 +71,40 @@ function usesExternalWeight(type: ExerciseType): boolean {
   return type === "weight_reps" || type === "weighted_bodyweight" || type === "assisted_bodyweight";
 }
 
+/** Nächste Stufe nach oben bzw. unten; z. B. aus den eigenen Gewichtsstufen eines Geräts. */
+export interface WeightSteps {
+  up: (weightKg: number) => number;
+  down: (weightKg: number) => number;
+  nearest: (weightKg: number) => number;
+}
+
+function stepsFromIncrement(incrementKg: number): WeightSteps {
+  return {
+    up: (weightKg) => weightKg + incrementKg,
+    down: (weightKg) => Math.max(weightKg - incrementKg, 0),
+    nearest: (weightKg) => roundToIncrement(weightKg, incrementKg),
+  };
+}
+
 function nextWeightedTarget(
   previous: PerformedSet,
   prescription: Prescription,
-  incrementKg: number,
+  steps: WeightSteps,
   type: ExerciseType,
 ): SetTarget {
   const { repMin, repMax, targetRir } = prescription;
   const reps = previous.reps ?? repMin;
   const weight = previous.weightKg ?? 0;
   // Bei unterstützten Übungen bedeutet weniger Gewicht mehr Leistung.
-  const harder = type === "assisted_bodyweight" ? -incrementKg : incrementKg;
+  const assisted = type === "assisted_bodyweight";
+  const harder = assisted ? steps.down : steps.up;
+  const easier = assisted ? steps.up : steps.down;
 
   if (reps >= repMax) {
-    return { weightKg: Math.max(weight + harder, 0), reps: repMin };
+    return { weightKg: Math.max(harder(weight), 0), reps: repMin };
   }
   if (reps <= repMin - 2) {
-    return { weightKg: Math.max(weight - harder, 0), reps: repMin };
+    return { weightKg: Math.max(easier(weight), 0), reps: repMin };
   }
   if (reps < repMin) return { weightKg: weight, reps: repMin };
 
@@ -108,10 +125,16 @@ function nextUnweightedTarget(
   return { weightKg: null, reps: tooHard ? base : base + step };
 }
 
-function deloadTarget(previous: PerformedSet, prescription: Prescription, incrementKg: number): SetTarget {
+function deloadTarget(previous: PerformedSet, prescription: Prescription, steps: WeightSteps): SetTarget {
   const reps = Math.max(prescription.repMin, Math.min(previous.reps ?? prescription.repMin, prescription.repMax) - 2);
   if (previous.weightKg === null) return { weightKg: null, reps };
-  return { weightKg: roundToIncrement(previous.weightKg * DELOAD_WEIGHT_FACTOR, incrementKg), reps };
+  return { weightKg: steps.nearest(previous.weightKg * DELOAD_WEIGHT_FACTOR), reps };
+}
+
+/** Gewicht halten statt steigern: gleiche Werte wie zuletzt, innerhalb des Zielbereichs. */
+function holdTarget(previous: PerformedSet, prescription: Prescription): SetTarget {
+  const reps = previous.reps === null ? null : Math.max(previous.reps, prescription.repMin);
+  return { weightKg: previous.weightKg, reps };
 }
 
 export interface NextTargetsInput {
@@ -121,11 +144,19 @@ export interface NextTargetsInput {
   previous: PerformedSet[];
   incrementKg: number;
   isDeload: boolean;
+  /** Eigene Gewichtsstufen; ohne Angabe gelten Vielfache von `incrementKg`. */
+  steps?: WeightSteps;
+  /** Nicht steigern (z. B. zyklusangepasst): Vorwerte halten. */
+  hold?: boolean;
+  /** Wiedereinstieg nach einer Pause: Zielgewichte mit diesem Faktor (< 1) verringern. */
+  weightFactor?: number;
 }
 
 /** Zielgewicht und Ziel-Wiederholungen für jeden Satz der nächsten Einheit. */
 export function nextSetTargets(input: NextTargetsInput): SetTarget[] {
   const { prescription, previous, incrementKg, isDeload, exerciseType } = input;
+  const steps = input.steps ?? stepsFromIncrement(incrementKg);
+  const factor = input.weightFactor ?? 1;
   const setCount = isDeload ? deloadSetCount(prescription.sets) : prescription.sets;
   const done = previous.filter((set) => set.reps !== null);
 
@@ -133,9 +164,17 @@ export function nextSetTargets(input: NextTargetsInput): SetTarget[] {
     // Gibt es weniger Vorwerte als Sätze, gilt der letzte bekannte Satz als Maßstab.
     const reference = done[Math.min(index, done.length - 1)];
     if (!reference) return { weightKg: null, reps: null };
-    if (isDeload) return deloadTarget(reference, prescription, incrementKg);
+    if (isDeload) return deloadTarget(reference, prescription, steps);
+    if (factor < 1) {
+      // Wiedereinstieg: leichter beginnen und mit den unteren Wiederholungen des Bereichs starten.
+      const eased = holdTarget(reference, prescription);
+      const lighter = eased.weightKg === null ? null : steps.nearest(eased.weightKg * factor);
+      const assisted = exerciseType === "assisted_bodyweight";
+      return { weightKg: assisted ? eased.weightKg : lighter, reps: eased.weightKg === null ? eased.reps : prescription.repMin };
+    }
+    if (input.hold) return holdTarget(reference, prescription);
     return usesExternalWeight(exerciseType)
-      ? nextWeightedTarget(reference, prescription, incrementKg, exerciseType)
+      ? nextWeightedTarget(reference, prescription, steps, exerciseType)
       : nextUnweightedTarget(reference, prescription, exerciseType);
   });
 }

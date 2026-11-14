@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ChevronRightIcon, SettingsIcon, UsersIcon, type LucideIcon } from "lucide-react";
+import { ChevronRightIcon, MapPinIcon, SettingsIcon, SlidersHorizontalIcon, UsersIcon, type LucideIcon } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { requireUser } from "@/features/auth/session";
 import { SignOutButton } from "@/features/users/components/sign-out-button";
@@ -31,6 +31,8 @@ export default async function MorePage() {
     <>
       <PageHeader title={t("more.title")} description={user.username} />
       <div className="grid gap-3">
+        <MoreLink href="/training/gyms" icon={MapPinIcon} label={t("gyms.title")} />
+        <MoreLink href="/training/adjustments" icon={SlidersHorizontalIcon} label={t("adjustments.title")} />
         <MoreLink href="/settings" icon={SettingsIcon} label={t("nav.settings")} />
         {user.role === "admin" ? (
           <MoreLink href="/admin" icon={UsersIcon} label={t("nav.admin")} />

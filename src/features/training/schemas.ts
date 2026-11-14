@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { EQUIPMENT } from "@/domain/exercises/types";
+import { ACTIVITY_TYPES } from "@/domain/cardio/types";
+import { EQUIPMENT, EXERCISE_TYPES, MECHANICS, MOVEMENT_PATTERNS, MUSCLES } from "@/domain/exercises/types";
+import { MAX_CYCLE_LENGTH, MIN_CYCLE_LENGTH } from "@/domain/training/cycle";
+import { VACATION_TYPES } from "@/domain/training/vacation";
+import { WEIGHT_UNITS } from "@/domain/training/weights";
+import { isValidLocalDate } from "@/lib/dates";
 import {
   ACTIVITY_LEVELS,
   BODY_REGIONS,
@@ -71,3 +76,86 @@ export const saveSetSchema = z.object({
   completed: z.boolean(),
 });
 export type SaveSetInput = z.infer<typeof saveSetSchema>;
+
+const localDate = z.string().refine(isValidLocalDate);
+const shortId = z.string().min(1).max(80);
+
+export const gymSchema = z.object({
+  name: z.string().trim().max(40),
+  type: z.enum(LOCATION_TYPES),
+  equipment: z.array(z.enum(EQUIPMENT)),
+  plateUnit: z.enum(WEIGHT_UNITS).nullable(),
+  barWeight: z.number().min(0).max(100).nullable(),
+  plates: z
+    .array(z.object({ weight: z.number().positive().max(100), pairs: z.number().int().min(1).max(20) }))
+    .max(20)
+    .nullable(),
+  weightRules: z
+    .array(
+      z.object({
+        equipment: z.enum(EQUIPMENT),
+        unit: z.enum(WEIGHT_UNITS),
+        increment: z.number().positive().max(100).nullable(),
+        values: z.array(z.number().positive().max(1000)).max(80),
+      }),
+    )
+    .max(EQUIPMENT.length),
+});
+export type GymInput = z.infer<typeof gymSchema>;
+
+export const customExerciseSchema = z.object({
+  name: z.string().trim().min(2).max(60),
+  type: z.enum(EXERCISE_TYPES),
+  mechanic: z.enum(MECHANICS),
+  pattern: z.enum(MOVEMENT_PATTERNS),
+  primary: z.array(z.enum(MUSCLES)).min(1).max(4),
+  secondary: z.array(z.enum(MUSCLES)).max(6),
+  equipment: z.array(z.enum(EQUIPMENT)).max(6),
+  note: z.string().trim().max(600),
+});
+export type CustomExerciseInput = z.infer<typeof customExerciseSchema>;
+
+export const routineExerciseSchema = z.object({
+  exerciseId: shortId,
+  sets: z.number().int().min(1).max(12),
+  repMin: z.number().int().min(1).max(600),
+  repMax: z.number().int().min(1).max(600),
+  targetRir: z.number().int().min(0).max(5),
+  restSeconds: z.number().int().min(0).max(900),
+  groupId: z.string().min(1).max(40).nullable(),
+});
+
+export const routineSchema = z.object({
+  name: z.string().trim().max(40),
+  /** 0 = kein fester Wochentag. */
+  weekday: z.number().int().min(0).max(7),
+  folderId: shortId,
+  exercises: z.array(routineExerciseSchema).max(30),
+});
+export type RoutineInput = z.infer<typeof routineSchema>;
+
+export const folderNameSchema = z.string().trim().min(1).max(40);
+
+export const vacationSchema = z
+  .object({
+    type: z.enum(VACATION_TYPES),
+    from: localDate,
+    until: localDate,
+    gymProfileId: shortId.nullable(),
+  })
+  .refine((value) => value.from <= value.until);
+
+export const cycleSchema = z.object({
+  enabled: z.boolean(),
+  lastStart: localDate,
+  lengthDays: z.number().int().min(MIN_CYCLE_LENGTH).max(MAX_CYCLE_LENGTH),
+});
+
+export const extraSportsSchema = z
+  .array(z.object({ type: z.enum(ACTIVITY_TYPES), sessionsPerWeek: z.number().int().min(1).max(7) }))
+  .max(6);
+
+export const injuriesSchema = z.object({
+  injuries: z.array(z.enum(BODY_REGIONS)),
+  injuryNote: z.string().trim().max(500),
+});

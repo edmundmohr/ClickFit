@@ -23,7 +23,7 @@ export function WorkoutSummary({ exercises, durationMinutes, unitSystem }: Worko
   const unit = t(`training.units.${weightUnitKey(unitSystem)}`);
   const logged = exercises.map((exercise) => ({
     exercise,
-    sets: exercise.sets.map((set) => toLoggedSet(exercise, set, unitSystem)),
+    sets: exercise.sets.map((set) => toLoggedSet(exercise, set)),
   }));
   const totals = sessionTotals(logged.flatMap((entry) => entry.sets));
   const records = logged.flatMap((entry) =>

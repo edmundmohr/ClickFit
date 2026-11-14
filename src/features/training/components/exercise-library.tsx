@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { ChevronRightIcon } from "lucide-react";
+import { BanIcon, ChevronRightIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Chip } from "@/components/forms/choice";
 import { MUSCLES, type Equipment, type Muscle } from "@/domain/exercises/types";
@@ -13,6 +14,8 @@ export interface LibraryExercise {
   name: string;
   primary: Muscle[];
   equipment: Equipment[];
+  custom: boolean;
+  excluded: boolean;
 }
 
 interface ExerciseLibraryProps {
@@ -28,6 +31,8 @@ export function ExerciseLibrary({ exercises, ownEquipment }: ExerciseLibraryProp
   const [query, setQuery] = useState("");
   const [muscle, setMuscle] = useState<Muscle | typeof ALL>(ALL);
   const [onlyMine, setOnlyMine] = useState(false);
+  const [onlyCustom, setOnlyCustom] = useState(false);
+  const hasCustom = exercises.some((exercise) => exercise.custom);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -35,9 +40,10 @@ export function ExerciseLibrary({ exercises, ownEquipment }: ExerciseLibraryProp
       (exercise) =>
         (needle === "" || exercise.name.toLowerCase().includes(needle)) &&
         (muscle === ALL || exercise.primary.includes(muscle)) &&
+        (!onlyCustom || exercise.custom) &&
         (!onlyMine || !ownEquipment || exercise.equipment.every((item) => ownEquipment.includes(item))),
     );
-  }, [exercises, query, muscle, onlyMine, ownEquipment]);
+  }, [exercises, query, muscle, onlyMine, onlyCustom, ownEquipment]);
 
   return (
     <div className="grid grid-cols-1 gap-4">
@@ -65,11 +71,18 @@ export function ExerciseLibrary({ exercises, ownEquipment }: ExerciseLibraryProp
             </option>
           ))}
         </select>
-        {ownEquipment ? (
-          <Chip selected={onlyMine} onToggle={() => setOnlyMine((value) => !value)} className="justify-self-start">
-            {t("training.library.onlyMine")}
-          </Chip>
-        ) : null}
+        <div className="flex flex-wrap gap-2">
+          {ownEquipment ? (
+            <Chip selected={onlyMine} onToggle={() => setOnlyMine((value) => !value)}>
+              {t("training.library.onlyMine")}
+            </Chip>
+          ) : null}
+          {hasCustom ? (
+            <Chip selected={onlyCustom} onToggle={() => setOnlyCustom((value) => !value)}>
+              {t("training.library.onlyCustom")}
+            </Chip>
+          ) : null}
+        </div>
       </div>
       <p className="text-muted-foreground text-sm">{t("training.library.count", { count: filtered.length })}</p>
       {filtered.length === 0 ? <p className="text-sm">{t("training.library.empty")}</p> : null}
@@ -90,6 +103,10 @@ export function ExerciseLibrary({ exercises, ownEquipment }: ExerciseLibraryProp
                     : t("equipment.none")}
                 </span>
               </span>
+              {exercise.custom ? <Badge variant="secondary">{t("training.library.custom")}</Badge> : null}
+              {exercise.excluded ? (
+                <BanIcon className="text-muted-foreground size-4 shrink-0" aria-label={t("training.library.exclude")} />
+              ) : null}
               <ChevronRightIcon className="text-muted-foreground size-4 shrink-0" aria-hidden />
             </Link>
           </li>

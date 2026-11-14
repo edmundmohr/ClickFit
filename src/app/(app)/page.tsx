@@ -18,7 +18,10 @@ import { getDashboardWidgets, type DashboardWidget } from "@/features/progress/s
 import { OnboardingPrompt } from "@/features/training/components/onboarding-prompt";
 import { getTrainingStats, listSessionsBetween } from "@/features/training/services/history-service";
 import { getActivePlan, type PlanDayView } from "@/features/training/services/plan-service";
+import { getTrainingSettings } from "@/features/training/services/settings-service";
 import { getInProgressSession } from "@/features/training/services/workout-service";
+import { plannedWeekdays as fixedWeekdays } from "@/features/training/titles";
+import { pauseDates } from "@/domain/training/vacation";
 import type { Meal } from "@/domain/nutrition/types";
 import { TIME_ZONE } from "@/i18n/config";
 import { toLocalDate, weekdayOf } from "@/lib/dates";
@@ -50,14 +53,15 @@ export default async function TodayPage() {
   const now = new Date();
   const today = toLocalDate(now);
   const todayWeekday = weekdayOf(today);
-  const [plan, widgets, running] = await Promise.all([
-    getActivePlan(db, user.id),
+  const [plan, widgets, running, settings] = await Promise.all([
+    getActivePlan(db, user.id, today),
     getDashboardWidgets(db, user.id),
     getInProgressSession(db, user.id),
+    getTrainingSettings(db, user.id),
   ]);
-  const plannedWeekdays = plan?.days.map((day) => day.weekday) ?? [];
+  const plannedWeekdays = fixedWeekdays(plan?.days ?? []);
   const [stats, todaySessions] = await Promise.all([
-    getTrainingStats(db, user.id, plannedWeekdays, today),
+    getTrainingStats(db, user.id, plannedWeekdays, today, pauseDates(settings.vacation)),
     listSessionsBetween(db, user.id, today, today),
   ]);
 
@@ -76,7 +80,7 @@ export default async function TodayPage() {
         ),
         streak: <StreakWidget stats={stats} />,
         week: <WeekWidget stats={stats} plannedWeekdays={plannedWeekdays} today={today} />,
-        recovery: <RecoveryWidget userId={user.id} today={today} />,
+        recovery: <RecoveryWidget userId={user.id} />,
       }
     : {};
   const content: Partial<Record<DashboardWidget, ReactNode>> = {

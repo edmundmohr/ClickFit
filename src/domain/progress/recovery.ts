@@ -35,6 +35,16 @@ function remaining(fatigue: number, elapsedHours: number): number {
   return fatigue * Math.max(0, 1 - elapsedHours / recoveryHours(fatigue));
 }
 
+/** Belastung außerhalb des Krafttrainings (Cardio, Zusatzsport), umgerechnet in harte Sätze. */
+export interface ExtraLoad {
+  /** Kennung der Einheit; mehrere Einträge derselben Einheit und Muskelgruppe werden addiert. */
+  id: string;
+  muscle: Muscle;
+  effectiveSets: number;
+  /** Ende der Einheit. */
+  at: Date;
+}
+
 export interface RecoveryOverride {
   /** Vom Nutzer gesetzter Erholungswert in Prozent. */
   percent: number;
@@ -50,6 +60,7 @@ export function recoveryStatus(
   lookup: ExerciseLookup,
   now: Date,
   overrides: Partial<Record<Muscle, RecoveryOverride>> = {},
+  extraLoads: readonly ExtraLoad[] = [],
 ): MuscleValues {
   // Ermüdung wird pro Einheit und Muskel gesammelt und klingt ab dem letzten Satz der Einheit ab.
   const loads = new Map<string, { muscle: Muscle; effectiveSets: number; at: number }>();
@@ -68,6 +79,16 @@ export function recoveryStatus(
       load.at = Math.max(load.at, at);
       loads.set(id, load);
     }
+  }
+
+  for (const extra of extraLoads) {
+    const at = extra.at.getTime();
+    const override = overrides[extra.muscle];
+    if (at > now.getTime() || (override && at <= override.setAt.getTime())) continue;
+    const id = `extra:${extra.id}:${extra.muscle}`;
+    const load = loads.get(id) ?? { muscle: extra.muscle, effectiveSets: 0, at };
+    load.effectiveSets += extra.effectiveSets;
+    loads.set(id, load);
   }
 
   const fatigue = emptyMuscleValues();

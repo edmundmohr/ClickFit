@@ -10,14 +10,16 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { warmupSets } from "@/domain/training/progression";
+import { afterSetCompleted, groupConsecutive, groupKind, groupRestSeconds } from "@/domain/training/supersets";
 import { estimateRemainingSeconds, isWorkoutForgotten, suggestFinishTime } from "@/domain/training/schedule";
 import { formatDayLong, formatDuration, formatTime } from "@/lib/format";
-import { toDisplayWeight, type UnitSystem } from "@/lib/units";
+import { toDisplayWeight, unitSystemOf, type UnitSystem } from "@/lib/units";
 import { deleteSetAction, deleteWorkoutAction, finishWorkoutAction } from "../../actions";
 import type { WorkoutView } from "../../services/workout-view";
 import { ConfirmDialog, ExerciseNoteDialog, SetOptionsDialog } from "./dialogs";
 import { ExerciseCard, type InvalidField } from "./exercise-card";
 import { useAlertSignal, useNow, useRestTimer, useWakeLock } from "./hooks";
+import { PlateDialog } from "./plate-dialog";
 import { RestTimerBar } from "./rest-timer-bar";
 import { SessionNote } from "./session-note";
 import { useSetSync } from "./use-set-sync";
@@ -27,6 +29,7 @@ import {
   parseReps,
   parseWeightKg,
   toDrafts,
+  toGroupMember,
   toInputText,
   workSetNumber,
   workoutReducer,
@@ -50,10 +53,8 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
   const t = useTranslations();
   const router = useRouter();
   const inProgress = view.status === "in_progress";
-  const [exercises, dispatch] = useReducer(workoutReducer, view.exercises, (initial) =>
-    toDrafts(initial, unitSystem),
-  );
-  const sync = useSetSync(exercises, unitSystem);
+  const [exercises, dispatch] = useReducer(workoutReducer, view.exercises, toDrafts);
+  const sync = useSetSync(exercises);
   const alertSignal = useAlertSignal();
   const timer = useRestTimer(alertSignal.signal);
   const now = useNow(inProgress);
@@ -62,6 +63,7 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
   const [invalid, setInvalid] = useState<InvalidField | null>(null);
   const [optionsFor, setOptionsFor] = useState<SetRef | null>(null);
   const [noteFor, setNoteFor] = useState<string | null>(null);
+  const [platesFor, setPlatesFor] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<"finish" | "delete" | null>(null);
   const [forgottenDismissed, setForgottenDismissed] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -99,7 +101,7 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
         toast.error(t("workout.needsReps"));
         return;
       }
-      if (exercise.type === "weight_reps" && parseWeightKg(set, unitSystem) === null) {
+      if (exercise.type === "weight_reps" && parseWeightKg(set, exercise.unit) === null) {
         setInvalid({ setId, field: "weight" });
         toast.error(t("workout.needsWeight"));
         return;
@@ -122,11 +124,29 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
     if (!inProgress) return;
     // Der Tipp ist die Nutzeraktion, die iOS für den späteren Signalton verlangt.
     alertSignal.prime();
-    if (openSets > 1) {
-      timer.start(set.type === "warmup" ? Math.min(exercise.restSeconds, WARMUP_REST_SECONDS) : exercise.restSeconds);
-    } else {
+    if (openSets <= 1) {
       timer.stop();
+      return;
     }
+    if (set.type === "warmup") {
+      timer.start(Math.min(exercise.restSeconds, WARMUP_REST_SECONDS));
+      return;
+    }
+    // Supersatz/Zirkel: Die Pause läuft erst, wenn alle Übungen der Gruppe den Durchgang haben.
+    const members = exercises.map((item) => {
+      const member = toGroupMember(item);
+      return item.id === exerciseId ? { ...member, completedSets: member.completedSets + 1 } : member;
+    });
+    const next = afterSetCompleted(members, exerciseId);
+    if (!next.rest && next.nextId) {
+      timer.stop();
+      const upcoming = exercises.find((item) => item.id === next.nextId);
+      if (upcoming) toast.info(t("workout.group.next", { name: upcoming.name }));
+      document.getElementById(`exercise-${next.nextId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    const group = exercise.groupId ? exercises.filter((item) => item.groupId === exercise.groupId) : [exercise];
+    timer.start(groupRestSeconds(group.map((item) => item.restSeconds)));
   }
 
   function addSet(exerciseId: string) {
@@ -141,7 +161,7 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
     const exercise = exercises.find((item) => item.id === exerciseId);
     if (!exercise) return;
     const firstWork = exercise.sets.find((set) => set.type !== "warmup");
-    const workWeightKg = firstWork ? parseWeightKg(firstWork, unitSystem) : null;
+    const workWeightKg = firstWork ? parseWeightKg(firstWork, exercise.unit) : null;
     if (workWeightKg === null || workWeightKg <= 0) {
       toast.error(t("workout.warmupNeedsWeight"));
       return;
@@ -155,7 +175,7 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
     const drafts: SetDraft[] = suggested.map((warmup) => ({
       id: crypto.randomUUID(),
       type: "warmup",
-      weightText: toInputText(toDisplayWeight(warmup.weightKg, unitSystem)),
+      weightText: toInputText(toDisplayWeight(warmup.weightKg, unitSystemOf(exercise.unit))),
       repsText: String(warmup.reps),
       rir: null,
       note: "",
@@ -212,7 +232,22 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
 
   const optionsTarget = optionsFor ? findSet(optionsFor) : null;
   const noteExercise = exercises.find((exercise) => exercise.exerciseId === noteFor) ?? null;
-  const title = view.focus ? t(`training.focus.${view.focus}`) : t("training.focus.free");
+  const title = view.name ?? (view.focus ? t(`training.focus.${view.focus}`) : t("training.focus.free"));
+  const platesExercise = exercises.find((exercise) => exercise.id === platesFor) ?? null;
+  const renderCard = (exercise: (typeof exercises)[number]) => (
+    <ExerciseCard
+      key={exercise.id}
+      exercise={exercise}
+      invalid={invalid}
+      onEdit={(setId, patch) => edit(exercise.id, setId, patch)}
+      onToggle={(setId) => toggle(exercise.id, setId)}
+      onOpenOptions={(setId) => setOptionsFor({ exerciseId: exercise.id, setId })}
+      onAddSet={() => addSet(exercise.id)}
+      onAddWarmup={() => addWarmup(exercise.id)}
+      onEditNote={() => setNoteFor(exercise.exerciseId)}
+      onOpenPlates={exercise.bar ? () => setPlatesFor(exercise.id) : undefined}
+    />
+  );
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -240,6 +275,7 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
             </p>
           </div>
           {view.isDeload ? <Badge variant="secondary">{t("workout.deload")}</Badge> : null}
+          {view.isShort ? <Badge variant="secondary">{t("workout.short")}</Badge> : null}
           {inProgress ? (
             <Button onClick={() => setConfirm("finish")} disabled={pending}>
               {t("workout.finish")}
@@ -279,20 +315,24 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
           <WorkoutSummary exercises={exercises} durationMinutes={durationMinutes} unitSystem={unitSystem} />
         )}
 
-        {exercises.map((exercise) => (
-          <ExerciseCard
-            key={exercise.id}
-            exercise={exercise}
-            unitSystem={unitSystem}
-            invalid={invalid}
-            onEdit={(setId, patch) => edit(exercise.id, setId, patch)}
-            onToggle={(setId) => toggle(exercise.id, setId)}
-            onOpenOptions={(setId) => setOptionsFor({ exerciseId: exercise.id, setId })}
-            onAddSet={() => addSet(exercise.id)}
-            onAddWarmup={() => addWarmup(exercise.id)}
-            onEditNote={() => setNoteFor(exercise.exerciseId)}
-          />
-        ))}
+        {groupConsecutive(exercises).map((group) => {
+          const kind = groupKind(group.items.length);
+          if (!kind || group.groupId === null) return group.items.map(renderCard);
+          return (
+            <section
+              key={group.groupId}
+              aria-label={t(`workout.group.${kind}`)}
+              className="border-primary grid gap-3 border-l-[3px] pl-2"
+            >
+              <p className="text-primary text-sm font-semibold">
+                {t(`workout.group.${kind}`)}
+                {" · "}
+                <span className="text-muted-foreground font-normal">{t("workout.group.hint")}</span>
+              </p>
+              {group.items.map(renderCard)}
+            </section>
+          );
+        })}
 
         <SessionNote sessionId={view.id} initialNote={view.note} />
         <div className="flex flex-wrap gap-3">
@@ -325,6 +365,7 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
         onDelete={() => optionsFor && removeSet(optionsFor)}
         onClose={() => setOptionsFor(null)}
       />
+      <PlateDialog exercise={platesExercise} onClose={() => setPlatesFor(null)} />
       <ExerciseNoteDialog
         exercise={noteExercise}
         onSaved={(note) => noteFor && dispatch({ type: "note", catalogExerciseId: noteFor, note })}

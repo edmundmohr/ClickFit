@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { requireUser } from "@/features/auth/session";
 import { MusclePanel, type MuscleInfo } from "@/features/progress/components/muscle-panel";
 import { getRecoveryOverrides, getTrainedSets } from "@/features/progress/services/progress-service";
-import { findExercise } from "@/features/training/catalog";
+import { getRecoverySnapshot } from "@/features/progress/services/recovery-service";
+import { getUserCatalog } from "@/features/training/services/exercise-service";
 import { MUSCLES, type Muscle } from "@/domain/exercises/types";
 import {
   areaDistribution,
@@ -13,7 +14,6 @@ import {
   trainingDaysPerMuscle,
   weeklySetsForMuscle,
 } from "@/domain/progress/muscle-load";
-import { recoveryStatus } from "@/domain/progress/recovery";
 import { BODY_AREAS } from "@/domain/progress/types";
 import { addDays, startOfWeek, toLocalDate } from "@/lib/dates";
 import { getDb } from "@/lib/server/context";
@@ -33,12 +33,15 @@ export default async function ProgressMusclesPage() {
   const today = toLocalDate(now);
   const db = getDb();
   const from = addDays(startOfWeek(today), -7 * (WEEKS - 1));
-  const [sets, overrides] = await Promise.all([
+  const [sets, overrides, catalog] = await Promise.all([
     getTrainedSets(db, user.id, { from }),
     getRecoveryOverrides(db, user.id),
+    getUserCatalog(db, user.id),
   ]);
+  const findExercise = catalog.find;
 
-  const recovery = recoveryStatus(sets, findExercise, now, overrides);
+  // Enthält neben dem Krafttraining auch Cardio und Zusatzsport.
+  const recovery = await getRecoverySnapshot(db, user.id, findExercise, now);
   const thisWeek = setsPerMuscle(sets, findExercise, startOfWeek(today), today);
   const fourWeeksFrom = addDays(today, -FOUR_WEEKS_DAYS);
   const days = trainingDaysPerMuscle(sets, findExercise, fourWeeksFrom, today);

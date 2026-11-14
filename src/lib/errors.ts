@@ -17,6 +17,10 @@ export const ERROR_CODES = [
   "SELF_NOT_ALLOWED",
   "PROFILE_REQUIRED",
   "PLAN_EMPTY",
+  "LAST_GYM",
+  "GYM_ACTIVE",
+  "PLAN_ACTIVE",
+  "WORKOUT_RUNNING",
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];

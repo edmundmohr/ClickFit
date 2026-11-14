@@ -9,7 +9,7 @@ einschließlich der Ergänzungen aus Abschnitt 8.
 | 2 | Training-Kern | fertig |
 | 3 | Ernährung | fertig |
 | 4 | Fortschritt & Dashboard | fertig |
-| 5 | Flexibilität | offen |
+| 5 | Flexibilität | fertig |
 | 6 | Offline & Export | offen |
 | 7 | Integrationen & optionale KI | offen |
 
@@ -41,13 +41,8 @@ einschließlich der Ergänzungen aus Abschnitt 8.
 - Verlauf, Kalender (Monatsansicht), Trainings-Streak, Heute-Seite
 - Sechs Schmuckgrafiken (siehe [GRAPHICS.md](GRAPHICS.md))
 
-Aus Phase 2 verschoben:
-
-- Eigene Übungen anlegen und bearbeiten → Phase 5 (zusammen mit dem Plan-Builder)
-- Supersätze/Zirkel → Phase 5 (zusammen mit dem Zeitsparmodus)
-- Cardio-Einheiten loggen (Distanz/Zeit) → Phase 5 (Cardio-Plan); die Übungen stehen schon
-  in der Bibliothek
-- Mahlzeiten im Kalender → Phase 3
+Aus Phase 2 verschoben und inzwischen umgesetzt: eigene Übungen, Supersätze/Zirkel und
+Cardio-Logging (Phase 5), Mahlzeiten im Kalender (Phase 3).
 
 ## Phase 3 – Ernährung (fertig)
 
@@ -81,20 +76,36 @@ Gewichtskurve als Diagramm folgt in Phase 4.
 - Monatsbericht und Jahresrückblick
 - Heute-Seite mit frei anordenbaren Kacheln und Schnellzugriff
 
-Offen aus dieser Phase: Cardio und Zusatzsport fließen noch nicht in die Erholung ein (kommt
-mit dem Cardio-Logging in Phase 5).
+Cardio und Zusatzsport fließen seit Phase 5 in die Erholung ein.
 
-## Phase 5 – Flexibilität
+## Phase 5 – Flexibilität (fertig)
 
-- Gym-Profile mit eigenem Equipment, Stangengewicht und Scheiben; Scheiben-Rechner
-- Flexible Gewichtseingabe: eigene Gewichtsstufen, freie Werte, kg/lbs auch gemischt
-- Urlaubsmodus, Zeitsparmodus, Übungen ausschließen, Verletztenmodus
-- Freier Plan-Builder mit Drag & Drop, Routinen in Ordnern, eigene Übungen
-- Supersätze/Zirkel (Pausentimer greift erst nach der Gruppe)
-- Lernender Generator (bevorzugt häufige Übungen, merkt sich getauschte/gelöschte Vorschläge)
-- Erholungsorientierter Modus als Alternative zum festen Split
-- Cardio-Plan und -Logging, Mobility-Routinen, Griffkraft-Modul
-- Zusatzsportarten (fließen in die Erholung ein), zyklusangepasstes Training (optional)
+- Trainingsorte (Gym-Profile) mit eigenem Equipment, Stange, Scheiben und Gewichtsstufen;
+  der Plan passt sich an den aktiven Ort an, ohne den gespeicherten Plan zu ändern
+- Scheiben-Rechner im Trainingsmodus
+- Flexible Gewichte: eigene Stufen oder feste Gewichtslisten je Gerät, freie Werte beim Loggen,
+  kg und lbs gemischt (z. B. Kurzhanteln in lbs, Stange in kg)
+- Urlaubsmodus (Pause oder Training unterwegs) mit leichterem Wiedereinstieg nach längerer Pause
+- Zeitsparmodus: Kurzvariante jeder Einheit
+- Übungen ausschließen, Verletztenmodus (Beschwerden ohne Fragebogen ändern)
+- Plan-Builder mit Drag & Drop, Routinen in Ordnern, eigene Übungen
+- Supersätze und Zirkel (Pause erst nach dem Durchgang)
+- Lernender Generator (merkt sich getauschte und gelöschte Vorschläge, bevorzugt oft Gemachtes)
+- Erholungsorientierter Modus: täglicher Vorschlag aus den frischesten Muskelgruppen
+- Cardio-Plan und -Logging mit Puls-Zonen und Intervallen; Zusatzsport
+- Cardio und Zusatzsport fließen in die Erholung ein
+- 17 Mobility-Routinen mit 60 Übungen, nach Körperregion und Beschwerde, mit geführtem Ablauf
+- Griffkraft-Modul, zyklusangepasstes Training (beides abschaltbar)
+
+Hinweise:
+
+- Der erholungsorientierte Modus ergänzt den Wochenplan um einen täglichen Vorschlag; der
+  Wochenplan bleibt daneben bestehen.
+- Der Zusatzsport wirkt auf zwei Wegen: über geloggte Einheiten auf die Erholung und – ab drei
+  beinlastigen Einheiten pro Woche – über einen Satz weniger bei Bein-Isolationsübungen im
+  nächsten erzeugten Plan.
+- Der Verletztenmodus meidet Bewegungsmuster je Körperregion nach einer festen Zuordnung
+  (`PATTERNS_TO_AVOID`); er ersetzt keine ärztliche Beratung.
 
 ## Phase 6 – Offline & Export
 

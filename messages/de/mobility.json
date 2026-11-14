@@ -1,0 +1,96 @@
+{
+  "title": "Mobility",
+  "description": "Kurze Routinen für mehr Beweglichkeit – unabhängig vom Krafttraining.",
+  "overview": {
+    "streak": "Serie",
+    "streakUnit": "{count, plural, one {Tag in Folge} other {Tage in Folge}}",
+    "week": "Diese Woche",
+    "weekUnit": "{count, plural, one {Einheit} other {Einheiten}}"
+  },
+  "filter": {
+    "region": "Körperregion",
+    "complaint": "Beschwerde oder Anlass",
+    "all": "Alle",
+    "results": "{count, plural, one {# Routine passt} other {# Routinen passen}}",
+    "empty": "Zu dieser Kombination gibt es keine Routine. Nimm einen der beiden Filter heraus.",
+    "reset": "Filter zurücksetzen"
+  },
+  "regions": {
+    "neck": "Nacken",
+    "shoulders": "Schultern",
+    "thoracic_spine": "Brustwirbelsäule",
+    "lower_back": "Unterer Rücken",
+    "hips": "Hüfte",
+    "hamstrings": "Beinrückseite",
+    "knees": "Knie",
+    "ankles": "Sprunggelenke",
+    "wrists": "Handgelenke",
+    "full_body": "Ganzkörper"
+  },
+  "complaints": {
+    "desk_stiffness": "Steif vom Sitzen",
+    "lower_back_pain": "Unterer Rücken zwickt",
+    "tight_hips": "Feste Hüfte",
+    "shoulder_tension": "Verspannte Schultern",
+    "neck_tension": "Verspannter Nacken",
+    "knee_discomfort": "Knie melden sich",
+    "post_leg_day": "Nach dem Beintraining",
+    "post_upper_day": "Nach dem Oberkörpertraining",
+    "morning_stiffness": "Morgens steif"
+  },
+  "levels": {
+    "easy": "Locker",
+    "moderate": "Mittel"
+  },
+  "routine": {
+    "minutes": "ca. {minutes} Min.",
+    "steps": "{count, plural, one {# Schritt} other {# Schritte}}",
+    "lastDone": "Zuletzt gemacht am {date}",
+    "doneToday": "Heute gemacht",
+    "neverDone": "Noch nie gemacht"
+  },
+  "recent": {
+    "title": "Letzte Einheiten",
+    "delete": "Eintrag „{name}“ löschen",
+    "unknownRoutine": "Routine nicht mehr vorhanden"
+  },
+  "detail": {
+    "back": "Alle Routinen",
+    "stepsTitle": "Übungen",
+    "stepsHint": "Tippe auf eine Übung, um die Anleitung zu sehen.",
+    "seconds": "{count} Sek.",
+    "reps": "{count} Wdh.",
+    "perSide": "je Seite"
+  },
+  "player": {
+    "title": "Geführter Ablauf",
+    "intro": "Mit Countdown, Signalton und automatischem Wechsel zur nächsten Übung. Der Bildschirm bleibt an.",
+    "start": "Ablauf starten",
+    "pause": "Pause",
+    "resume": "Fortsetzen",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "done": "Fertig",
+    "cancel": "Ablauf abbrechen",
+    "step": "Schritt {current} von {total}",
+    "prepare": "Mach dich bereit",
+    "go": "Los",
+    "paused": "Pausiert",
+    "hold": "{count, plural, one {# Sekunde halten} other {# Sekunden halten}}",
+    "repeat": "{count, plural, one {# Wiederholung} other {# Wiederholungen}}",
+    "repsUnit": "{count, plural, one {Wiederholung} other {Wiederholungen}}",
+    "sides": {
+      "left": "Linke Seite",
+      "right": "Rechte Seite"
+    },
+    "upNext": "Danach: {name}",
+    "lastStep": "Das ist der letzte Schritt.",
+    "finishedTitle": "Geschafft!",
+    "finishedText": "Aktive Zeit: {time} Min. Trag die Routine jetzt in dein Protokoll ein.",
+    "complete": "Routine abschließen",
+    "restart": "Nochmal von vorn",
+    "loggedTitle": "Eingetragen",
+    "loggedText": "Die Routine steht für heute in deinem Protokoll.",
+    "backToOverview": "Zur Übersicht"
+  }
+}

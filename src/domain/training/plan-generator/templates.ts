@@ -47,6 +47,48 @@ const ABDUCTORS = accessory(["hip_abduction"]);
 const ADDUCTORS = accessory(["hip_adduction"]);
 const TRAPS = accessory(["shrug"]);
 
+/** Griffkraft-Modul: Griffübung, ersatzweise Tragen oder Unterarm-Curls. */
+export const GRIP_SLOT: Slot = accessory(["grip", "carry", "elbow_flexion"], ["forearms"]);
+export const GRIP_DAYS_PER_WEEK = 2;
+/** Reihenfolge, in der Tage für die Griffarbeit gewählt werden (Zug-Tage zuerst). */
+export const GRIP_DAY_ORDER: DayFocus[] = [
+  "pull_a",
+  "pull_b",
+  "upper_a",
+  "upper_b",
+  "full_body_a",
+  "full_body_c",
+  "full_body_b",
+  "lower_b",
+  "legs_b",
+  "lower_a",
+  "legs_a",
+  "push_a",
+  "push_b",
+];
+
+/** Alle Slot-Arten, aus denen der erholungsorientierte Modus den Tag zusammenstellt. */
+export const RECOVERY_SLOTS: Slot[] = [
+  SQUAT,
+  PUSH_H,
+  PULL_V,
+  HINGE,
+  PULL_H,
+  PUSH_V,
+  LUNGE,
+  HIP_THRUST,
+  CORE_STABILITY,
+  SIDE_DELTS,
+  BICEPS,
+  TRICEPS,
+  LEG_CURL,
+  REAR_DELTS,
+  CALVES,
+  CHEST_FLY,
+  CORE_FLEXION,
+  LEG_EXTENSION,
+];
+
 export const DAY_TEMPLATES: Record<DayFocus, Slot[]> = {
   full_body_a: [SQUAT, PUSH_H, PULL_H, HINGE, PUSH_V, CORE_STABILITY, BICEPS, CALVES],
   full_body_b: [HINGE, PUSH_V, PULL_V, LUNGE, PUSH_H, CORE_FLEXION, TRICEPS, SIDE_DELTS],

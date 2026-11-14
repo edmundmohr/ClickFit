@@ -106,5 +106,23 @@
   "deleteConfirm": "Löschen",
   "deleted": "Training gelöscht.",
   "status": "{elapsed} · noch ca. {minutes} min",
-  "statusLabel": "Dauer und verbleibende Zeit"
+  "statusLabel": "Dauer und verbleibende Zeit",
+  "short": "Kurz",
+  "group": {
+    "superset": "Supersatz",
+    "circuit": "Zirkel",
+    "hint": "abwechselnd, Pause erst nach dem Durchgang",
+    "next": "Ohne Pause weiter mit: {name}"
+  },
+  "plates": {
+    "open": "Scheiben",
+    "title": "Scheiben-Rechner",
+    "target": "Gewünschtes Gesamtgewicht ({unit})",
+    "enterWeight": "Gib ein Gewicht ein.",
+    "bar": "Stange: {weight} {unit}",
+    "perSide": "Pro Seite auflegen:",
+    "empty": "Nur die Stange, keine Scheiben.",
+    "total": "Ergibt zusammen: {weight} {unit}",
+    "missing": "Mit deinen Scheiben fehlen {weight} {unit} zum Wunschgewicht."
+  }
 }

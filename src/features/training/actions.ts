@@ -2,13 +2,16 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { getDb } from "@/lib/server/context";
 import { fail, invalid, ok, type ActionResult } from "@/lib/action-result";
 import { toLocalDate } from "@/lib/dates";
 import { requireUser } from "@/features/auth/session";
 import type { Exercise } from "@/domain/exercises/types";
+import type { WeightUnit } from "@/domain/training/weights";
 import { onboardingSchema, saveSetSchema } from "./schemas";
+import { getRecoveryDay } from "./services/recovery-day-service";
 import { saveOnboarding } from "./services/profile-service";
 import { createPlanFromProfile, getSwapOptions, swapPlanExercise } from "./services/plan-service";
 import {
@@ -18,8 +21,14 @@ import {
   saveExerciseNote,
   saveSessionNote,
   saveSet,
+  startFreeWorkout,
   startWorkout,
 } from "./services/workout-service";
+
+/** Einheit aus den Einstellungen des Nutzers. */
+function unitOf(user: { unitSystem?: string | null }): WeightUnit {
+  return user.unitSystem === "imperial" ? "lbs" : "kg";
+}
 
 
 const idSchema = z.string().min(1).max(80);
@@ -83,7 +92,23 @@ export async function startWorkoutAction(formData: FormData): Promise<void> {
   const user = await requireUser();
   const planDayId = idSchema.safeParse(formData.get("planDayId"));
   if (!planDayId.success) redirect("/training");
-  const sessionId = await startWorkout(getDb(), user.id, planDayId.data);
+  const sessionId = await startWorkout(getDb(), user.id, planDayId.data, new Date(), {
+    short: formData.get("short") === "1",
+    defaultUnit: unitOf(user),
+  });
+  redirect(`/workout/${sessionId}`);
+}
+
+/** Erholungsorientierter Modus: startet das Training aus den heute frischesten Muskelgruppen. */
+export async function startRecoveryWorkoutAction(): Promise<void> {
+  const user = await requireUser();
+  const db = getDb();
+  const day = await getRecoveryDay(db, user.id);
+  if (!day || day.exercises.length === 0) redirect("/training");
+  const t = await getTranslations("training.recoveryMode");
+  const sessionId = await startFreeWorkout(db, user.id, t("sessionName"), day.exercises, new Date(), {
+    defaultUnit: unitOf(user),
+  });
   redirect(`/workout/${sessionId}`);
 }
 

@@ -31,7 +31,7 @@
     "no": "Nein",
     "types": "Welche Art?",
     "frequency": "Wie oft pro Woche?",
-    "hint": "Geplante Cardio-Einheiten kommen in einer späteren Phase dazu. Deine Angaben werden schon jetzt gespeichert."
+    "hint": "Daraus kannst du dir unter Training → Cardio einen Wochenplan erstellen lassen."
   },
   "cardioTypes": {
     "running": "Laufen",

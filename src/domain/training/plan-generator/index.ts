@@ -2,7 +2,7 @@
  * Regelbasierter Plan-Generator. Deterministisch: gleiche Eingaben ergeben immer denselben Plan.
  * Kein Zufall, kein Datum, kein Datenbankzugriff.
  */
-import type { Difficulty, Equipment, Exercise, MovementPattern } from "@/domain/exercises/types";
+import type { Difficulty, Equipment, Exercise, MovementPattern, Muscle } from "@/domain/exercises/types";
 import type {
   BodyRegion,
   ExperienceLevel,
@@ -14,7 +14,7 @@ import type {
 } from "../types";
 import { MAX_TRAINING_DAYS, MIN_TRAINING_DAYS } from "../types";
 import { DELOAD_EVERY_WEEKS, WARMUP_SECONDS, estimateExerciseSeconds, prescribe } from "./prescription";
-import { DAY_TEMPLATES, SPLIT_BY_DAYS, type Slot } from "./templates";
+import { DAY_TEMPLATES, GRIP_DAY_ORDER, GRIP_DAYS_PER_WEEK, GRIP_SLOT, SPLIT_BY_DAYS, type Slot } from "./templates";
 
 const MIN_EXERCISES_PER_DAY = 3;
 const DIFFICULTY_RANK: Record<Difficulty, number> = { beginner: 0, intermediate: 1, advanced: 2 };
@@ -51,16 +51,41 @@ const CORE_PATTERNS: MovementPattern[] = ["core_flexion", "core_stability", "cor
  *   schlechter, damit im Studio nicht das Widerstandsband vor dem Gerät gewählt wird.
  *   Für Bauchübungen gilt das nicht: Plank und Crunch sind dort erste Wahl.
  */
-function slotRank(exercise: Exercise, slot: Slot): number {
+function slotRank(exercise: Exercise, slot: Slot, preferences?: PreferenceMap): number {
   const mechanicMismatch = slot.kind === "compound" && exercise.mechanic !== "compound" ? 100 : 0;
   const specialty = exercise.priority === 3 ? 10 : 0;
   const unloaded = isUnloaded(exercise) && !CORE_PATTERNS.includes(exercise.pattern) ? 1 : 0;
-  return mechanicMismatch + specialty + exercise.priority + unloaded;
+  return mechanicMismatch + specialty + exercise.priority + unloaded + learnedOffset(preferences?.get(exercise.id));
 }
 
-function compareForSlot(slot: Slot) {
+/** Was der Generator über eine Übung gelernt hat. */
+export interface ExercisePreference {
+  /** In wie vielen Einheiten der letzten Wochen die Übung gemacht wurde. */
+  usage: number;
+  /** Wie oft ein Vorschlag mit dieser Übung getauscht oder gelöscht wurde. */
+  rejections: number;
+}
+export type PreferenceMap = ReadonlyMap<string, ExercisePreference>;
+
+export const FREQUENT_USAGE = 3;
+const USAGE_BONUS = 0.5;
+const REJECTION_PENALTY = 1.5;
+const MAX_COUNTED_REJECTIONS = 2;
+
+/**
+ * Lernender Generator: Oft gemachte Übungen rücken unter gleich guten Kandidaten nach vorn,
+ * abgelehnte Vorschläge nach hinten. Die Grundreihenfolge (Grundübung vor Spezialübung) bleibt.
+ */
+function learnedOffset(preference: ExercisePreference | undefined): number {
+  if (!preference) return 0;
+  // Wer eine Übung trotz früherer Ablehnung wieder regelmäßig macht, hat seine Meinung geändert.
+  if (preference.usage >= FREQUENT_USAGE) return -USAGE_BONUS;
+  return Math.min(preference.rejections, MAX_COUNTED_REJECTIONS) * REJECTION_PENALTY;
+}
+
+function compareForSlot(slot: Slot, preferences?: PreferenceMap) {
   return (a: Exercise, b: Exercise): number =>
-    slotRank(a, slot) - slotRank(b, slot) ||
+    slotRank(a, slot, preferences) - slotRank(b, slot, preferences) ||
     Number(isUnloaded(a)) - Number(isUnloaded(b)) ||
     a.id.localeCompare(b.id);
 }
@@ -69,10 +94,11 @@ function compareCandidates(a: Exercise, b: Exercise): number {
   return a.priority - b.priority || a.id.localeCompare(b.id);
 }
 
-interface SelectionContext {
-  candidates: Exercise[];
-  usedInWeek: Set<string>;
-  usedToday: Set<string>;
+export interface SelectionContext {
+  candidates: readonly Exercise[];
+  usedInWeek: ReadonlySet<string>;
+  usedToday: ReadonlySet<string>;
+  preferences?: PreferenceMap;
 }
 
 /**
@@ -80,7 +106,7 @@ interface SelectionContext {
  * genutzte Übung genommen – aber nur, wenn sie gleich gut ist. Sonst wiederholt sich lieber
  * die Standardübung, als dass eine deutlich schlechtere Variante im Plan landet.
  */
-function pickForSlot(slot: Slot, context: SelectionContext): Exercise | null {
+export function pickForSlot(slot: Slot, context: SelectionContext): Exercise | null {
   for (const pattern of slot.patterns) {
     const matching = context.candidates
       .filter(
@@ -89,20 +115,22 @@ function pickForSlot(slot: Slot, context: SelectionContext): Exercise | null {
           !context.usedToday.has(exercise.id) &&
           (!slot.muscles || slot.muscles.some((muscle) => exercise.primary.includes(muscle))),
       )
-      .sort(compareForSlot(slot));
+      .sort(compareForSlot(slot, context.preferences));
     const best = matching[0];
     if (!best) continue;
+    const rank = (exercise: Exercise) => slotRank(exercise, slot, context.preferences);
     const fresh = matching.find((exercise) => !context.usedInWeek.has(exercise.id));
-    return fresh && slotRank(fresh, slot) === slotRank(best, slot) ? fresh : best;
+    return fresh && rank(fresh) === rank(best) ? fresh : best;
   }
   return null;
 }
 
-function buildDay(
-  slots: Slot[],
-  profile: TrainingProfile,
-  candidates: Exercise[],
+export function buildDay(
+  slots: readonly Slot[],
+  profile: Pick<TrainingProfile, "goal" | "experience" | "sessionMinutes">,
+  candidates: readonly Exercise[],
   usedInWeek: Set<string>,
+  preferences?: PreferenceMap,
 ): PlannedExercise[] {
   const budgetSeconds = profile.sessionMinutes * 60 - WARMUP_SECONDS;
   const usedToday = new Set<string>();
@@ -110,7 +138,7 @@ function buildDay(
   let usedSeconds = 0;
 
   for (const slot of slots) {
-    const exercise = pickForSlot(slot, { candidates, usedInWeek, usedToday });
+    const exercise = pickForSlot(slot, { candidates, usedInWeek, usedToday, preferences });
     if (!exercise) continue;
     const entry = prescribe(exercise, slot.kind, profile.goal, profile.experience);
     const seconds = estimateExerciseSeconds(entry);
@@ -128,17 +156,29 @@ export function sortWeekdays(weekdays: readonly Weekday[]): Weekday[] {
   return [...new Set(weekdays)].sort((a, b) => a - b);
 }
 
-export function generatePlan(profile: TrainingProfile, catalog: readonly Exercise[]): GeneratedPlan {
-  const weekdays = sortWeekdays(profile.weekdays);
-  if (weekdays.length < MIN_TRAINING_DAYS || weekdays.length > MAX_TRAINING_DAYS) {
-    throw new RangeError(`Training days must be between ${MIN_TRAINING_DAYS} and ${MAX_TRAINING_DAYS}.`);
-  }
-  const { split, days } = SPLIT_BY_DAYS[weekdays.length];
-  const avoided = new Set(profile.injuries.flatMap((region) => PATTERNS_TO_AVOID[region]));
+/** Bewegungsmuster, die wegen der angegebenen Beschwerden gemieden werden. */
+export function avoidedPatterns(injuries: readonly BodyRegion[]): Set<MovementPattern> {
+  return new Set(injuries.flatMap((region) => PATTERNS_TO_AVOID[region]));
+}
+
+export type CandidateProfile = Pick<TrainingProfile, "equipment" | "excludedExerciseIds" | "injuries" | "experience">;
+
+/** Ob eine Übung für den Nutzer in Frage kommt: Equipment, Ausschlüsse, Beschwerden, Schwierigkeit. */
+export function isSuitable(exercise: Exercise, profile: CandidateProfile): boolean {
+  return (
+    !profile.excludedExerciseIds.includes(exercise.id) &&
+    !avoidedPatterns(profile.injuries).has(exercise.pattern) &&
+    DIFFICULTY_RANK[exercise.difficulty] <= EXPERIENCE_RANK[profile.experience] &&
+    isExerciseAvailable(exercise, profile.equipment)
+  );
+}
+
+/** Alle Kraftübungen, aus denen der Generator für diesen Nutzer wählen darf. */
+export function filterCandidates(profile: CandidateProfile, catalog: readonly Exercise[]): Exercise[] {
+  const avoided = avoidedPatterns(profile.injuries);
   const excluded = new Set(profile.excludedExerciseIds);
   const maxDifficulty = EXPERIENCE_RANK[profile.experience];
-
-  const candidates = catalog.filter(
+  return catalog.filter(
     (exercise) =>
       exercise.pattern !== "cardio" &&
       !excluded.has(exercise.id) &&
@@ -146,13 +186,66 @@ export function generatePlan(profile: TrainingProfile, catalog: readonly Exercis
       DIFFICULTY_RANK[exercise.difficulty] <= maxDifficulty &&
       isExerciseAvailable(exercise, profile.equipment),
   );
+}
+
+export interface GeneratorOptions {
+  /** Gelernte Vorlieben je Übung. */
+  preferences?: PreferenceMap;
+  /** Griffkraft-Modul: ergänzt an zwei Tagen eine Griff- bzw. Unterarmübung. */
+  includeGrip?: boolean;
+  /** Beinlastige Zusatzsport-Einheiten pro Woche (Laufen, Radfahren, Fußball …). */
+  legSportSessions?: number;
+}
+
+/** Ab so vielen beinlastigen Einheiten pro Woche gibt es bei Bein-Isolationsübungen einen Satz weniger. */
+export const LEG_SPORT_THRESHOLD = 3;
+const MIN_SETS = 2;
+const LEG_MUSCLES: readonly Muscle[] = ["quads", "hamstrings", "glutes", "calves", "adductors", "abductors"];
+
+export function generatePlan(
+  profile: TrainingProfile,
+  catalog: readonly Exercise[],
+  options: GeneratorOptions = {},
+): GeneratedPlan {
+  const weekdays = sortWeekdays(profile.weekdays);
+  if (weekdays.length < MIN_TRAINING_DAYS || weekdays.length > MAX_TRAINING_DAYS) {
+    throw new RangeError(`Training days must be between ${MIN_TRAINING_DAYS} and ${MAX_TRAINING_DAYS}.`);
+  }
+  const { split, days } = SPLIT_BY_DAYS[weekdays.length];
+  const candidates = filterCandidates(profile, catalog);
 
   const usedInWeek = new Set<string>();
   const plannedDays: PlannedDay[] = days.map((focus, index) => ({
     focus,
     weekday: weekdays[index],
-    exercises: buildDay(DAY_TEMPLATES[focus], profile, candidates, usedInWeek),
+    exercises: buildDay(DAY_TEMPLATES[focus], profile, candidates, usedInWeek, options.preferences),
   }));
+
+  if (options.includeGrip) {
+    // Die Tage mit Zug-Anteil zuerst; kurze Griffarbeit kommt ans Ende und zählt nicht ins Zeitbudget.
+    const gripDays = [...plannedDays]
+      .sort((a, b) => GRIP_DAY_ORDER.indexOf(a.focus) - GRIP_DAY_ORDER.indexOf(b.focus))
+      .slice(0, GRIP_DAYS_PER_WEEK);
+    for (const day of gripDays) {
+      const usedToday = new Set(day.exercises.map((entry) => entry.exerciseId));
+      const exercise = pickForSlot(GRIP_SLOT, { candidates, usedInWeek, usedToday, preferences: options.preferences });
+      if (!exercise) continue;
+      day.exercises.push(prescribe(exercise, GRIP_SLOT.kind, profile.goal, profile.experience));
+      usedInWeek.add(exercise.id);
+    }
+  }
+
+  if ((options.legSportSessions ?? 0) >= LEG_SPORT_THRESHOLD) {
+    const byId = new Map(candidates.map((exercise) => [exercise.id, exercise]));
+    for (const day of plannedDays) {
+      day.exercises = day.exercises.map((entry) => {
+        const exercise = byId.get(entry.exerciseId);
+        const isLegIsolation =
+          exercise?.mechanic === "isolation" && exercise.primary.every((muscle) => LEG_MUSCLES.includes(muscle));
+        return isLegIsolation ? { ...entry, sets: Math.max(MIN_SETS, entry.sets - 1) } : entry;
+      });
+    }
+  }
 
   return { split, deloadEveryWeeks: DELOAD_EVERY_WEEKS[profile.experience], days: plannedDays };
 }

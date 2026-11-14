@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { FlameIcon, InfoIcon, PlusIcon, StickyNoteIcon } from "lucide-react";
+import { CircleDotIcon, FlameIcon, InfoIcon, PlusIcon, StickyNoteIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { detectRecords } from "@/domain/training/records";
 import { formatClock, formatDayShort, formatNumber } from "@/lib/format";
-import { toDisplayWeight, weightUnitKey, type UnitSystem } from "@/lib/units";
+import { toDisplayWeight, unitSystemOf } from "@/lib/units";
 import { SetRow } from "./set-row";
 import { toLoggedSet, usesWeight, workSetNumber, type ExerciseDraft, type SetDraft } from "./workout-state";
 
@@ -18,7 +18,6 @@ export interface InvalidField {
 
 interface ExerciseCardProps {
   exercise: ExerciseDraft;
-  unitSystem: UnitSystem;
   invalid: InvalidField | null;
   onEdit: (setId: string, patch: Partial<SetDraft>) => void;
   onToggle: (setId: string) => void;
@@ -26,11 +25,12 @@ interface ExerciseCardProps {
   onAddSet: () => void;
   onAddWarmup: () => void;
   onEditNote: () => void;
+  /** Öffnet den Scheiben-Rechner; nur bei Übungen mit Scheiben vorhanden. */
+  onOpenPlates?: () => void;
 }
 
 export function ExerciseCard({
   exercise,
-  unitSystem,
   invalid,
   onEdit,
   onToggle,
@@ -38,10 +38,12 @@ export function ExerciseCard({
   onAddSet,
   onAddWarmup,
   onEditNote,
+  onOpenPlates,
 }: ExerciseCardProps) {
   const t = useTranslations();
   const showWeight = usesWeight(exercise.type);
-  const unit = t(`training.units.${weightUnitKey(unitSystem)}`);
+  const unitSystem = unitSystemOf(exercise.unit);
+  const unit = t(`training.units.${exercise.unit}`);
   const isTimed = exercise.type === "duration";
 
   const weightColumn =
@@ -60,7 +62,7 @@ export function ExerciseCard({
     .join(" · ");
 
   return (
-    <Card>
+    <Card id={`exercise-${exercise.id}`} className="scroll-mt-20">
       <CardHeader className="gap-1">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-lg leading-tight">{exercise.name}</CardTitle>
@@ -114,7 +116,7 @@ export function ExerciseCard({
             number={workSetNumber(exercise.sets, set.id)}
             showWeight={showWeight}
             repsPlaceholder={`${exercise.repMin}–${exercise.repMax}`}
-            isRecord={detectRecords([toLoggedSet(exercise, set, unitSystem)], exercise.bests).length > 0}
+            isRecord={detectRecords([toLoggedSet(exercise, set)], exercise.bests).length > 0}
             invalid={invalid?.setId === set.id ? invalid.field : null}
             onEdit={(patch) => onEdit(set.id, patch)}
             onToggle={() => onToggle(set.id)}
@@ -130,6 +132,12 @@ export function ExerciseCard({
             <Button variant="outline" size="sm" onClick={onAddWarmup}>
               <FlameIcon aria-hidden />
               {t("workout.addWarmup")}
+            </Button>
+          ) : null}
+          {onOpenPlates ? (
+            <Button variant="outline" size="sm" onClick={onOpenPlates}>
+              <CircleDotIcon aria-hidden />
+              {t("workout.plates.open")}
             </Button>
           ) : null}
           <Button variant="outline" size="sm" onClick={onEditNote}>

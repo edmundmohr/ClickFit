@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/layout/page-header";
 import { requireUser } from "@/features/auth/session";
-import { getCatalog } from "@/features/training/catalog";
+import { getUserCatalog } from "@/features/training/services/exercise-service";
 import { OnboardingWizard } from "@/features/training/components/onboarding/onboarding-wizard";
 import type { OnboardingState } from "@/features/training/components/onboarding/state";
 import { DEFAULT_EQUIPMENT, getProfile, toTrainingProfile } from "@/features/training/services/profile-service";
@@ -71,7 +71,7 @@ export default async function OnboardingPage() {
     };
   }
 
-  const exercises = getCatalog()
+  const exercises = (await getUserCatalog(getDb(), user.id)).all
     .filter((exercise) => exercise.pattern !== "cardio")
     .map(({ id, name }) => ({ id, name }))
     .sort((a, b) => a.name.localeCompare(b.name, "de"));

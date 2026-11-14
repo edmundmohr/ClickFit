@@ -6,8 +6,8 @@ Läuft komplett auf Cloudflare (Workers, D1, R2) unter `clickfit.online`.
 - Anforderungen: [docs/SPEC.md](docs/SPEC.md)
 - Umsetzungsplan und Stand: [docs/ROADMAP.md](docs/ROADMAP.md)
 
-**Stand:** Die Phasen 1 bis 4 sind fertig (Fundament, Training-Kern, Ernährung, Fortschritt).
-Als Nächstes folgt Phase 5 (Flexibilität).
+**Stand:** Die Phasen 1 bis 5 sind fertig (Fundament, Training-Kern, Ernährung, Fortschritt,
+Flexibilität). Als Nächstes folgt Phase 6 (Offline & Export).
 
 ## Technik
 
@@ -19,6 +19,7 @@ Als Nächstes folgt Phase 5 (Flexibilität).
 | Dateien | Cloudflare R2 (privater Bucket, ab Phase 4 genutzt) |
 | Anmeldung | Better Auth, Login per Benutzername, Sessions in der Datenbank |
 | Texte | next-intl, nur Deutsch, alle Texte in `messages/de/*.json` |
+| Drag & Drop | `@dnd-kit` im Plan-Builder (Touch, Maus und Tastatur) |
 | Tests | Vitest gegen eine echte lokale D1 (Miniflare) |
 
 ## Projektregeln
@@ -103,7 +104,11 @@ Das führt Typprüfung, ESLint, die Zeilenprüfung und die Tests aus. Einzeln:
 | `npm run typecheck` | TypeScript |
 | `npm run lint` | ESLint inklusive i18n-Regel |
 | `npm run check:size` | 600-Zeilen-Regel |
-| `npm run test` | Tests (Rechte, Anmeldung, Plan-Generator, Progression, Rekorde, Streaks, Kalorien und Makros, adaptiver Verbrauch, Trainings- und Ernährungs-Dienste) |
+| `npm run test` | Tests (Rechte, Anmeldung, Plan-Generator, Progression, Rekorde, Streaks, Kalorien und Makros, adaptiver Verbrauch, Erholung, Gewichtsstufen und Scheiben, Plan-Anpassung, Supersätze, Cardio, Mobility sowie alle Dienste gegen die lokale D1) |
+
+In `.next/types` tauchten beim Entwickeln Kopien wie `routes.d 2.ts` auf (vermutlich durch die
+Ordner-Synchronisierung von macOS). `tsconfig.json` schließt solche Dateien aus, damit die
+Typprüfung nicht an ihnen scheitert.
 
 ## Training (Phase 2)
 
@@ -161,6 +166,44 @@ Das führt Typprüfung, ESLint, die Zeilenprüfung und die Tests aus. Einzeln:
   den Besitzer. Bilder werden vor dem Upload im Browser auf 1600 px verkleinert. Erlaubt sind
   JPEG, PNG und WebP bis 8 MB.
 - **Heute-Seite:** Reihenfolge und Sichtbarkeit der Kacheln unter `/dashboard`.
+
+## Flexibilität (Phase 5)
+
+- **Trainingsorte:** unter `/training/gyms`. Jeder Ort hat eigenes Equipment, optional eine
+  eigene Stange mit Scheiben und eigene Gewichtsstufen je Gerät. Genau ein Ort ist aktiv.
+- **Plan passt sich an, ohne sich zu ändern:** `src/domain/training/adaptation.ts`. Übungen,
+  die am aktiven Ort nicht gehen, ausgeschlossen sind oder ein Bewegungsmuster einer
+  angegebenen Beschwerde nutzen, werden in der Anzeige und beim Start durch die beste
+  Alternative ersetzt. Der gespeicherte Plan bleibt, wie er ist; nach dem Wechsel zurück ins
+  Studio steht wieder der ursprüngliche Plan da.
+- **Gewichte:** `src/domain/training/weights.ts`. Gespeichert wird immer in kg. Je Gerät lässt
+  sich Einheit (kg oder lbs), Sprung oder eine feste Liste vorhandener Gewichte festlegen; die
+  Progression schlägt dann die nächste vorhandene Stufe vor. Beim Loggen ist jeder Wert
+  erlaubt. Der Scheiben-Rechner probiert alle Kombinationen der vorhandenen Scheiben durch.
+- **Routinen und Ordner:** Ein Plan ist zugleich ein Ordner (`training_plan`), seine Tage sind
+  die Routinen (`plan_day`). Der aktive Ordner ist der Wochenplan. Der Builder unter
+  `/training/routines/<id>` speichert eine Routine immer vollständig.
+- **Supersätze und Zirkel:** Übungen mit gleicher `group_id`. Die Pause startet erst, wenn alle
+  Übungen der Gruppe den Durchgang haben (`src/domain/training/supersets.ts`).
+- **Eigene Übungen:** Tabelle `custom_exercise`, Kennung beginnt mit `custom-`. Gelöschte
+  Übungen werden nur archiviert, damit der Verlauf vollständig bleibt.
+- **Lernender Generator:** Tauschen im erzeugten Plan und Löschen im Builder zählen als
+  Ablehnung (`exercise_preference`); die Nutzung kommt aus dem Verlauf der letzten 90 Tage.
+  Der Generator bleibt deterministisch.
+- **Anpassungen:** unter `/training/adjustments`: Verletztenmodus,
+  Urlaubsmodus (Pause oder Training unterwegs), erholungsorientierter Modus, Griffkraft-Modul,
+  Zusatzsport und zyklusangepasstes Training.
+- **Zeitsparmodus:** „Kurz“ auf der Plan-Karte startet eine Variante mit einem Satz weniger,
+  Supersätzen aus benachbarten Isolationsübungen und ohne die letzten Übungen.
+- **Wiedereinstieg:** Nach mehr als zehn Tagen ohne Training beginnen die Zielgewichte bei
+  90 %, nach drei Wochen bei 85 %, nach sechs Wochen bei 75 %.
+- **Cardio und Zusatzsport:** `src/domain/cardio`, Seite `/training/cardio`. Geloggte Einheiten
+  werden in Muskelbelastung umgerechnet und fließen in die Erholung ein. Die Puls-Zonen
+  beruhen auf der Formel nach Tanaka (208 − 0,7 × Alter) und sind Richtwerte.
+- **Mobility:** 60 Übungen und 17 Routinen liegen als Daten im Code (`src/data/mobility`) und
+  brauchen keinen Seed. Der geführte Ablauf läuft unter `/training/mobility/<id>`.
+- **Zyklus:** Die Phase wird rein nach Kalender aus dem letzten Periodenbeginn geschätzt. Die
+  Angaben lassen sich jederzeit samt Abschalten löschen.
 
 ## Datenbank
 

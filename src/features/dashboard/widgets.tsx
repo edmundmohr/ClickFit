@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Illustration } from "@/components/illustration";
 import { MUSCLES } from "@/domain/exercises/types";
-import { RECOVERY_LOOKBACK_DAYS, recoveryLevel, recoveryStatus } from "@/domain/progress/recovery";
+import { recoveryLevel } from "@/domain/progress/recovery";
 import { WEEKDAYS, type Weekday } from "@/domain/training/types";
 import { WeightCard } from "@/features/nutrition/components/weight-card";
 import { getWeightStatus } from "@/features/nutrition/services/tracking-service";
-import { getRecoveryOverrides, getTrainedSets } from "@/features/progress/services/progress-service";
+import { getRecoverySnapshot } from "@/features/progress/services/recovery-service";
 import { startWorkoutAction } from "@/features/training/actions";
-import { findExercise } from "@/features/training/catalog";
+import { getUserCatalog } from "@/features/training/services/exercise-service";
+import { routineTitle } from "@/features/training/titles";
 import type { SessionSummary, TrainingStats } from "@/features/training/services/history-service";
 import type { PlanDayView } from "@/features/training/services/plan-service";
 import { addDays, startOfWeek, type LocalDate } from "@/lib/dates";
@@ -74,7 +75,9 @@ export async function TrainingWidget({ training }: { training: TrainingToday }) 
       <Card className="border-primary">
         <CardHeader>
           <CardDescription>{t("home.todayWorkout")}</CardDescription>
-          <CardTitle className="text-xl">{t(`training.focus.${todayDay.focus}`)}</CardTitle>
+          <CardTitle className="text-xl">
+            {routineTitle(todayDay, (focus) => t(`training.focus.${focus}`))}
+          </CardTitle>
           <CardDescription>
             {t("training.plan.exercises", { count: todayDay.exercises.length })}
             {" · "}
@@ -100,11 +103,11 @@ export async function TrainingWidget({ training }: { training: TrainingToday }) 
           <MoonIcon className="text-muted-foreground size-5" aria-hidden />
           {t("home.restDayTitle")}
         </CardTitle>
-        {upcoming ? (
+        {upcoming && upcoming.weekday !== null ? (
           <CardDescription>
             {t("home.restDayText", {
               weekday: t(`training.weekdays.${upcoming.weekday}`),
-              focus: t(`training.focus.${upcoming.focus}`),
+              focus: routineTitle(upcoming, (focus) => t(`training.focus.${focus}`)),
             })}
           </CardDescription>
         ) : null}
@@ -195,14 +198,11 @@ export async function WeightWidget({ userId, today, unitSystem }: { userId: stri
 const MUSCLES_SHOWN = 3;
 
 /** Kachel „Erholung“: die am stärksten ermüdeten Muskelgruppen. */
-export async function RecoveryWidget({ userId, today }: { userId: string; today: LocalDate }) {
+export async function RecoveryWidget({ userId }: { userId: string }) {
   const t = await getTranslations();
   const db = getDb();
-  const [sets, overrides] = await Promise.all([
-    getTrainedSets(db, userId, { from: addDays(today, -RECOVERY_LOOKBACK_DAYS) }),
-    getRecoveryOverrides(db, userId),
-  ]);
-  const status = recoveryStatus(sets, findExercise, new Date(), overrides);
+  const catalog = await getUserCatalog(db, userId);
+  const status = await getRecoverySnapshot(db, userId, catalog.find);
   const tired = MUSCLES.filter((muscle) => recoveryLevel(status[muscle]) !== "fresh")
     .sort((a, b) => status[a] - status[b])
     .slice(0, MUSCLES_SHOWN);

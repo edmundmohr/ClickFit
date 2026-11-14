@@ -17,6 +17,8 @@ export function trainingStreak(
   completedDates: ReadonlySet<LocalDate>,
   plannedWeekdays: readonly Weekday[],
   today: LocalDate,
+  /** Tage, die nicht als verpasst zählen (Urlaubsmodus „Pause“). */
+  excusedDates: ReadonlySet<LocalDate> = new Set(),
 ): number {
   let streak = 0;
   for (let offset = 0; offset < MAX_STREAK_LOOKBACK_DAYS; offset++) {
@@ -27,7 +29,7 @@ export function trainingStreak(
     }
     const isToday = offset === 0;
     const isPlanned = plannedWeekdays.length === 0 || plannedWeekdays.includes(weekdayOf(day));
-    if (isPlanned && !isToday) break;
+    if (isPlanned && !isToday && !excusedDates.has(day)) break;
   }
   return streak;
 }

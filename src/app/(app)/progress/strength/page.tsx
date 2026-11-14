@@ -9,7 +9,7 @@ import { requireUser } from "@/features/auth/session";
 import { getWeights } from "@/features/nutrition/services/tracking-service";
 import { ExerciseSelect } from "@/features/progress/components/exercise-select";
 import { getTrainedSets } from "@/features/progress/services/progress-service";
-import { findExercise } from "@/features/training/catalog";
+import { getUserCatalog } from "@/features/training/services/exercise-service";
 import { getProfile } from "@/features/training/services/profile-service";
 import { mostUsedExercises } from "@/domain/progress/muscle-load";
 import { LIFT_EXERCISE_IDS, STRENGTH_LIFTS, detectPlateau, exerciseSeries, rateStrength } from "@/domain/progress/strength";
@@ -34,11 +34,13 @@ export default async function ProgressStrengthPage({ searchParams }: PageProps<"
   const t = await getTranslations();
   const today = toLocalDate(new Date());
   const db = getDb();
-  const [sets, stored, weights] = await Promise.all([
+  const [sets, stored, weights, catalog] = await Promise.all([
     getTrainedSets(db, user.id),
     getProfile(db, user.id),
     getWeights(db, user.id, addDays(today, -WEIGHT_LOOKBACK_DAYS), today),
+    getUserCatalog(db, user.id),
   ]);
+  const findExercise = catalog.find;
   const usage = mostUsedExercises(sets, MOST_USED_LIMIT).flatMap((entry) => {
     const exercise = findExercise(entry.exerciseId);
     return exercise ? [{ ...entry, name: exercise.name }] : [];

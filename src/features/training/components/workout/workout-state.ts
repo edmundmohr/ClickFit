@@ -5,7 +5,8 @@
 import type { ExerciseType } from "@/domain/exercises/types";
 import type { LoggedSet } from "@/domain/training/records";
 import type { SetType } from "@/domain/training/types";
-import { fromDisplayWeight, parseDecimal, toDisplayWeight, type UnitSystem } from "@/lib/units";
+import type { WeightUnit } from "@/domain/training/weights";
+import { fromDisplayWeight, parseDecimal, toDisplayWeight, unitSystemOf } from "@/lib/units";
 import type { SaveSetInput } from "../../schemas";
 import type { WorkoutExerciseView, WorkoutSetView } from "../../services/workout-view";
 
@@ -32,13 +33,13 @@ export function toInputText(value: number | null): string {
   return value === null ? "" : String(value).replace(".", ",");
 }
 
-function toDraft(set: WorkoutSetView, unitSystem: UnitSystem): SetDraft {
+function toDraft(set: WorkoutSetView, unit: WeightUnit): SetDraft {
   // Noch nicht geloggte Sätze sind mit den Zielwerten vorbelegt: Ein Tipp genügt zum Abhaken.
   const weightKg = set.weightKg ?? set.targetWeightKg;
   return {
     id: set.id,
     type: set.type,
-    weightText: toInputText(weightKg === null ? null : toDisplayWeight(weightKg, unitSystem)),
+    weightText: toInputText(weightKg === null ? null : toDisplayWeight(weightKg, unitSystemOf(unit))),
     repsText: toInputText(set.reps ?? set.targetReps),
     rir: set.rir,
     note: set.note ?? "",
@@ -46,16 +47,17 @@ function toDraft(set: WorkoutSetView, unitSystem: UnitSystem): SetDraft {
   };
 }
 
-export function toDrafts(exercises: WorkoutExerciseView[], unitSystem: UnitSystem): ExerciseDraft[] {
+/** Jede Übung wird in ihrer eigenen Einheit angezeigt (z. B. Kurzhanteln in lbs, Stange in kg). */
+export function toDrafts(exercises: WorkoutExerciseView[]): ExerciseDraft[] {
   return exercises.map((exercise) => ({
     ...exercise,
-    sets: exercise.sets.map((set) => toDraft(set, unitSystem)),
+    sets: exercise.sets.map((set) => toDraft(set, exercise.unit)),
   }));
 }
 
-export function parseWeightKg(set: SetDraft, unitSystem: UnitSystem): number | null {
+export function parseWeightKg(set: SetDraft, unit: WeightUnit): number | null {
   const value = parseDecimal(set.weightText);
-  return value === null ? null : fromDisplayWeight(value, unitSystem);
+  return value === null ? null : fromDisplayWeight(value, unitSystemOf(unit));
 }
 
 export function parseReps(set: SetDraft): number | null {
@@ -63,17 +65,13 @@ export function parseReps(set: SetDraft): number | null {
   return value === null ? null : Math.round(value);
 }
 
-export function toSavePayload(
-  exercise: ExerciseDraft,
-  set: SetDraft,
-  unitSystem: UnitSystem,
-): SaveSetInput {
+export function toSavePayload(exercise: ExerciseDraft, set: SetDraft): SaveSetInput {
   return {
     id: set.id,
     workoutExerciseId: exercise.id,
     position: exercise.sets.findIndex((item) => item.id === set.id),
     type: set.type,
-    weightKg: usesWeight(exercise.type) ? parseWeightKg(set, unitSystem) : null,
+    weightKg: usesWeight(exercise.type) ? parseWeightKg(set, exercise.unit) : null,
     reps: parseReps(set),
     rir: set.rir,
     note: set.note.trim() || null,
@@ -81,10 +79,10 @@ export function toSavePayload(
   };
 }
 
-export function toLoggedSet(exercise: ExerciseDraft, set: SetDraft, unitSystem: UnitSystem): LoggedSet {
+export function toLoggedSet(exercise: ExerciseDraft, set: SetDraft): LoggedSet {
   return {
     type: set.type,
-    weightKg: usesWeight(exercise.type) ? parseWeightKg(set, unitSystem) : null,
+    weightKg: usesWeight(exercise.type) ? parseWeightKg(set, exercise.unit) : null,
     reps: parseReps(set),
     completed: set.completed,
   };
@@ -142,4 +140,15 @@ export function workSetNumber(sets: readonly SetDraft[], setId: string): number 
     if (set.id === setId) return Math.max(number, 1);
   }
   return 1;
+}
+
+/** Stand einer Übung für die Supersatz-Logik: Aufwärmsätze zählen nicht als Durchgang. */
+export function toGroupMember(exercise: ExerciseDraft) {
+  const work = exercise.sets.filter((set) => set.type !== "warmup");
+  return {
+    id: exercise.id,
+    groupId: exercise.groupId,
+    completedSets: work.filter((set) => set.completed).length,
+    totalSets: work.length,
+  };
 }

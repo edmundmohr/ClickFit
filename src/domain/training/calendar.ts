@@ -9,6 +9,8 @@ export type DayStatus = "done" | "planned" | "missed" | "rest";
 export interface PlanSchedule {
   startDate: LocalDate;
   weekdays: readonly Weekday[];
+  /** Tage im Pausen-Urlaub: gelten als Ruhetage. */
+  pausedDates?: ReadonlySet<LocalDate>;
 }
 
 /**
@@ -25,7 +27,10 @@ export function dayStatus(
 ): DayStatus {
   if (completedDates.has(date)) return "done";
   const isPlanned =
-    schedule !== null && date >= schedule.startDate && schedule.weekdays.includes(weekdayOf(date));
+    schedule !== null &&
+    date >= schedule.startDate &&
+    schedule.weekdays.includes(weekdayOf(date)) &&
+    !schedule.pausedDates?.has(date);
   if (!isPlanned) return "rest";
   return date >= today ? "planned" : "missed";
 }

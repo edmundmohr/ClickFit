@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { routineTitle } from "../titles";
 import { getTranslations } from "next-intl/server";
 import { ChevronRightIcon } from "lucide-react";
 import { formatDayShort, formatNumber } from "@/lib/format";
@@ -18,7 +19,7 @@ export async function SessionList({ sessions, unitSystem }: { sessions: SessionS
               <span className="block font-medium">
                 {formatDayShort(session.date)}
                 {" · "}
-                {session.focus ? t(`focus.${session.focus}`) : t("focus.free")}
+                {routineTitle(session, (focus) => t(`focus.${focus}`))}
               </span>
               <span className="text-muted-foreground block text-sm">
                 {[

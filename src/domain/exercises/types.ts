@@ -122,6 +122,14 @@ export interface Exercise {
   unilateral?: boolean;
   /** Kurze Anleitung auf Deutsch, ein Schritt pro Eintrag. */
   instructions: string[];
+  /** Vom Nutzer selbst angelegte Übung. */
+  custom?: boolean;
+  /** Gelöschte eigene Übung: nur noch für den Verlauf sichtbar. */
+  archived?: boolean;
+}
+
+export function isOneOfExerciseValues<T extends string>(allowed: readonly T[], value: unknown): value is T {
+  return typeof value === "string" && (allowed as readonly string[]).includes(value);
 }
 
 export function isMuscle(value: string): value is Muscle {

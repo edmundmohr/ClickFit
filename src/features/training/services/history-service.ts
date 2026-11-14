@@ -13,6 +13,8 @@ export interface SessionSummary {
   id: string;
   date: LocalDate;
   focus: DayFocus | null;
+  /** Name der Routine, falls sie einen eigenen hat. */
+  name: string | null;
   durationMinutes: number | null;
   completedSets: number;
   volumeKg: number;
@@ -58,6 +60,7 @@ async function summarize(
       id: session.id,
       date: session.date,
       focus: isOneOf(DAY_FOCUSES, session.focus) ? session.focus : null,
+      name: session.name,
       durationMinutes: durationMs === null ? null : Math.max(1, Math.round(durationMs / 60000)),
       completedSets: totals.completedSets,
       volumeKg: totals.volumeKg,
@@ -111,6 +114,7 @@ export async function getTrainingStats(
   userId: string,
   plannedWeekdays: readonly Weekday[],
   today: LocalDate,
+  excusedDates: ReadonlySet<LocalDate> = new Set(),
 ): Promise<TrainingStats> {
   const rows = await db
     .selectDistinct({ date: workoutSession.date })
@@ -126,7 +130,7 @@ export async function getTrainingStats(
   const dates = new Set(rows.map((row) => row.date));
   const monday = startOfWeek(today);
   return {
-    streak: trainingStreak(dates, plannedWeekdays, today),
+    streak: trainingStreak(dates, plannedWeekdays, today, excusedDates),
     doneThisWeek: [...dates].filter((date) => date >= monday && date <= today).sort(),
   };
 }

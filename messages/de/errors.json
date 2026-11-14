@@ -11,5 +11,9 @@
   "NOT_ADMIN": "Dafür brauchst du Admin-Rechte.",
   "SELF_NOT_ALLOWED": "Für dein eigenes Konto nutze bitte „Passwort ändern“ in den Einstellungen.",
   "PROFILE_REQUIRED": "Bitte fülle zuerst den Fragebogen aus.",
-  "PLAN_EMPTY": "Mit diesen Angaben lässt sich kein Plan erstellen. Bitte prüfe Equipment und Ausschlüsse."
+  "PLAN_EMPTY": "Mit diesen Angaben lässt sich kein Plan erstellen. Bitte prüfe Equipment und Ausschlüsse.",
+  "LAST_GYM": "Mindestens ein Trainingsort muss bleiben.",
+  "GYM_ACTIVE": "Der aktive Trainingsort kann nicht gelöscht werden. Wähle zuerst einen anderen aus.",
+  "PLAN_ACTIVE": "Der Wochenplan kann nicht gelöscht werden. Mach zuerst einen anderen Ordner zum Wochenplan.",
+  "WORKOUT_RUNNING": "Es läuft bereits ein Training. Schließe es zuerst ab."
 }

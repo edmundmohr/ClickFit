@@ -1,6 +1,9 @@
 {
   "tabs": {
     "plan": "Plan",
+    "routines": "Routinen",
+    "cardio": "Cardio",
+    "mobility": "Mobility",
     "exercises": "Übungen",
     "history": "Verlauf",
     "calendar": "Kalender",
@@ -37,7 +40,8 @@
     "full_body": "Ganzkörper",
     "upper_lower": "Oberkörper / Unterkörper",
     "upper_lower_ppl": "Oberkörper / Unterkörper + Push / Pull / Beine",
-    "push_pull_legs": "Push / Pull / Beine"
+    "push_pull_legs": "Push / Pull / Beine",
+    "custom": "Eigener Plan"
   },
   "focus": {
     "full_body_a": "Ganzkörper A",
@@ -125,12 +129,37 @@
     "swapDone": "Übung getauscht.",
     "regenerate": "Plan neu erstellen",
     "regenerateTitle": "Plan neu erstellen?",
-    "regenerateText": "Der aktuelle Plan wird durch einen frisch erzeugten ersetzt. Getauschte Übungen gehen verloren, dein Trainingsverlauf bleibt erhalten.",
+    "regenerateText": "Der aktuelle Wochenplan wird durch einen frisch erzeugten ersetzt. Der Generator berücksichtigt, welche Übungen du oft machst und welche Vorschläge du getauscht oder gelöscht hast. Dein Trainingsverlauf bleibt erhalten.",
     "regenerateConfirm": "Neu erstellen",
     "regenerated": "Dein Plan wurde neu erstellt.",
     "editProfile": "Fragebogen erneut ausfüllen",
     "rest": "Pause {time}",
-    "rir": "RIR {rir}"
+    "rir": "RIR {rir}",
+    "edit": "Bearbeiten",
+    "startShort": "Kurz, ca. {minutes} min",
+    "replaces": "statt {name}",
+    "reasons": {
+      "equipment": "am aktuellen Ort nicht möglich",
+      "excluded": "ausgeschlossen",
+      "injury": "wegen Beschwerden"
+    },
+    "dropped": "Entfällt heute ohne Ersatz: {names}",
+    "noDay": "Ohne festen Tag",
+    "emptyDay": "Diese Routine hat noch keine Übungen.",
+    "location": "Ort: {name}",
+    "adjustments": "Anpassungen",
+    "injuryTitle": "Verletztenmodus aktiv",
+    "injuryText": "Übungen, die {regions} belasten, werden ersetzt oder entfallen.",
+    "vacationPauseTitle": "Urlaub: Pause bis {date}",
+    "vacationPauseText": "Die Tage zählen nicht als verpasst. Nach einer längeren Pause steigst du mit leichteren Gewichten wieder ein.",
+    "vacationTravelTitle": "Urlaub: Training unterwegs bis {date}",
+    "vacationTravelText": "Der Plan ist an den Ort „{name}“ angepasst.",
+    "cycleTitle": "Zyklus: {phase} (Tag {day})",
+    "weekPlan": "Wochenplan",
+    "group": {
+      "superset": "Supersatz",
+      "circuit": "Zirkel"
+    }
   },
   "library": {
     "title": "Übungen",
@@ -151,7 +180,22 @@
     "noteText": "Zum Beispiel Sitzeinstellung oder Griffbreite. Die Notiz erscheint bei jedem Training.",
     "notePlaceholder": "Notiz zur Übung",
     "noteSaved": "Notiz gespeichert.",
-    "back": "Zurück zu den Übungen"
+    "back": "Zurück zu den Übungen",
+    "newCustom": "Eigene Übung",
+    "custom": "Eigene",
+    "onlyCustom": "Nur eigene",
+    "exclude": "Übung ausschließen",
+    "include": "Wieder zulassen",
+    "excludedHint": "Diese Übung ist ausgeschlossen. Im Plan wird sie durch eine Alternative ersetzt.",
+    "excludeDone": "Übung ausgeschlossen.",
+    "includeDone": "Übung wieder zugelassen.",
+    "editCustom": "Übung bearbeiten",
+    "deleteCustom": "Übung löschen",
+    "deleteCustomTitle": "Eigene Übung löschen?",
+    "deleteCustomText": "Die Übung verschwindet aus der Auswahl. Bereits geloggte Trainings behalten sie.",
+    "customDeleted": "Übung gelöscht.",
+    "noInstructions": "Für diese Übung ist keine Anleitung hinterlegt.",
+    "pattern": "Bewegung"
   },
   "history": {
     "title": "Verlauf",
@@ -173,5 +217,74 @@
     "dayPlanned": "{date}: Training geplant",
     "dayMissed": "{date}: Training verpasst",
     "dayRest": "{date}: Ruhetag"
+  },
+  "recoveryMode": {
+    "sessionName": "Training nach Erholung",
+    "title": "Heute nach Erholung",
+    "text": "Zusammengestellt aus deinen frischesten Muskelgruppen: {muscles}.",
+    "rest": "Deine Muskeln sind noch nicht erholt. Heute passt eher Pause, Mobility oder lockeres Cardio.",
+    "start": "Dieses Training starten",
+    "ready": "{percent} % erholt"
+  },
+  "cyclePhases": {
+    "menstruation": "Menstruation",
+    "follicular": "Follikelphase",
+    "ovulation": "Eisprung",
+    "luteal": "Lutealphase",
+    "late_luteal": "späte Lutealphase"
+  },
+  "cycleHints": {
+    "menstruation": "Heute ist ein Satz weniger hart eingeplant, die Gewichte bleiben wie zuletzt.",
+    "follicular": "Gute Phase für harte Einheiten und neue Bestwerte.",
+    "ovulation": "Leistungsfähigkeit meist hoch. Wärm dich gründlich auf.",
+    "luteal": "Normal trainieren und auf dein Gefühl achten.",
+    "late_luteal": "Heute ist ein Satz weniger hart eingeplant, die Gewichte bleiben wie zuletzt."
+  },
+  "customExercise": {
+    "newTitle": "Eigene Übung anlegen",
+    "editTitle": "Eigene Übung bearbeiten",
+    "name": "Name",
+    "type": "Wie wird geloggt?",
+    "mechanic": "Art der Übung",
+    "pattern": "Bewegungsmuster",
+    "patternHint": "Bestimmt, welche Übungen als Alternative gelten und was der Verletztenmodus meidet.",
+    "primary": "Hauptmuskeln (1 bis 4)",
+    "secondary": "Unterstützende Muskeln",
+    "equipment": "Benötigtes Equipment",
+    "equipmentHint": "Nichts ausgewählt bedeutet: ohne Geräte machbar.",
+    "note": "Notiz oder Anleitung",
+    "notePlaceholder": "Ein Schritt pro Zeile",
+    "save": "Übung speichern",
+    "saved": "Übung gespeichert.",
+    "needsName": "Gib der Übung einen Namen (mindestens 2 Zeichen).",
+    "needsMuscle": "Wähle mindestens einen Hauptmuskel."
+  },
+  "patterns": {
+    "horizontal_push": "Drücken horizontal",
+    "vertical_push": "Drücken über Kopf",
+    "chest_fly": "Fliegende (Brust)",
+    "horizontal_pull": "Rudern",
+    "vertical_pull": "Ziehen von oben",
+    "shoulder_raise": "Seitheben/Frontheben",
+    "rear_delt": "Hintere Schulter",
+    "shrug": "Schulterheben",
+    "elbow_flexion": "Armbeugen",
+    "elbow_extension": "Armstrecken",
+    "squat": "Kniebeuge",
+    "hinge": "Hüftbeuge (Kreuzheben)",
+    "lunge": "Ausfallschritt",
+    "hip_thrust": "Hüftstrecken",
+    "knee_extension": "Beinstrecken",
+    "knee_flexion": "Beinbeugen",
+    "hip_abduction": "Abduktion",
+    "hip_adduction": "Adduktion",
+    "calf_raise": "Wadenheben",
+    "core_flexion": "Bauch: Beugen",
+    "core_stability": "Rumpf: Stabilität",
+    "core_rotation": "Rumpf: Rotation",
+    "back_extension": "Rückenstrecken",
+    "carry": "Tragen",
+    "grip": "Griffkraft",
+    "cardio": "Cardio"
   }
 }

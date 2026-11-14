@@ -7,28 +7,42 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/layout/page-header";
 import { requireUser } from "@/features/auth/session";
-import { findExercise, getCatalog } from "@/features/training/catalog";
+import { findExercise } from "@/features/training/catalog";
+import { ExerciseActions } from "@/features/training/components/exercise-actions";
 import { ExerciseNoteForm } from "@/features/training/components/exercise-note-form";
-import { getProfile } from "@/features/training/services/profile-service";
+import { getTrainingContext } from "@/features/training/services/context-service";
+import { getUserCatalog, isCustomExerciseId } from "@/features/training/services/exercise-service";
 import { getExerciseNotes } from "@/features/training/services/workout-service";
 import { findAlternatives } from "@/domain/training/plan-generator";
+import { toLocalDate } from "@/lib/dates";
 import { getDb } from "@/lib/server/context";
 
 export async function generateMetadata({ params }: PageProps<"/training/exercises/[id]">): Promise<Metadata> {
   const { id } = await params;
-  return { title: findExercise(id)?.name };
+  const builtIn = findExercise(id);
+  if (builtIn || !isCustomExerciseId(id)) return { title: builtIn?.name };
+  // Eigene Übungen stehen nicht im eingebauten Katalog: Der Name kommt aus dem Konto des Nutzers.
+  const user = await requireUser();
+  return { title: (await getUserCatalog(getDb(), user.id)).find(id)?.name };
 }
 
 export default async function ExerciseDetailPage({ params }: PageProps<"/training/exercises/[id]">) {
   const user = await requireUser();
   const { id } = await params;
-  const exercise = findExercise(id);
-  if (!exercise) notFound();
-
   const t = await getTranslations();
   const db = getDb();
-  const [stored, notes] = await Promise.all([getProfile(db, user.id), getExerciseNotes(db, user.id, [id])]);
-  const alternatives = findAlternatives(exercise, getCatalog(), { equipment: stored?.equipment, limit: 6 });
+  const [context, notes] = await Promise.all([
+    getTrainingContext(db, user.id, toLocalDate(new Date())),
+    getExerciseNotes(db, user.id, [id]),
+  ]);
+  const exercise = context.catalog.find(id);
+  if (!exercise || exercise.archived) notFound();
+  const excluded = context.profile?.excludedExerciseIds.includes(id) ?? false;
+  const alternatives = findAlternatives(exercise, context.catalog.all, {
+    equipment: context.profile?.equipment,
+    excludedIds: context.profile?.excludedExerciseIds,
+    limit: 6,
+  });
 
   return (
     <>
@@ -41,6 +55,15 @@ export default async function ExerciseDetailPage({ params }: PageProps<"/trainin
         description={`${t(`training.exerciseTypes.${exercise.type}`)} · ${t(`training.mechanics.${exercise.mechanic}`)}`}
       />
       <div className="grid gap-4">
+        {excluded ? (
+          <p className="rounded-md border border-amber-500/50 px-3 py-2 text-sm">{t("training.library.excludedHint")}</p>
+        ) : null}
+        <ExerciseActions
+          exerciseId={exercise.id}
+          excluded={excluded}
+          canExclude={context.profile !== null}
+          custom={exercise.custom ?? false}
+        />
         <Card>
           <CardContent className="grid gap-4">
             <div>
@@ -90,11 +113,15 @@ export default async function ExerciseDetailPage({ params }: PageProps<"/trainin
             <CardTitle>{t("training.library.instructions")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ol className="list-decimal space-y-2 pl-5">
-              {exercise.instructions.map((step) => (
-                <li key={step}>{step}</li>
-              ))}
-            </ol>
+            {exercise.instructions.length === 0 ? (
+              <p className="text-muted-foreground text-sm">{t("training.library.noInstructions")}</p>
+            ) : (
+              <ol className="list-decimal space-y-2 pl-5">
+                {exercise.instructions.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+            )}
           </CardContent>
         </Card>
         <Card>

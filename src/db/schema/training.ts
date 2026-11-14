@@ -34,7 +34,26 @@ export const userProfile = sqliteTable("user_profile", {
   updatedAt: timestamp().notNull(),
 });
 
-/** Trainingsort mit vorhandenem Equipment. Phase 5 erweitert dies zu vollen Gym-Profilen. */
+/** Eigene Gewichtsstufen eines Geräts an einem Trainingsort, in der dort üblichen Einheit. */
+export interface StoredWeightRule {
+  equipment: string;
+  unit: "kg" | "lbs";
+  /** Kleinster Sprung in der Einheit der Regel; `null`, wenn eine feste Liste gilt. */
+  increment: number | null;
+  /** Feste Liste vorhandener Gewichte (z. B. Kurzhanteln); leer = beliebige Vielfache. */
+  values: number[];
+}
+
+/** Vorhandene Scheiben einer Größe: Gewicht in der Scheiben-Einheit und Anzahl der Paare. */
+export interface StoredPlate {
+  weight: number;
+  pairs: number;
+}
+
+/**
+ * Trainingsort (Gym-Profil) mit Equipment, Stange, Scheiben und Gewichtsstufen.
+ * Der Ort mit `isDefault` ist der aktuell aktive.
+ */
 export const gymProfile = sqliteTable(
   "gym_profile",
   {
@@ -44,17 +63,29 @@ export const gymProfile = sqliteTable(
     name: text(),
     equipment: text({ mode: "json" }).$type<string[]>().notNull(),
     isDefault: integer({ mode: "boolean" }).notNull().default(false),
+    /** Einheit von Stange und Scheiben; `null` = Einheit aus den Einstellungen des Nutzers. */
+    plateUnit: text(),
+    /** Gewicht der Stange in der Scheiben-Einheit; `null` = Standardstange. */
+    barWeight: real(),
+    plates: text({ mode: "json" }).$type<StoredPlate[]>(),
+    weightRules: text({ mode: "json" }).$type<StoredWeightRule[]>(),
     createdAt: timestamp().notNull(),
     updatedAt: timestamp().notNull(),
   },
   (table) => [index("gym_profile_user_id_idx").on(table.userId)],
 );
 
+/**
+ * Ein Plan ist zugleich ein Ordner für Routinen (Plantage). Status `active` = Wochenplan,
+ * `saved` = weiterer Ordner, `archived` = ersetzter, ausgeblendeter Plan.
+ */
 export const trainingPlan = sqliteTable(
   "training_plan",
   {
     id: text().primaryKey(),
     userId: cascadeUser(),
+    /** Name des Ordners; `null` bei erzeugten Plänen (Anzeige über den Split). */
+    name: text(),
     split: text().notNull(),
     source: text().notNull().default("generated"),
     status: text().notNull().default("active"),
@@ -77,7 +108,10 @@ export const planDay = sqliteTable(
       .references(() => trainingPlan.id, { onDelete: "cascade" }),
     position: integer().notNull(),
     focus: text().notNull(),
+    /** ISO-Wochentag 1–7; 0 = Routine ohne festen Tag. */
     weekday: integer().notNull(),
+    /** Eigener Name der Routine; `null` = Anzeige über den Fokus. */
+    name: text(),
   },
   (table) => [index("plan_day_plan_id_idx").on(table.planId)],
 );
@@ -96,6 +130,8 @@ export const planExercise = sqliteTable(
     repMax: integer().notNull(),
     targetRir: integer().notNull(),
     restSeconds: integer().notNull(),
+    /** Übungen mit gleicher Kennung bilden einen Supersatz bzw. Zirkel. */
+    groupId: text(),
   },
   (table) => [index("plan_exercise_plan_day_id_idx").on(table.planDayId)],
 );
@@ -109,6 +145,12 @@ export const workoutSession = sqliteTable(
     planDayId: text().references(() => planDay.id, { onDelete: "set null" }),
     /** Tagesfokus als Momentaufnahme, damit der Verlauf auch nach Planänderungen stimmt. */
     focus: text(),
+    /** Name der Routine als Momentaufnahme. */
+    name: text(),
+    /** Trainingsort, an dem trainiert wurde (bestimmt Einheiten und Gewichtsstufen). */
+    gymProfileId: text().references(() => gymProfile.id, { onDelete: "set null" }),
+    /** Kurzvariante der Einheit (Zeitsparmodus). */
+    isShort: integer({ mode: "boolean" }).notNull().default(false),
     /** Lokales Datum des Trainings (YYYY-MM-DD, Europe/Berlin). */
     date: text().notNull(),
     status: text().notNull().default("in_progress"),
@@ -140,6 +182,7 @@ export const workoutExercise = sqliteTable(
     repMax: integer().notNull(),
     targetRir: integer().notNull(),
     restSeconds: integer().notNull(),
+    groupId: text(),
   },
   (table) => [
     index("workout_exercise_session_id_idx").on(table.sessionId),

@@ -91,20 +91,28 @@ export async function saveOnboarding(
     excludedExerciseIds: input.excludedExerciseIds,
     updatedAt: now,
   };
+  // Der aktive Ort wird angepasst, nicht ersetzt: Stange, Scheiben und Gewichtsstufen bleiben erhalten.
+  const active = await db.query.gymProfile.findFirst({
+    where: and(eq(gymProfile.userId, userId), eq(gymProfile.isDefault, true)),
+  });
   await db.batch([
     db
       .insert(userProfile)
       .values({ userId, ...values, completedAt: now })
       .onConflictDoUpdate({ target: userProfile.userId, set: values }),
-    db.delete(gymProfile).where(and(eq(gymProfile.userId, userId), eq(gymProfile.isDefault, true))),
-    db.insert(gymProfile).values({
-      id: newId(),
-      userId,
-      type: input.locationType,
-      equipment: input.equipment,
-      isDefault: true,
-      createdAt: now,
-      updatedAt: now,
-    }),
+    active
+      ? db
+          .update(gymProfile)
+          .set({ type: input.locationType, equipment: input.equipment, updatedAt: now })
+          .where(eq(gymProfile.id, active.id))
+      : db.insert(gymProfile).values({
+          id: newId(),
+          userId,
+          type: input.locationType,
+          equipment: input.equipment,
+          isDefault: true,
+          createdAt: now,
+          updatedAt: now,
+        }),
   ]);
 }

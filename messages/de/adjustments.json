@@ -1,0 +1,75 @@
+{
+  "title": "Anpassungen",
+  "description": "Hier stellst du ein, was dein Training gerade beeinflusst. Der Plan passt sich sofort an.",
+  "saved": "Gespeichert.",
+  "needsProfile": "Fülle zuerst den Fragebogen aus, damit die App deinen Plan kennt.",
+  "injury": {
+    "title": "Verletztenmodus",
+    "text": "Wähle, wo du gerade Beschwerden hast. Übungen mit belastenden Bewegungsmustern werden im Plan ersetzt oder entfallen, bis du die Auswahl wieder aufhebst.",
+    "note": "Notiz (freiwillig)",
+    "notePlaceholder": "z. B. seit wann, was genau schmerzt",
+    "save": "Beschwerden speichern",
+    "disclaimer": "Die App ersetzt keine ärztliche Beratung. Lass starke oder anhaltende Schmerzen abklären."
+  },
+  "excluded": {
+    "title": "Ausgeschlossene Übungen",
+    "text": "Diese Übungen schlägt die App nicht vor; im Plan werden sie ersetzt. Ausschließen kannst du eine Übung auf ihrer Detailseite.",
+    "empty": "Du hast keine Übung ausgeschlossen.",
+    "include": "{name} wieder zulassen",
+    "toLibrary": "Zur Übungsbibliothek"
+  },
+  "vacation": {
+    "title": "Urlaubsmodus",
+    "text": "Für Reisen und Pausen. Bei „Pause“ zählen die Tage nicht als verpasst; bei „Unterwegs trainieren“ richtet sich der Plan nach dem gewählten Ort. Nach mehr als zehn Tagen ohne Training startet die App mit leichteren Gewichten.",
+    "types": {
+      "pause": "Pause",
+      "travel": "Unterwegs trainieren"
+    },
+    "typeHints": {
+      "pause": "Kein Training, der Streak bleibt erhalten.",
+      "travel": "Training am Reiseort, z. B. Hotelgym oder nur mit Körpergewicht."
+    },
+    "from": "Von",
+    "until": "Bis",
+    "gym": "Trainingsort unterwegs",
+    "noGym": "Ort wählen",
+    "newGym": "Ort für die Reise anlegen",
+    "save": "Urlaub speichern",
+    "end": "Urlaub beenden",
+    "ended": "Urlaub beendet.",
+    "current": "{type} vom {from} bis {until}",
+    "invalid": "Bitte prüfe die Daten: Das Ende darf nicht vor dem Anfang liegen, und für „Unterwegs trainieren“ brauchst du einen Ort."
+  },
+  "modes": {
+    "title": "Trainingsmodi",
+    "recoveryTitle": "Erholungsorientierter Modus",
+    "recoveryText": "Zusätzlich zum Wochenplan schlägt die App täglich ein Training aus den frischesten Muskelgruppen vor.",
+    "gripTitle": "Griffkraft-Modul",
+    "gripText": "Ergänzt an zwei Tagen pro Woche eine Griff- bzw. Unterarmübung. Gilt ab dem nächsten neu erstellten Plan.",
+    "on": "An",
+    "off": "Aus"
+  },
+  "cycle": {
+    "title": "Zyklusangepasstes Training",
+    "text": "Freiwillig. Die App schätzt aus dem Beginn deiner letzten Periode die Zyklusphase. Während der Menstruation und kurz davor plant sie einen Satz weniger hart und hält die Gewichte; sonst trainierst du normal. Die Angaben bleiben in deinem Konto und fließen nur in den Plan ein.",
+    "enable": "Zyklus berücksichtigen",
+    "lastStart": "Erster Tag der letzten Periode",
+    "length": "Übliche Zykluslänge in Tagen",
+    "save": "Zyklus speichern",
+    "disable": "Abschalten und Angaben löschen",
+    "disabled": "Zyklusangaben gelöscht.",
+    "invalid": "Bitte gib ein Datum und eine Zykluslänge zwischen 21 und 40 Tagen an."
+  },
+  "sports": {
+    "title": "Zusatzsport",
+    "text": "Gib an, was du neben dem Krafttraining regelmäßig machst. Ab drei beinlastigen Einheiten pro Woche plant der Generator bei Bein-Isolationsübungen einen Satz weniger. Geloggte Einheiten (unter Cardio) fließen in die Erholung ein.",
+    "empty": "Noch kein Zusatzsport angegeben.",
+    "type": "Sportart",
+    "perWeek": "pro Woche",
+    "perWeekLabel": "Einheiten pro Woche für {name}",
+    "add": "Sportart hinzufügen",
+    "remove": "{name} entfernen",
+    "save": "Zusatzsport speichern",
+    "toCardio": "Einheit unter Cardio eintragen"
+  }
+}

@@ -1,20 +1,27 @@
 /**
  * Workouts starten, Sätze speichern, abschließen und verwerfen.
  */
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, max } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
-import { exerciseNote, planDay, planExercise, trainingPlan, workoutExercise, workoutSession, workoutSet } from "@/db/schema";
-import { defaultIncrementKg, isDeloadWeek, nextSetTargets } from "@/domain/training/progression";
+import { exerciseNote, planExercise, workoutExercise, workoutSession, workoutSet } from "@/db/schema";
+import { adaptDay, shortenDay } from "@/domain/training/adaptation";
+import { cycleStatus } from "@/domain/training/cycle";
+import { isDeloadWeek, nextSetTargets } from "@/domain/training/progression";
+import type { PlannedExercise } from "@/domain/training/types";
+import { reentryFactor } from "@/domain/training/vacation";
+import { ladderFor, type WeightUnit } from "@/domain/training/weights";
 import { AppError } from "@/lib/errors";
 import { diffDays, toLocalDate } from "@/lib/dates";
 import { newId } from "@/lib/tokens";
-import { findExercise } from "../catalog";
 import type { SaveSetInput } from "../schemas";
+import { getTrainingContext, weightContext, type TrainingContext } from "./context-service";
+import { getUserCatalog } from "./exercise-service";
+import { getOwnedDay } from "./plan-service";
 import { getOwnedSession, getOwnedWorkoutExercise, getPreviousPerformances } from "./workout-queries";
 
 /** D1 erlaubt höchstens 100 gebundene Parameter pro Anweisung. */
 const SET_INSERT_CHUNK = 7;
-const EXERCISE_INSERT_CHUNK = 10;
+const EXERCISE_INSERT_CHUNK = 9;
 
 function chunk<T>(items: T[], size: number): T[][] {
   const chunks: T[][] = [];
@@ -30,62 +37,101 @@ export async function getInProgressSession(db: AppDatabase, userId: string) {
   return session ?? null;
 }
 
+export interface StartOptions {
+  /** Kurzvariante der Einheit (Zeitsparmodus). */
+  short?: boolean;
+  /** Einheit aus den Einstellungen des Nutzers; bestimmt die Gewichtsstufen ohne eigene Regeln. */
+  defaultUnit?: WeightUnit;
+}
+
+interface SeedEntry {
+  exerciseId: string;
+  sets: number;
+  repMin: number;
+  repMax: number;
+  targetRir: number;
+  restSeconds: number;
+  groupId: string | null;
+}
+
+interface SessionSeed {
+  planId: string | null;
+  planDayId: string | null;
+  focus: string | null;
+  name: string | null;
+  isShort: boolean;
+  isDeload: boolean;
+  entries: SeedEntry[];
+}
+
+const MAX_TARGET_RIR = 5;
+
+/** Datum der letzten abgeschlossenen Einheit; `null`, wenn es noch keine gibt. */
+async function getLastWorkoutDate(db: AppDatabase, userId: string): Promise<string | null> {
+  const [row] = await db
+    .select({ date: max(workoutSession.date) })
+    .from(workoutSession)
+    .where(and(eq(workoutSession.userId, userId), eq(workoutSession.status, "completed")));
+  return row?.date ?? null;
+}
+
 /**
- * Startet das Training eines Plantags. Läuft bereits ein Training, wird dieses fortgesetzt:
- * Es gibt immer höchstens ein offenes Workout pro Nutzer.
+ * Legt die Einheit mit Zielwerten für jeden Satz an. Berücksichtigt die Gewichtsstufen des
+ * Trainingsorts, den Wiedereinstieg nach einer Pause und – falls aktiviert – die Zyklusphase.
  */
-export async function startWorkout(
+async function createSession(
   db: AppDatabase,
   userId: string,
-  planDayId: string,
-  now = new Date(),
+  seed: SessionSeed,
+  context: TrainingContext,
+  now: Date,
+  defaultUnit: WeightUnit,
 ): Promise<string> {
-  const running = await getInProgressSession(db, userId);
-  if (running) return running.id;
-
-  const [day] = await db
-    .select({ day: planDay, plan: trainingPlan })
-    .from(planDay)
-    .innerJoin(trainingPlan, eq(planDay.planId, trainingPlan.id))
-    .where(and(eq(planDay.id, planDayId), eq(trainingPlan.userId, userId)));
-  if (!day) throw new AppError("NOT_FOUND");
-
-  const planned = await db.query.planExercise.findMany({
-    where: eq(planExercise.planDayId, planDayId),
-    orderBy: asc(planExercise.position),
-  });
   const today = toLocalDate(now);
-  const isDeload = isDeloadWeek(diffDays(day.plan.startDate, today), day.plan.deloadEveryWeeks);
-  const previous = await getPreviousPerformances(
-    db,
-    userId,
-    planned.map((row) => row.exerciseId),
-  );
+  const [previous, lastDate] = await Promise.all([
+    getPreviousPerformances(
+      db,
+      userId,
+      seed.entries.map((entry) => entry.exerciseId),
+    ),
+    getLastWorkoutDate(db, userId),
+  ]);
+  const weightFactor = reentryFactor(lastDate === null ? null : diffDays(lastDate, today));
+  const cycle = context.settings.cycle?.enabled
+    ? cycleStatus(context.settings.cycle.lastStart, context.settings.cycle.lengthDays, today)
+    : null;
+  const weights = weightContext(context, defaultUnit);
 
   const sessionId = newId();
   const exerciseRows: (typeof workoutExercise.$inferInsert)[] = [];
   const setRows: (typeof workoutSet.$inferInsert)[] = [];
-  for (const row of planned) {
-    const exercise = findExercise(row.exerciseId);
+  for (const entry of seed.entries) {
+    const exercise = context.catalog.find(entry.exerciseId);
     if (!exercise) continue;
     const workoutExerciseId = newId();
+    const targetRir = Math.min(entry.targetRir + (cycle?.rirOffset ?? 0), MAX_TARGET_RIR);
     exerciseRows.push({
       id: workoutExerciseId,
       sessionId,
       userId,
       position: exerciseRows.length,
-      exerciseId: row.exerciseId,
-      repMin: row.repMin,
-      repMax: row.repMax,
-      targetRir: row.targetRir,
-      restSeconds: row.restSeconds,
+      exerciseId: entry.exerciseId,
+      repMin: entry.repMin,
+      repMax: entry.repMax,
+      targetRir,
+      restSeconds: entry.restSeconds,
+      groupId: entry.groupId,
     });
+    const ladder = ladderFor(exercise.equipment, weights);
     const targets = nextSetTargets({
       exerciseType: exercise.type,
-      prescription: row,
-      previous: previous.get(row.exerciseId)?.sets ?? [],
-      incrementKg: defaultIncrementKg(exercise),
-      isDeload,
+      prescription: { ...entry, targetRir },
+      previous: previous.get(entry.exerciseId)?.sets ?? [],
+      incrementKg: ladder.incrementKg,
+      steps: ladder,
+      isDeload: seed.isDeload,
+      hold: cycle?.holdProgression ?? false,
+      weightFactor,
     });
     targets.forEach((target, position) =>
       setRows.push({
@@ -104,12 +150,15 @@ export async function startWorkout(
     db.insert(workoutSession).values({
       id: sessionId,
       userId,
-      planId: day.plan.id,
-      planDayId,
-      focus: day.day.focus,
+      planId: seed.planId,
+      planDayId: seed.planDayId,
+      focus: seed.focus,
+      name: seed.name,
+      gymProfileId: context.gym?.id ?? null,
+      isShort: seed.isShort,
       date: today,
       status: "in_progress",
-      isDeload,
+      isDeload: seed.isDeload,
       startedAt: now,
       createdAt: now,
       updatedAt: now,
@@ -118,6 +167,90 @@ export async function startWorkout(
     ...chunk(setRows, SET_INSERT_CHUNK).map((rows) => db.insert(workoutSet).values(rows)),
   ]);
   return sessionId;
+}
+
+/**
+ * Startet das Training eines Plantags bzw. einer Routine. Läuft bereits ein Training, wird
+ * dieses fortgesetzt: Es gibt immer höchstens ein offenes Workout pro Nutzer.
+ * Übungen, die heute nicht passen (Ort, Beschwerden, Ausschlüsse), werden ersetzt.
+ */
+export async function startWorkout(
+  db: AppDatabase,
+  userId: string,
+  planDayId: string,
+  now = new Date(),
+  options: StartOptions = {},
+): Promise<string> {
+  const running = await getInProgressSession(db, userId);
+  if (running) return running.id;
+
+  const { day, plan } = await getOwnedDay(db, userId, planDayId);
+  const today = toLocalDate(now);
+  const [planned, context] = await Promise.all([
+    db.query.planExercise.findMany({
+      where: eq(planExercise.planDayId, planDayId),
+      orderBy: asc(planExercise.position),
+    }),
+    getTrainingContext(db, userId, today),
+  ]);
+
+  const adapted = context.candidateProfile
+    ? adaptDay(planned, context.catalog.find, context.catalog.all, context.candidateProfile).items
+    : planned.flatMap((entry) => {
+        const exercise = context.catalog.find(entry.exerciseId);
+        return exercise ? [{ entry, exercise }] : [];
+      });
+  const entries = options.short ? shortenDay(adapted) : adapted.map((item) => item.entry);
+
+  return createSession(
+    db,
+    userId,
+    {
+      planId: plan.id,
+      planDayId,
+      focus: day.focus,
+      name: day.name,
+      isShort: options.short ?? false,
+      isDeload: isDeloadWeek(diffDays(plan.startDate, today), plan.deloadEveryWeeks),
+      entries,
+    },
+    context,
+    now,
+    options.defaultUnit ?? "kg",
+  );
+}
+
+/**
+ * Startet ein Training ohne Plantag aus fertig zusammengestellten Übungen
+ * (erholungsorientierter Modus).
+ */
+export async function startFreeWorkout(
+  db: AppDatabase,
+  userId: string,
+  name: string,
+  entries: PlannedExercise[],
+  now = new Date(),
+  options: StartOptions = {},
+): Promise<string> {
+  const running = await getInProgressSession(db, userId);
+  if (running) return running.id;
+  const context = await getTrainingContext(db, userId, toLocalDate(now));
+  return createSession(
+    db,
+    userId,
+    {
+      planId: null,
+      planDayId: null,
+      focus: null,
+      name,
+      isShort: false,
+      isDeload: false,
+      entries: entries.map((entry) => ({ ...entry, groupId: null })),
+    },
+    context,
+    now,
+    options.defaultUnit ?? "kg",
+  );
 }
 
 /**
@@ -200,7 +333,7 @@ export async function saveExerciseNote(
   exerciseId: string,
   note: string,
 ): Promise<void> {
-  if (!findExercise(exerciseId)) throw new AppError("NOT_FOUND");
+  if (!(await getUserCatalog(db, userId)).find(exerciseId)) throw new AppError("NOT_FOUND");
   const text = note.trim();
   const where = and(eq(exerciseNote.userId, userId), eq(exerciseNote.exerciseId, exerciseId));
   if (!text) {

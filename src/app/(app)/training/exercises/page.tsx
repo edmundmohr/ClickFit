@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/layout/page-header";
 import { requireUser } from "@/features/auth/session";
-import { getCatalog } from "@/features/training/catalog";
+import Link from "next/link";
+import { PlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { getTrainingContext } from "@/features/training/services/context-service";
+import { toLocalDate } from "@/lib/dates";
 import { ExerciseLibrary } from "@/features/training/components/exercise-library";
-import { getProfile } from "@/features/training/services/profile-service";
 import { getDb } from "@/lib/server/context";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,15 +18,29 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ExercisesPage() {
   const user = await requireUser();
   const t = await getTranslations("training.library");
-  const stored = await getProfile(getDb(), user.id);
-  const exercises = getCatalog()
-    .map(({ id, name, primary, equipment }) => ({ id, name, primary, equipment }))
+  const context = await getTrainingContext(getDb(), user.id, toLocalDate(new Date()));
+  const excluded = new Set(context.profile?.excludedExerciseIds ?? []);
+  const exercises = context.catalog.all
+    .map(({ id, name, primary, equipment, custom }) => ({
+      id,
+      name,
+      primary,
+      equipment,
+      custom: custom ?? false,
+      excluded: excluded.has(id),
+    }))
     .sort((a, b) => a.name.localeCompare(b.name, "de"));
 
   return (
     <>
       <PageHeader title={t("title")} />
-      <ExerciseLibrary exercises={exercises} ownEquipment={stored?.equipment ?? null} />
+      <Button asChild variant="outline" className="mb-4">
+        <Link href="/training/exercises/new">
+          <PlusIcon aria-hidden />
+          {t("newCustom")}
+        </Link>
+      </Button>
+      <ExerciseLibrary exercises={exercises} ownEquipment={context.profile?.equipment ?? null} />
     </>
   );
 }

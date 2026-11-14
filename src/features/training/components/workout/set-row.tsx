@@ -23,7 +23,7 @@ interface SetRowProps {
 }
 
 const inputClass =
-  "border-input bg-background h-11 w-full min-w-0 rounded-md border px-2 text-center text-base tabular-nums";
+  "border-input bg-background h-11 w-full min-w-0 rounded-md border px-1 text-center text-base tabular-nums";
 
 export function SetRow({
   set,

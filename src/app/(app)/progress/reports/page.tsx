@@ -7,7 +7,7 @@ import { requireUser } from "@/features/auth/session";
 import { getDailyTotals } from "@/features/nutrition/services/diary-service";
 import { getWeights } from "@/features/nutrition/services/tracking-service";
 import { getPeriodSessions, getTrainedSets } from "@/features/progress/services/progress-service";
-import { findExercise } from "@/features/training/catalog";
+import { getUserCatalog } from "@/features/training/services/exercise-service";
 import { weightTrend } from "@/domain/nutrition/adaptive";
 import { periodReport } from "@/domain/progress/reports";
 import { addDays, shiftMonth, toLocalDate } from "@/lib/dates";
@@ -58,7 +58,8 @@ export default async function ProgressReportsPage({ searchParams }: PageProps<"/
 
   const unit = t(`training.units.${weightUnitKey(user.unitSystem)}`);
   const display = (kg: number) => toDisplayWeight(kg, user.unitSystem);
-  const name = (exerciseId: string) => findExercise(exerciseId)?.name ?? exerciseId;
+  const catalog = await getUserCatalog(db, user.id);
+  const name = (exerciseId: string) => catalog.find(exerciseId)?.name ?? exerciseId;
   const stats = [
     { label: t("progress.reports.workouts"), value: String(report.workouts) },
     { label: t("progress.reports.trainingDays"), value: String(report.trainingDays) },

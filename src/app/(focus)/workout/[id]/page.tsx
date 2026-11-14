@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function WorkoutPage({ params }: PageProps<"/workout/[id]">) {
   const user = await requireUser();
   const { id } = await params;
-  const view = await getWorkoutView(getDb(), user.id, id).catch((error: unknown) => {
+  const view = await getWorkoutView(getDb(), user.id, id, user.unitSystem === "imperial" ? "lbs" : "kg").catch((error: unknown) => {
     if (error instanceof AppError && error.code === "NOT_FOUND") return null;
     throw error;
   });

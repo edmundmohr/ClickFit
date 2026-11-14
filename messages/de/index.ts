@@ -15,6 +15,11 @@ import onboarding from "./onboarding.json";
 import workout from "./workout.json";
 import nutrition from "./nutrition.json";
 import progress from "./progress.json";
+import gyms from "./gyms.json";
+import routines from "./routines.json";
+import adjustments from "./adjustments.json";
+import cardio from "./cardio.json";
+import mobility from "./mobility.json";
 
 const messages = {
   common,
@@ -34,6 +39,11 @@ const messages = {
   workout,
   nutrition,
   progress,
+  gyms,
+  routines,
+  adjustments,
+  cardio,
+  mobility,
 };
 
 export default messages;

@@ -1,0 +1,129 @@
+{
+  "title": "Cardio & Zusatzsport",
+  "description": "Plane deine Ausdauer-Einheiten und trage Cardio und anderen Sport ein. Beides fließt in die Muskel-Erholung ein.",
+  "types": {
+    "running": "Laufen",
+    "cycling": "Radfahren",
+    "rowing": "Rudern",
+    "walking": "Gehen",
+    "swimming": "Schwimmen",
+    "cross_trainer": "Crosstrainer",
+    "hiking": "Wandern",
+    "football": "Fußball",
+    "racket_sport": "Schlägersport",
+    "climbing": "Klettern",
+    "martial_arts": "Kampfsport",
+    "team_sport": "Mannschaftssport",
+    "skiing": "Skifahren",
+    "dancing": "Tanzen",
+    "yoga": "Yoga",
+    "other": "Sonstiges"
+  },
+  "groups": {
+    "cardio": "Cardio",
+    "sport": "Zusatzsport"
+  },
+  "intensities": {
+    "easy": "Leicht",
+    "moderate": "Mittel",
+    "hard": "Hart"
+  },
+  "zoneNames": {
+    "1": "Regeneration",
+    "2": "Grundlage",
+    "3": "Tempo",
+    "4": "Schwelle",
+    "5": "Maximal"
+  },
+  "values": {
+    "zone": "Zone {zone}",
+    "minutes": "{count} min",
+    "distance": "{value} km",
+    "pace": "{value} min/km",
+    "speed": "{value} km/h",
+    "heartRate": "Ø Puls {value}",
+    "bpmRange": "{min}–{max}",
+    "intervals": "{repeats} × {work} s Belastung / {rest} s Pause"
+  },
+  "week": {
+    "title": "Diese Woche",
+    "sessions": "Einheiten",
+    "minutes": "Minuten",
+    "distance": "Kilometer",
+    "log": "Einheit eintragen"
+  },
+  "plan": {
+    "title": "Wochenplan",
+    "hint": "Geplante Cardio-Einheiten je Wochentag. Mit „Loggen“ trägst du eine Einheit mit den geplanten Werten ein.",
+    "today": "Heute",
+    "done": "Erledigt",
+    "rest": "Kein Cardio geplant",
+    "add": "Eintrag hinzufügen",
+    "addFor": "Eintrag für {day} hinzufügen",
+    "log": "Loggen",
+    "logFor": "{type} am {day} loggen",
+    "edit": "{type} am {day} bearbeiten",
+    "delete": "{type} am {day} löschen",
+    "deleted": "Eintrag gelöscht",
+    "generate": "Plan aus meinem Profil erstellen",
+    "generateHint": "Der Plan nutzt Arten, Häufigkeit und Trainingstage aus deinem Fragebogen. Ohne Cardio-Angabe plant er zwei lockere Einheiten.",
+    "generateTitle": "Wochenplan neu erstellen?",
+    "generateText": "Deine bisherigen Einträge im Wochenplan werden durch den neuen Plan ersetzt.",
+    "generateConfirm": "Plan erstellen",
+    "generated": "{count, plural, one {# Einheit geplant} other {# Einheiten geplant}}"
+  },
+  "planForm": {
+    "addTitle": "Einheit planen",
+    "editTitle": "Geplante Einheit ändern",
+    "text": "Zusatzsport wird nicht geplant, du kannst ihn aber jederzeit eintragen.",
+    "weekday": "Wochentag",
+    "type": "Art",
+    "minutes": "Dauer (min)",
+    "zone": "Puls-Zone",
+    "noZone": "Keine Vorgabe",
+    "note": "Notiz",
+    "save": "Speichern",
+    "saved": "Wochenplan gespeichert"
+  },
+  "form": {
+    "title": "Einheit eintragen",
+    "text": "Cardio oder Zusatzsport. Die Einheit zählt für deine Muskel-Erholung.",
+    "type": "Art",
+    "date": "Datum",
+    "minutes": "Dauer (min)",
+    "distance": "Distanz (km)",
+    "heartRate": "Ø Puls",
+    "zone": "Puls-Zone",
+    "noZone": "Keine Angabe",
+    "zoneFromHeartRate": "Dein Puls entspricht Zone {zone}. Ohne Auswahl wird sie übernommen.",
+    "intensity": "Anstrengung",
+    "note": "Notiz",
+    "optional": "optional",
+    "save": "Eintragen",
+    "saved": "Einheit eingetragen"
+  },
+  "intervals": {
+    "toggle": "Intervalle",
+    "work": "Belastung (s)",
+    "rest": "Pause (s)",
+    "repeats": "Durchgänge"
+  },
+  "zones": {
+    "title": "Deine Puls-Zonen",
+    "maxHeartRate": "Maximalpuls etwa {value} Schläge pro Minute (Formel nach Tanaka, Alter {age}).",
+    "hint": "Die Werte sind Richtwerte. Ein gemessener Maximalpuls ist genauer.",
+    "zone": "Zone",
+    "share": "Anteil",
+    "bpm": "Puls",
+    "percent": "{min}–{max} %",
+    "noProfile": "Für deine Puls-Zonen brauchen wir dein Geburtsjahr aus dem Fragebogen.",
+    "toOnboarding": "Fragebogen ausfüllen"
+  },
+  "recent": {
+    "title": "Letzte Einheiten",
+    "hint": "Die letzten {days} Tage",
+    "empty": "Noch keine Einheit eingetragen.",
+    "delete": "{type} vom {date} löschen",
+    "deleted": "Einheit gelöscht"
+  }
+}

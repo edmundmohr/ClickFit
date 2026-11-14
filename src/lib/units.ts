@@ -24,6 +24,10 @@ export function weightUnitKey(unitSystem: UnitSystem): "kg" | "lbs" {
   return unitSystem === "imperial" ? "lbs" : "kg";
 }
 
+export function unitSystemOf(unit: "kg" | "lbs"): UnitSystem {
+  return unit === "lbs" ? "imperial" : "metric";
+}
+
 /** Liest eine Zahl aus einem Eingabefeld; akzeptiert Komma und Punkt. Leere Eingabe ergibt null. */
 export function parseDecimal(input: string): number | null {
   const normalized = input.trim().replace(",", ".");
