@@ -208,6 +208,13 @@ Typprüfung nicht an ihnen scheitert.
 - **Anpassungen:** unter `/training/adjustments`: Verletztenmodus,
   Urlaubsmodus (Pause oder Training unterwegs), erholungsorientierter Modus, Griffkraft-Modul,
   Zusatzsport und zyklusangepasstes Training.
+- **Fokus-Training:** unter `/training/focus` (Knopf auf der Plan-Seite). Man wählt eine oder
+  mehrere Körperregionen (Brust, Rücken, Schultern, Arme, Bauch, Po, Beine) und eine Dauer; die
+  App stellt daraus eine einzelne Einheit zusammen (`src/domain/training/focus-day.ts`). Die
+  Regionen kommen im Wechsel dran, damit bei wenig Zeit jede mindestens eine Übung bekommt;
+  Grundübungen stehen vorne. Equipment des aktiven Orts, Ausschlüsse, Beschwerden und gelernte
+  Vorlieben gelten wie im Wochenplan. Die Einheit ändert den Plan nicht und läuft im Verlauf
+  als „Fokus: …“.
 - **Zeitsparmodus:** „Kurz“ auf der Plan-Karte startet eine Variante mit einem Satz weniger,
   Supersätzen aus benachbarten Isolationsübungen und ohne die letzten Übungen.
 - **Wiedereinstieg:** Nach mehr als zehn Tagen ohne Training beginnen die Zielgewichte bei

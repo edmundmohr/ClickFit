@@ -12,6 +12,8 @@ import { requireUser } from "@/features/auth/session";
 import type { Exercise } from "@/domain/exercises/types";
 import type { WeightUnit } from "@/domain/training/weights";
 import { onboardingSchema } from "./schemas";
+import { parseFocusAreas, parseFocusMinutes } from "@/domain/training/focus-day";
+import { getFocusDay } from "./services/focus-day-service";
 import { getRecoveryDay } from "./services/recovery-day-service";
 import { saveOnboarding } from "./services/profile-service";
 import { createPlanFromProfile, getSwapOptions, swapPlanExercise } from "./services/plan-service";
@@ -125,6 +127,24 @@ export async function startRecoveryWorkoutAction(): Promise<void> {
   if (!day || day.exercises.length === 0) redirect("/training");
   const t = await getTranslations("training.recoveryMode");
   const sessionId = await startFreeWorkout(db, user.id, t("sessionName"), day.exercises, new Date(), {
+    defaultUnit: unitOf(user),
+  });
+  redirect(`/workout/${sessionId}`);
+}
+
+/** Fokus-Training: startet die Einheit für die gewählten Körperregionen. */
+export async function startFocusWorkoutAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const areas = parseFocusAreas(formData.get("areas"));
+  if (areas.length === 0) redirect("/training/focus");
+  const db = getDb();
+  const day = await getFocusDay(db, user.id, areas, parseFocusMinutes(formData.get("minutes")));
+  if (!day || day.exercises.length === 0) redirect(`/training/focus?areas=${areas.join(",")}`);
+  const t = await getTranslations();
+  const name = t("training.focusTraining.sessionName", {
+    areas: areas.map((area) => t(`training.focusTraining.areas.${area}`)).join(", "),
+  });
+  const sessionId = await startFreeWorkout(db, user.id, name, day.exercises, new Date(), {
     defaultUnit: unitOf(user),
   });
   redirect(`/workout/${sessionId}`);
