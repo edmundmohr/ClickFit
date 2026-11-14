@@ -18,6 +18,13 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Spanne den Rumpf an, halte den Rücken gerade und hebe die Stange nah am Körper, bis du aufrecht stehst.",
       "Senke die Stange kontrolliert ab, indem du zuerst die Hüfte nach hinten schiebst.",
     ],
+    mistakes: [
+      "Rücken rundet sich – Brust raus, Lat anspannen, Rücken neutral",
+      "Stange entfernt sich vom Körper – Stange an den Schienbeinen entlangführen",
+      "Hüfte steigt schneller als die Schultern – Brust und Hüfte gemeinsam heben",
+      "Oben ins Hohlkreuz überstreckt – gerade stehen, Gesäß anspannen",
+    ],
+    cues: ["Boden wegdrücken", "Stange am Bein", "Rücken neutral"],
   },
   {
     id: "sumo-deadlift",
@@ -35,6 +42,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Drücke die Knie nach außen und hebe die Stange mit geradem Rücken bis in den Stand.",
       "Senke die Stange kontrolliert ab und halte sie nah am Körper.",
     ],
+    mistakes: [
+      "Knie fallen nach innen – Knie über die Fußspitzen drücken",
+      "Hüfte zu hoch beim Start – Hüfte tiefer, Brust aufrecht",
+      "Rücken rundet sich – Lat anspannen, Brust raus",
+    ],
+    cues: ["Knie nach außen", "Boden auseinanderdrücken", "Brust hoch"],
   },
   {
     id: "romanian-deadlift",
@@ -52,6 +65,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Schiebe die Hüfte nach hinten und senke die Stange mit leicht gebeugten Knien bis unter die Knie.",
       "Richte dich aus der Hüfte wieder auf und halte den Rücken gerade.",
     ],
+    mistakes: [
+      "Rücken rundet sich unten – nur so tief, wie der Rücken gerade bleibt",
+      "Knie beugen sich immer mehr – Kniewinkel bleibt fast gleich",
+      "Stange wandert vom Körper weg – Stange an den Oberschenkeln entlang",
+    ],
+    cues: ["Hüfte nach hinten", "Stange am Bein", "Schienbeine senkrecht"],
   },
   {
     id: "dumbbell-romanian-deadlift",
@@ -69,6 +88,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Schiebe die Hüfte nach hinten und führe die Hanteln nah an den Beinen nach unten.",
       "Richte dich auf, sobald du eine Dehnung in den Beinrückseiten spürst, der Rücken bleibt gerade.",
     ],
+    mistakes: [
+      "Hanteln schwingen nach vorn – Hanteln nah an den Beinen führen",
+      "Rücken rundet sich – Schultern zurück, Nacken lang",
+      "In die Hocke statt in die Hüftbeuge – Gesäß nach hinten, Knie nur leicht gebeugt",
+    ],
+    cues: ["Gesäß zur Wand", "Hanteln am Bein", "Dehnung spüren"],
   },
   {
     id: "single-leg-dumbbell-romanian-deadlift",
@@ -87,6 +112,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Kippe den Oberkörper nach vorn und strecke das freie Bein nach hinten, bis beide etwa waagerecht sind.",
       "Richte dich kontrolliert auf und halte die Hüfte parallel zum Boden.",
     ],
+    mistakes: [
+      "Hüfte dreht auf – Fußspitze des freien Beins zeigt zum Boden",
+      "Standknie durchgestreckt – Standknie leicht gebeugt",
+      "Rücken rundet sich – Linie vom Kopf bis zur Ferse halten",
+    ],
+    cues: ["Ferse nach hinten schieben", "Zehen zum Boden", "Lange Linie"],
   },
   {
     id: "good-morning",
@@ -104,6 +135,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Schiebe die Hüfte nach hinten und neige den geraden Oberkörper nach vorn.",
       "Richte dich aus der Hüfte auf und beginne mit leichtem Gewicht.",
     ],
+    mistakes: [
+      "Rücken rundet sich – nur so tief, wie der Rücken neutral bleibt",
+      "Knie beugen sich zur Hocke – Knie nur leicht gebeugt, Hüfte nach hinten",
+      "Stange drückt in den Nacken – Stange auf den oberen Rücken, Hände fest",
+    ],
+    cues: ["Hüfte nach hinten", "Rücken lang", "Brust raus"],
   },
   {
     id: "kettlebell-swing",
@@ -121,6 +158,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Schwinge sie mit geradem Rücken zwischen den Beinen nach hinten und strecke dann explosiv die Hüfte.",
       "Lass die Kettlebell bis auf Brusthöhe steigen und führe sie mit der Hüfte, nicht mit den Armen.",
     ],
+    mistakes: [
+      "Kniebeuge statt Hüftbeuge – Hüfte nach hinten, Knie nur leicht beugen",
+      "Arme heben die Kettlebell – Arme locker, der Schwung kommt aus der Hüfte",
+      "Oben ins Hohlkreuz – oben gerade stehen, Gesäß und Bauch fest",
+    ],
+    cues: ["Hüfte explosiv nach vorn", "Arme locker", "Oben Gesäß fest"],
   },
   {
     id: "kettlebell-deadlift",
@@ -138,6 +181,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Schiebe die Hüfte nach hinten, greife den Griff und richte dich mit geradem Rücken auf.",
       "Senke die Kettlebell kontrolliert zwischen den Füßen ab.",
     ],
+    mistakes: [
+      "Rücken rundet sich – Brust raus, Schultern zurück",
+      "Kettlebell steht vor den Füßen – Griff zwischen den Mittelfüßen",
+      "Aus den Armen gezogen – Arme gestreckt, die Beine drücken",
+    ],
+    cues: ["Hüfte nach hinten", "Boden wegdrücken", "Oben Gesäß anspannen"],
   },
   {
     id: "cable-pull-through",
@@ -155,6 +204,13 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Schiebe die Hüfte weit nach hinten, der Rücken bleibt gerade.",
       "Strecke die Hüfte kraftvoll nach vorn und spanne das Gesäß an.",
     ],
+    mistakes: [
+      "Zu nah am Kabelzug – so weit vorgehen, dass Zug auf dem Seil bleibt",
+      "Arme ziehen das Seil – Arme gestreckt, Bewegung aus der Hüfte",
+      "Oben ins Hohlkreuz – Gesäß anspannen, Rippen unten",
+      "Hocke statt Hüftbeuge – Knie nur leicht beugen",
+    ],
+    cues: ["Hüfte nach hinten", "Arme passiv", "Gesäß nach vorn"],
   },
   {
     id: "bodyweight-good-morning",
@@ -172,6 +228,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Schiebe die Hüfte nach hinten und neige den geraden Oberkörper nach vorn.",
       "Richte dich aus der Hüfte wieder auf und halte die Knie leicht gebeugt.",
     ],
+    mistakes: [
+      "Rücken rundet sich – Brust raus, nur so tief wie gerade möglich",
+      "Kopf hängt nach unten – Blick schräg nach vorn unten, Nacken lang",
+      "Gewicht auf den Zehen – Gewicht Richtung Fersen verlagern",
+    ],
+    cues: ["Hüfte zur Wand", "Rücken lang", "Fersen belasten"],
   },
   {
     id: "single-leg-bodyweight-romanian-deadlift",
@@ -190,6 +252,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Kippe den Oberkörper nach vorn und strecke das freie Bein nach hinten.",
       "Richte dich langsam auf und halte Rücken und Hüfte gerade.",
     ],
+    mistakes: [
+      "Wackeln, Standfuß verliert Halt – langsamer werden, festen Blickpunkt suchen",
+      "Hüfte dreht auf – Zehen des freien Beins zeigen nach unten",
+      "Rücken rundet sich – Arme nach vorn, Linie halten",
+    ],
+    cues: ["Ferse nach hinten", "Fester Blickpunkt", "Fuß greift den Boden"],
   },
   {
     id: "band-good-morning",
@@ -207,6 +275,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Schiebe die Hüfte nach hinten und neige den geraden Oberkörper nach vorn.",
       "Richte dich gegen den Bandzug wieder auf und halte die Knie leicht gebeugt.",
     ],
+    mistakes: [
+      "Band rutscht in den Nacken – Band auf den Schultern mit den Händen fixieren",
+      "Rücken rundet sich – nur so tief, wie der Rücken gerade bleibt",
+      "Oben überstreckt – gerade stehen, Gesäß anspannen",
+    ],
+    cues: ["Hüfte nach hinten", "Rücken lang", "Gegen das Band aufrichten"],
   },
   {
     id: "lying-leg-curl",
@@ -224,6 +298,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Beuge die Knie und ziehe das Polster Richtung Gesäß.",
       "Senke das Gewicht langsam ab und lass die Hüfte auf dem Polster.",
     ],
+    mistakes: [
+      "Hüfte hebt vom Polster ab – Becken in das Polster drücken",
+      "Gewicht schwingt hoch – kontrolliert beugen, oben kurz halten",
+      "Nur halbe Bewegung – fast bis zur Streckung absenken",
+    ],
+    cues: ["Becken ins Polster", "Fersen zum Gesäß", "Langsam ablassen"],
   },
   {
     id: "seated-leg-curl",
@@ -241,6 +321,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Beuge die Knie und ziehe das Polster nach unten hinten.",
       "Lass das Polster kontrolliert zurück und bleib mit dem Rücken an der Lehne.",
     ],
+    mistakes: [
+      "Oberschenkelpolster zu locker – Polster fest auf die Oberschenkel stellen",
+      "Oberkörper zieht mit – Griffe halten, Rücken an der Lehne",
+      "Gewichtsblock knallt zurück – kontrolliert bis fast zur Streckung",
+    ],
+    cues: ["Fersen nach unten ziehen", "Unten kurz halten", "Langsam zurück"],
   },
   {
     id: "nordic-curl",
@@ -258,6 +344,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Lass dich mit gestreckter Hüfte so langsam wie möglich nach vorn sinken.",
       "Fange dich mit den Händen ab und drücke dich leicht zurück in die Ausgangsposition.",
     ],
+    mistakes: [
+      "Hüfte knickt ein – Linie von Knie bis Schulter, Gesäß fest",
+      "Nach kurzem Weg fallen lassen – so lange wie möglich bremsen",
+      "Zu viel Umfang zu Beginn – mit wenigen Wiederholungen einsteigen",
+    ],
+    cues: ["Gesäß fest", "So langsam wie möglich", "Gerade Linie halten"],
   },
   {
     id: "sliding-leg-curl",
@@ -275,6 +367,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Schiebe die Fersen langsam nach vorn, bis die Beine fast gestreckt sind.",
       "Ziehe die Fersen zurück zum Gesäß und halte die Hüfte oben.",
     ],
+    mistakes: [
+      "Hüfte sinkt beim Ausschieben ab – Gesäß fest anspannen",
+      "Fersen rutschen unkontrolliert weg – langsam ausschieben, Tempo halten",
+      "Hohlkreuz – Rippen nach unten, Bauch fest",
+    ],
+    cues: ["Hüfte hoch", "Fersen in den Boden", "Langsam ausschieben"],
   },
   {
     id: "band-leg-curl",
@@ -292,6 +390,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Beuge die Knie und ziehe die Fersen Richtung Gesäß.",
       "Strecke die Beine langsam wieder und lass die Hüfte am Boden.",
     ],
+    mistakes: [
+      "Becken kippt ins Hohlkreuz – Bauch fest, Becken flach am Boden",
+      "Band schnellt zurück – Beine langsam gegen den Zug strecken",
+      "Zu wenig Grundspannung – weiter vom Befestigungspunkt weglegen",
+    ],
+    cues: ["Fersen zum Gesäß", "Langsam strecken", "Becken bleibt unten"],
   },
   {
     id: "dumbbell-leg-curl",
@@ -309,6 +413,12 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Beuge die Knie, bis die Unterschenkel fast senkrecht stehen.",
       "Senke die Hantel langsam ab und halte sie die ganze Zeit fest eingeklemmt.",
     ],
+    mistakes: [
+      "Hantel rutscht aus den Füßen – leicht beginnen, Hantel anreichen lassen",
+      "Hüfte hebt von der Bank ab – Becken in die Bank drücken",
+      "Über die Senkrechte gezogen – kurz davor stoppen, sonst kippt die Hantel",
+    ],
+    cues: ["Füße fest zusammen", "Becken auf die Bank", "Langsam ablassen"],
   },
   {
     id: "suspension-leg-curl",
@@ -326,5 +436,11 @@ export const LEGS_HAMSTRINGS_EXERCISES: Exercise[] = [
       "Ziehe die Fersen zum Gesäß und halte die Hüfte oben.",
       "Strecke die Beine kontrolliert wieder aus.",
     ],
+    mistakes: [
+      "Hüfte sinkt ab – Gesäß anspannen, Hüfte gestreckt halten",
+      "Schlaufen pendeln seitlich – Fersen gleichmäßig ziehen, Knie hüftbreit",
+      "Falscher Abstand zum Ankerpunkt – Fersen direkt unter den Ankerpunkt",
+    ],
+    cues: ["Hüfte hoch", "Fersen zum Gesäß", "Gesäß fest"],
   },
 ];

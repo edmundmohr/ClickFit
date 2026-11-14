@@ -15,9 +15,16 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
     priority: 1,
     instructions: [
       "Lege die Stange im Rack auf den oberen Rücken, hebe sie aus und stelle die Füße etwa schulterbreit.",
-      "Beuge Hüfte und Knie und gehe so tief, bis die Oberschenkel mindestens waagerecht sind.",
+      "Spanne den Rumpf an, beuge Hüfte und Knie und gehe mit neutralem Rücken so tief, bis die Oberschenkel mindestens waagerecht sind.",
       "Drücke dich über den ganzen Fuß nach oben, die Knie zeigen in Richtung der Zehen.",
     ],
+    mistakes: [
+      "Knie fallen nach innen – Knie aktiv in Richtung Zehen schieben",
+      "Fersen heben ab – Gewicht über den ganzen Fuß verteilen",
+      "Unterer Rücken rundet sich unten – nur so tief, wie der Rücken neutral bleibt",
+      "Hüfte schießt zuerst hoch – Brust und Hüfte gemeinsam heben",
+    ],
+    cues: ["Luft holen, Bauch fest", "Knie nach außen", "Ganzer Fuß am Boden"],
   },
   {
     id: "barbell-front-squat",
@@ -35,6 +42,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Gehe mit aufrechtem Oberkörper tief in die Hocke.",
       "Drücke dich nach oben und lass die Ellbogen dabei nicht absinken.",
     ],
+    mistakes: [
+      "Ellbogen sinken ab – Ellbogen hoch, Oberarme etwa waagerecht",
+      "Oberkörper kippt nach vorn – Brust aufrecht, Rumpf fest",
+      "Stange liegt in den Händen – Stange auf den Schultern ablegen, Finger nur locker",
+    ],
+    cues: ["Ellbogen hoch", "Brust raus", "Senkrecht runter, senkrecht hoch"],
   },
   {
     id: "goblet-squat",
@@ -52,6 +65,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Gehe tief in die Hocke, die Ellbogen wandern zwischen die Knie.",
       "Drücke dich wieder hoch und halte den Oberkörper aufrecht.",
     ],
+    mistakes: [
+      "Hantel weit vom Körper – Hantel eng an der Brust halten",
+      "Rücken rundet sich unten – nur so tief, wie der Rücken gerade bleibt",
+      "Knie fallen nach innen – Ellbogen schieben die Knie leicht nach außen",
+    ],
+    cues: ["Hantel an die Brust", "Zwischen die Knie setzen", "Brust hoch"],
   },
   {
     id: "kettlebell-goblet-squat",
@@ -69,6 +88,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Beuge die Knie und setze dich tief zwischen die Fersen.",
       "Drücke dich über die Fersen nach oben und halte die Brust aufgerichtet.",
     ],
+    mistakes: [
+      "Kettlebell zieht nach vorn – Ellbogen unter der Kugel, eng am Körper",
+      "Fersen lösen sich – Gewicht auf Mittelfuß und Ferse",
+      "Schultern hochgezogen – Schultern tief, Nacken lang",
+    ],
+    cues: ["Hörner fest greifen", "Ellbogen nach unten", "Brust aufrichten"],
   },
   {
     id: "smith-machine-squat",
@@ -86,6 +111,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Entriegle die Stange und gehe kontrolliert in die Hocke.",
       "Drücke dich nach oben und verriegle die Stange nach dem Satz.",
     ],
+    mistakes: [
+      "Füße direkt unter der Stange – Füße etwas vor die Stange stellen",
+      "Becken kippt unten ab – nur so tief, wie der Rücken neutral bleibt",
+      "Knie oben schlagartig durchgedrückt – Knie oben nur fast strecken",
+    ],
+    cues: ["Rücken gegen die Stange", "Über die Fersen drücken", "Knie Richtung Zehen"],
   },
   {
     id: "leg-press",
@@ -103,6 +134,13 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Löse die Sicherung und senke die Platte, bis die Knie etwa 90 Grad gebeugt sind.",
       "Drücke die Platte weg, ohne die Knie durchzustrecken, und lass den unteren Rücken am Polster.",
     ],
+    mistakes: [
+      "Becken hebt vom Polster ab – nur so tief, wie das Gesäß unten bleibt",
+      "Knie schnappen oben durch – Knie leicht gebeugt lassen",
+      "Fersen lösen sich von der Platte – ganze Fußsohle auf der Platte",
+      "Knie fallen nach innen – Knie in Linie mit den Fußspitzen",
+    ],
+    cues: ["Gesäß ins Polster", "Ganze Fußsohle drücken", "Griffe fest halten"],
   },
   {
     id: "hack-squat",
@@ -120,6 +158,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Löse die Sicherung und gehe tief in die Hocke.",
       "Drücke dich nach oben, ohne die Knie am Ende durchzudrücken.",
     ],
+    mistakes: [
+      "Fersen heben ab – Füße etwas höher auf die Platte stellen",
+      "Gesäß löst sich vom Polster – Rücken flach am Polster halten",
+      "Nur halbe Wiederholungen – kontrolliert tief, so weit es sauber geht",
+    ],
+    cues: ["Rücken ans Polster", "Tief und kontrolliert", "Knie folgen den Zehen"],
   },
   {
     id: "bodyweight-squat",
@@ -137,6 +181,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Schiebe die Hüfte nach hinten und gehe so tief wie möglich in die Hocke.",
       "Drücke dich wieder hoch, die Fersen bleiben am Boden und die Knie folgen den Zehen.",
     ],
+    mistakes: [
+      "Fersen heben ab – Hüfte weiter nach hinten, Gewicht auf den Mittelfuß",
+      "Knie fallen nach innen – Knie aktiv nach außen drücken",
+      "Oberkörper fällt weit nach vorn – Brust hoch, Arme zum Ausgleich nach vorn",
+    ],
+    cues: ["Hüfte nach hinten", "Arme nach vorn", "Knie nach außen"],
   },
   {
     id: "jump-squat",
@@ -154,6 +204,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Springe explosiv nach oben und strecke Hüfte und Knie.",
       "Lande weich auf dem ganzen Fuß und gehe direkt in die nächste Kniebeuge.",
     ],
+    mistakes: [
+      "Harte Landung auf gestreckten Beinen – über Fußballen und Knie weich abfedern",
+      "Knie knicken bei der Landung nach innen – Knie über den Zehen landen",
+      "Weitermachen trotz Ermüdung – Satz beenden, wenn die Sprünge flacher werden",
+    ],
+    cues: ["Explosiv hoch", "Leise landen", "Arme mitschwingen"],
   },
   {
     id: "pistol-squat",
@@ -172,6 +228,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Gehe langsam tief in die Hocke, das freie Bein bleibt über dem Boden.",
       "Drücke dich über den ganzen Fuß wieder hoch und halte das Knie über dem Fuß.",
     ],
+    mistakes: [
+      "Ferse hebt ab – Gewicht über den Mittelfuß, Arme nach vorn",
+      "Knie fällt nach innen – Knie über dem zweiten Zeh halten",
+      "Unten in die Hocke fallen lassen – langsam absenken, anfangs auf eine Box",
+    ],
+    cues: ["Arme nach vorn", "Langsam runter", "Knie über den Fuß"],
   },
   {
     id: "chair-squat",
@@ -189,6 +251,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Schiebe die Hüfte nach hinten und senke dich, bis das Gesäß die Sitzfläche leicht berührt.",
       "Stehe ohne Schwung wieder auf und halte die Knie über den Füßen.",
     ],
+    mistakes: [
+      "Auf den Stuhl plumpsen lassen – kontrolliert absenken, nur antippen",
+      "Mit Schwung aufstehen – ohne Ausholen aus den Beinen hochdrücken",
+      "Gewicht auf den Zehen – Gewicht auf Mittelfuß und Fersen verlagern",
+    ],
+    cues: ["Gesäß nach hinten", "Nur antippen", "Aus den Fersen hoch"],
   },
   {
     id: "wall-sit",
@@ -206,6 +274,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Halte die Position, die Füße stehen flach und die Knie über den Sprunggelenken.",
       "Atme ruhig weiter und drücke den unteren Rücken an die Wand.",
     ],
+    mistakes: [
+      "Knie schieben vor die Zehen – Füße weiter von der Wand wegstellen",
+      "Hände stützen auf den Oberschenkeln – Arme locker hängen lassen oder vor der Brust",
+      "Zu hoch gesessen – Oberschenkel etwa waagerecht",
+    ],
+    cues: ["Rücken an die Wand", "Fersen in den Boden", "Oberschenkel waagerecht"],
   },
   {
     id: "band-squat",
@@ -223,6 +297,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Gehe in die Hocke, bis die Oberschenkel mindestens waagerecht sind.",
       "Drücke dich gegen den Bandzug nach oben und halte den Oberkörper aufrecht.",
     ],
+    mistakes: [
+      "Hände sinken nach vorn ab – Hände an den Schultern fixieren",
+      "Band rutscht unter den Füßen – mittig unter den ganzen Fuß stellen",
+      "Vom Band nach unten ziehen lassen – auch abwärts langsam bremsen",
+    ],
+    cues: ["Hände an die Schultern", "Gegen das Band drücken", "Knie nach außen"],
   },
   {
     id: "leg-extension",
@@ -240,6 +320,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Strecke die Beine, bis die Knie fast durchgestreckt sind.",
       "Senke das Gewicht langsam ab und hole keinen Schwung.",
     ],
+    mistakes: [
+      "Gesäß hebt vom Sitz ab – an den Griffen festhalten, Becken auf dem Sitz",
+      "Gewicht schnellt hoch – oben kurz halten, langsam ablassen",
+      "Gewichtsblock knallt unten auf – kurz vor dem Aufsetzen umkehren",
+    ],
+    cues: ["Oben kurz halten", "Griffe fest ziehen", "Langsam ablassen"],
   },
   {
     id: "dumbbell-leg-extension",
@@ -257,6 +343,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Strecke die Beine langsam, bis die Knie fast durchgestreckt sind.",
       "Senke die Hantel kontrolliert ab und halte dich an der Bank fest.",
     ],
+    mistakes: [
+      "Hantel rutscht aus den Füßen – leichtes Gewicht, Füße fest zusammendrücken",
+      "Oberkörper lehnt sich weit zurück – aufrecht sitzen, Hände an der Bank",
+      "Schwung aus der Hüfte – nur die Knie bewegen",
+    ],
+    cues: ["Füße fest zusammen", "Langsam strecken", "Oberschenkel ruhig halten"],
   },
   {
     id: "band-leg-extension",
@@ -275,6 +367,12 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Strecke das Bein gegen den Bandzug nach vorn, bis das Knie fast gestreckt ist.",
       "Beuge das Knie langsam zurück, der Oberschenkel bleibt auf dem Stuhl.",
     ],
+    mistakes: [
+      "Band schnellt zurück – langsam gegen den Zug zurückbeugen",
+      "Band ohne Spannung zu Beginn – Schlaufe kürzer knoten oder stärkeres Band wählen",
+      "Oberkörper lehnt zurück – aufrecht sitzen, Sitzfläche seitlich greifen",
+    ],
+    cues: ["Oben kurz anspannen", "Langsam zurück", "Aufrecht sitzen"],
   },
   {
     id: "reverse-nordic-curl",
@@ -292,5 +390,11 @@ export const LEGS_QUADS_EXERCISES: Exercise[] = [
       "Lehne dich mit gerader Linie von Knie bis Schulter langsam nach hinten.",
       "Komm aus der Kraft der Oberschenkel zurück und gehe nur so weit, wie es die Knie schmerzfrei zulassen.",
     ],
+    mistakes: [
+      "Hüfte knickt ein – Linie von Knie bis Schulter halten, Gesäß anspannen",
+      "Hohlkreuz – Bauch fest, Becken leicht einrollen",
+      "Mit Schwung zurückkommen – langsam und kontrolliert aufrichten",
+    ],
+    cues: ["Gesäß fest", "Gerade Linie halten", "Langsam nach hinten"],
   },
 ];

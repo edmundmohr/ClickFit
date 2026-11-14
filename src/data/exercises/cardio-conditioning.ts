@@ -18,6 +18,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Laufe aufrecht mit kurzen Schritten und setze den Fuß unter dem Körper auf.",
       "Wähle ein Tempo, bei dem du gleichmäßig atmen kannst, und laufe am Ende locker aus.",
     ],
+    mistakes: [
+      "Überschreiten mit hartem Fersenaufprall – kürzere Schritte, höhere Schrittfrequenz",
+      "Umfang zu schnell gesteigert – Strecke und Tempo nur schrittweise erhöhen",
+      "Schultern hochgezogen – Schultern locker, Arme etwa 90 Grad gebeugt",
+    ],
+    cues: ["Leise Füße", "Schultern locker", "Groß machen"],
   },
   {
     id: "treadmill-running",
@@ -35,6 +41,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Steigere die Geschwindigkeit schrittweise und laufe mittig auf dem Band.",
       "Reduziere am Ende das Tempo und gehe ein bis zwei Minuten aus.",
     ],
+    mistakes: [
+      "An den Griffen festhalten – Arme frei mitschwingen lassen",
+      "Blick auf die Füße – Blick geradeaus",
+      "Vom laufenden Band abspringen – erst Tempo senken, dann absteigen",
+    ],
+    cues: ["Blick geradeaus", "Arme locker mitschwingen", "Kurze, schnelle Schritte"],
   },
   {
     id: "walking",
@@ -52,6 +64,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Schwinge die Arme locker mit und rolle den Fuß von der Ferse ab.",
       "Halte das Tempo gleichmäßig und steigere nach und nach Dauer oder Strecke.",
     ],
+    mistakes: [
+      "Zu lange Schritte – lieber die Schrittfrequenz erhöhen",
+      "Blick nach unten – Blick nach vorn, Kopf aufrecht",
+      "Schlurfender Gang – Fuß bewusst abrollen und abdrücken",
+    ],
+    cues: ["Groß machen", "Arme aktiv", "Kräftig abdrücken"],
   },
   {
     id: "treadmill-incline-walking",
@@ -69,6 +87,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Gehe aufrecht mit großen Schritten und schwinge die Arme mit.",
       "Halte dich möglichst nicht an den Griffen fest und senke am Ende Steigung und Tempo.",
     ],
+    mistakes: [
+      "Am Handlauf hängen – Steigung oder Tempo senken, bis es ohne geht",
+      "Stark nach vorn gebeugt – aufrecht bleiben, nur leicht vorlehnen",
+      "Steigung zu schnell erhöht – mit geringer Steigung beginnen und steigern",
+    ],
+    cues: ["Hände weg vom Griff", "Ganzer Fuß setzt auf", "Brust aufrecht"],
   },
   {
     id: "stationary-bike",
@@ -86,6 +110,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Tritt gleichmäßig mit etwa 70 bis 90 Umdrehungen pro Minute.",
       "Wähle den Widerstand so, dass du die geplante Zeit durchhältst, und bleibe mit dem Oberkörper ruhig.",
     ],
+    mistakes: [
+      "Hüfte wippt auf dem Sattel – Sattel etwas tiefer stellen",
+      "Hoher Widerstand bei niedriger Trittfrequenz – leichter einstellen, flüssiger treten",
+      "Knie fallen nach innen – Knie über den Pedalen halten",
+    ],
+    cues: ["Rund treten", "Oberkörper ruhig", "Knie über dem Fuß"],
   },
   {
     id: "rowing-machine",
@@ -103,6 +133,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Drücke zuerst die Beine weg, lehne dich dann leicht zurück und ziehe den Griff zum unteren Rippenbogen.",
       "Strecke erst die Arme, beuge dann die Hüfte und rolle zum Schluss mit den Knien nach vorn.",
     ],
+    mistakes: [
+      "Rundrücken in der Auslage – aus der Hüfte vorbeugen, Rücken gerade",
+      "Knie zu früh gebeugt beim Vorrollen – Griff erst über die Knie führen",
+      "Zu weit zurückgelehnt – nur leicht hinter die Senkrechte",
+    ],
+    cues: ["Beine, Rücken, Arme", "Arme, Rücken, Beine", "Kraftvoll ziehen, ruhig zurück"],
   },
   {
     id: "cross-trainer",
@@ -120,6 +156,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Bewege Arme und Beine gleichmäßig und stehe aufrecht.",
       "Wähle einen Widerstand, bei dem die Bewegung rund bleibt, und halte die Fersen möglichst auf den Pedalen.",
     ],
+    mistakes: [
+      "An den Griffen hängen – Gewicht über den Füßen, Griffe nur führen",
+      "Knie durchgestreckt – Knie leicht gebeugt lassen",
+      "Arme passiv – mit den Armen aktiv schieben und ziehen",
+    ],
+    cues: ["Aktiv schieben und ziehen", "Fersen unten", "Rumpf fest"],
   },
   {
     id: "stair-climber",
@@ -137,6 +179,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Setze den ganzen Fuß auf jede Stufe und steige aufrecht.",
       "Stütze dich nur leicht an den Griffen ab, statt dich darauf zu lehnen.",
     ],
+    mistakes: [
+      "Auf die Griffe gestützt – Tempo senken statt sich festzuhalten",
+      "Mini-Schritte – Stufen vollständig nutzen",
+      "Nach vorn gebeugt – Hüfte unter den Schultern, Oberkörper aufrecht",
+    ],
+    cues: ["Aufrecht steigen", "Durch die Ferse drücken", "Hände nur locker"],
   },
   {
     id: "jump-rope",
@@ -154,6 +202,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Schwinge das Seil aus den Handgelenken und springe nur wenige Zentimeter hoch.",
       "Lande weich auf den Fußballen und halte die Knie leicht gebeugt.",
     ],
+    mistakes: [
+      "Zu hohe Sprünge – nur so hoch, dass das Seil durchpasst",
+      "Seil falsch eingestellt – mittig darauf stehend reichen die Griffe etwa bis unter die Achseln",
+      "Umfang zu schnell gesteigert – Waden und Achillessehnen langsam an die Belastung gewöhnen",
+    ],
+    cues: ["Leicht und leise", "Handgelenke drehen", "Kleine Sprünge"],
   },
   {
     id: "burpee",
@@ -171,6 +225,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Springe mit den Füßen zurück in den Liegestütz und senke die Brust zum Boden.",
       "Drücke dich hoch, springe mit den Füßen zu den Händen und dann gestreckt nach oben.",
     ],
+    mistakes: [
+      "Hohlkreuz im Liegestütz – Rumpf fest, Körper bleibt gerade",
+      "Hart auf den Boden fallen – Brust kontrolliert absenken",
+      "Rundrücken beim Zurückspringen in die Hocke – Brust hoch, Füße flach neben die Hände",
+    ],
+    cues: ["Rumpf fest", "Weich landen", "Oben ganz strecken"],
   },
   {
     id: "jumping-jack",
@@ -188,6 +248,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Springe in die Grätsche und führe die Arme seitlich über den Kopf.",
       "Springe zurück in die Ausgangsposition und lande weich auf den Fußballen.",
     ],
+    mistakes: [
+      "Knie fallen bei der Landung nach innen – Knie zeigen über die Fußspitzen",
+      "Hohlkreuz beim Armheben – Bauch fest, Rippen unten",
+      "Arme und Beine nicht im Takt – gleichzeitig öffnen und schließen",
+    ],
+    cues: ["Leicht federn", "Arme und Beine synchron", "Bauch fest"],
   },
   {
     id: "high-knees",
@@ -205,6 +271,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Ziehe die Knie abwechselnd bis auf Hüfthöhe und schwinge die Arme aktiv mit.",
       "Lande auf den Fußballen und halte den Oberkörper aufrecht.",
     ],
+    mistakes: [
+      "Oberkörper lehnt nach hinten – aufrecht oder leicht vorgeneigt bleiben",
+      "Knie bleiben tief – Tempo senken, Knie bis Hüfthöhe",
+      "Laute, harte Landung – leise und federnd aufsetzen",
+    ],
+    cues: ["Knie hoch", "Arme aktiv", "Schnelle Füße"],
   },
   {
     id: "box-jump",
@@ -222,6 +294,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Hole mit den Armen Schwung und springe mit beiden Beinen auf die Box.",
       "Lande weich mit gebeugten Knien, richte dich auf und steige einzeln wieder herunter.",
     ],
+    mistakes: [
+      "Box zu hoch – Höhe so wählen, dass du nicht in tiefer Hocke landest",
+      "Knie fallen bei der Landung nach innen – Knie über den Füßen",
+      "Landung auf der Kante – mit dem ganzen Fuß mittig auf der Box landen",
+    ],
+    cues: ["Arme kraftvoll schwingen", "Leise landen", "Oben ganz aufrichten"],
   },
   {
     id: "farmer-walk",
@@ -239,6 +317,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Gehe mit kurzen, zügigen Schritten und halte die Schultern hinten unten.",
       "Setze die Hanteln kontrolliert ab, bevor der Griff nachlässt.",
     ],
+    mistakes: [
+      "Oberkörper schwankt – Rumpf fest, Hanteln ruhig neben dem Körper",
+      "Hanteln schlagen gegen die Beine – Hanteln parallel zur Gehrichtung halten",
+      "Kopf nach vorn geschoben – Kopf über den Schultern, Blick nach vorn",
+    ],
+    cues: ["Griff fest quetschen", "Groß machen", "Rumpf fest"],
   },
   {
     id: "kettlebell-farmer-walk",
@@ -256,6 +340,12 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Gehe aufrecht mit kleinen Schritten, der Rumpf bleibt fest.",
       "Stelle die Kettlebells am Ende der Strecke kontrolliert ab.",
     ],
+    mistakes: [
+      "Kettlebells schlagen gegen die Beine – Griff mittig halten, Arme gestreckt",
+      "Schultern hochgezogen – Schultern tief, weg von den Ohren",
+      "Oberkörper nach vorn gebeugt – aufrecht gehen, Blick nach vorn",
+    ],
+    cues: ["Griffe fest", "Schultern tief", "Aufrecht gehen"],
   },
   {
     id: "suitcase-carry",
@@ -274,5 +364,11 @@ export const CARDIO_CONDITIONING_EXERCISES: Exercise[] = [
       "Gehe aufrecht, ohne dich zur Hantelseite oder von ihr weg zu neigen.",
       "Wechsle nach der Strecke die Hand und halte die Schultern auf gleicher Höhe.",
     ],
+    mistakes: [
+      "Oberkörper kippt zur Hantel – gegenüberliegende Rumpfseite aktiv anspannen",
+      "Freier Arm abgespreizt als Gegengewicht – Arm locker am Körper",
+      "Hantel schaukelt – Hantel ruhig am Körper, kurze Schritte",
+    ],
+    cues: ["Schultern waagerecht", "Gegenseite fest", "Groß machen"],
   },
 ];

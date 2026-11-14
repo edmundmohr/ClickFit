@@ -199,6 +199,8 @@ describe("restoring pending changes in the workout", () => {
     incrementKg: 2.5,
     bar: null,
     note: "",
+    cues: [],
+    mistakes: [],
     previous: null,
     bests: null,
     sets: [

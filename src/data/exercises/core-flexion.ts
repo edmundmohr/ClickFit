@@ -18,6 +18,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Rolle Kopf und Schultern Richtung Knie, der untere Rücken bleibt am Boden.",
       "Senke den Oberkörper langsam ab und ziehe nicht am Kopf.",
     ],
+    mistakes: [
+      "Kinn auf der Brust – eine Faust Abstand zwischen Kinn und Brust",
+      "Hochreißen mit Schwung – langsam einrollen, oben kurz halten",
+      "Zu weit aufgerichtet – Bewegung endet, wenn die Schulterblätter abheben",
+    ],
+    cues: ["Rippen zum Becken", "Beim Hochrollen ausatmen", "Blick schräg nach oben"],
   },
   {
     id: "reverse-crunch",
@@ -35,6 +41,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Rolle das Becken ein und ziehe die Knie Richtung Brust.",
       "Senke das Becken langsam ab und hole keinen Schwung.",
     ],
+    mistakes: [
+      "Beine schwingen nach hinten – Bewegung kommt aus dem Becken, nicht aus den Beinen",
+      "Zu weit über den Kopf gerollt – nur so weit, bis das Gesäß abhebt",
+      "Hände drücken stark in den Boden – Arme nur zur Stabilisierung nutzen",
+    ],
+    cues: ["Becken einrollen", "Knie zur Brust", "Langsam abrollen"],
   },
   {
     id: "lying-leg-raise",
@@ -52,6 +64,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Hebe die fast gestreckten Beine, bis sie senkrecht stehen.",
       "Senke sie langsam ab und drücke den unteren Rücken dabei in den Boden.",
     ],
+    mistakes: [
+      "Hohlkreuz beim Absenken – nur so tief, wie der Rücken am Boden bleibt",
+      "Nur Hüftbeuger arbeiten – oben das Becken leicht vom Boden einrollen",
+      "Nacken verspannt – Kopf locker am Boden ablegen",
+    ],
+    cues: ["Unterer Rücken am Boden", "Ausatmen beim Heben", "Beine lang"],
   },
   {
     id: "hanging-knee-raise",
@@ -69,6 +87,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Ziehe die Knie Richtung Brust und rolle das Becken leicht ein.",
       "Senke die Beine kontrolliert ab und pendle nicht.",
     ],
+    mistakes: [
+      "Nur Hüftbeugung ohne Beckenrollen – oben das Becken Richtung Brust kippen",
+      "Schultern hängen passiv – Schultern aktiv nach unten ziehen",
+      "Griff ermüdet vor dem Bauch – bei Bedarf Schlaufen nutzen",
+    ],
+    cues: ["Schultern weg von Ohren", "Becken zur Brust kippen", "Unten ruhig hängen"],
   },
   {
     id: "hanging-leg-raise",
@@ -86,6 +110,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Hebe die gestreckten Beine mindestens bis in die Waagerechte.",
       "Senke sie langsam ab und vermeide Schwung.",
     ],
+    mistakes: [
+      "Schwung aus dem Pendeln – vor jeder Wiederholung kurz ruhig hängen",
+      "Hohlkreuz beim Heben – Becken früh einrollen",
+      "Beine nur mit Schwung hoch – zuerst Knieheben im Hang sicher beherrschen",
+    ],
+    cues: ["Schultern aktiv", "Beine lang", "Becken einrollen"],
   },
   {
     id: "dip-bar-knee-raise",
@@ -103,6 +133,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Ziehe die Knie Richtung Brust und rolle das Becken ein.",
       "Senke die Beine langsam ab und halte die Schultern tief.",
     ],
+    mistakes: [
+      "Schultern sinken zu den Ohren – Holme aktiv nach unten drücken",
+      "Oberkörper lehnt weit zurück – Rumpf möglichst senkrecht halten",
+      "Beine schwingen – unten kurz stoppen",
+    ],
+    cues: ["Holme wegdrücken", "Becken einrollen", "Ruhig hängen"],
   },
   {
     id: "cable-crunch",
@@ -120,6 +156,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Rolle den Oberkörper ein und führe die Ellbogen Richtung Knie.",
       "Richte dich langsam auf, die Hüfte bleibt dabei an derselben Stelle.",
     ],
+    mistakes: [
+      "Zug aus den Armen – Hände bleiben fest am Kopf",
+      "Rücken bleibt gerade – Wirbelsäule aktiv einrollen, Brust zum Becken",
+      "Zu viel Gewicht – Hüfte schiebt nach hinten, Gewicht reduzieren",
+    ],
+    cues: ["Brust zum Becken", "Hände am Kopf fixiert", "Ausatmen beim Einrollen"],
   },
   {
     id: "ab-crunch-machine",
@@ -137,6 +179,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Rolle den Oberkörper nach vorn ein und spanne den Bauch an.",
       "Führe das Gewicht langsam zurück, ohne es abzusetzen.",
     ],
+    mistakes: [
+      "Zug aus den Armen – Arme halten nur, der Bauch arbeitet",
+      "Hüfte klappt statt Rumpf rollt – Rücken rund machen, Brust zum Becken",
+      "Zu viel Schwung – unten kurz stoppen",
+    ],
+    cues: ["Rippen zum Becken", "Ausatmen beim Einrollen", "Langsam zurück"],
   },
   {
     id: "decline-sit-up",
@@ -154,6 +202,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Rolle den Oberkörper Wirbel für Wirbel nach oben.",
       "Senke dich langsam ab und hole keinen Schwung mit den Armen.",
     ],
+    mistakes: [
+      "Ziehen am Nacken – Hände an die Brust oder locker an die Schläfen",
+      "Hochschwingen mit geradem Rücken – Kinn leicht zur Brust und einrollen",
+      "Neigung zu steil gewählt – mit geringer Neigung beginnen",
+    ],
+    cues: ["Rippen zum Becken", "Wirbel für Wirbel", "Kontrolliert ablegen"],
   },
   {
     id: "sit-up",
@@ -171,6 +225,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Richte den Oberkörper auf, bis er fast senkrecht ist.",
       "Rolle langsam zurück auf den Boden und zieh nicht am Nacken.",
     ],
+    mistakes: [
+      "Füße heben ab – Füße fest aufstellen, bei Bedarf unter etwas klemmen",
+      "Schwung aus Armen und Kopf – Arme bleiben vor der Brust gekreuzt",
+      "Hohlkreuz beim Ablegen – Rücken Wirbel für Wirbel abrollen",
+    ],
+    cues: ["Kinn leicht zur Brust", "Ausatmen beim Hochkommen", "Langsam abrollen"],
   },
   {
     id: "v-up",
@@ -188,6 +248,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Hebe gleichzeitig die gestreckten Beine und den Oberkörper und führe die Hände zu den Füßen.",
       "Senke Arme und Beine kontrolliert ab, ohne sie ganz abzulegen.",
     ],
+    mistakes: [
+      "Beine und Oberkörper nicht gleichzeitig – beide Hälften treffen sich in der Mitte",
+      "Hohlkreuz in der Streckung – unteren Rücken in den Boden drücken",
+      "Mit Schwung hochgeworfen – kontrolliert hochklappen, notfalls Knie beugen",
+    ],
+    cues: ["Unterer Rücken bleibt unten", "Beine lang", "Oben ausatmen"],
   },
   {
     id: "weighted-crunch",
@@ -205,6 +271,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Rolle die Schultern vom Boden Richtung Knie.",
       "Senke den Oberkörper langsam ab, der untere Rücken bleibt am Boden.",
     ],
+    mistakes: [
+      "Hantel drückt auf den Hals – Hantel auf dem Brustbein halten",
+      "Gewicht verkürzt die Bewegung – nur so schwer, dass die Schulterblätter sauber abheben",
+      "Kopf nach vorn gezogen – Kinn locker, Blick schräg nach oben",
+    ],
+    cues: ["Hantel fest an der Brust", "Rippen zum Becken", "Beim Hochrollen ausatmen"],
   },
   {
     id: "heel-tap",
@@ -222,6 +294,12 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Beuge dich abwechselnd zur Seite und tippe mit der Hand an die Ferse.",
       "Halte die Schultern die ganze Zeit vom Boden.",
     ],
+    mistakes: [
+      "Kopf hängt auf der Brust – Nacken lang, Blick schräg nach oben",
+      "Bewegung nur aus den Armen – seitlich aus der Taille beugen",
+      "Füße zu nah am Gesäß – Füße so weit weg, dass die Hände die Fersen knapp erreichen",
+    ],
+    cues: ["Schultern oben", "Rippen zur Hüfte", "Ruhig weiteratmen"],
   },
   {
     id: "dumbbell-side-bend",
@@ -240,5 +318,11 @@ export const CORE_FLEXION_EXERCISES: Exercise[] = [
       "Neige den Oberkörper zur Hantelseite, ohne nach vorn oder hinten auszuweichen.",
       "Richte dich mit der gegenüberliegenden Rumpfseite wieder auf.",
     ],
+    mistakes: [
+      "Hüfte schiebt zur Seite – Becken bleibt mittig über den Füßen",
+      "Abfedern unten – Bewegung unten kurz stoppen",
+      "Hanteln in beiden Händen – nur eine Hantel, sonst gleicht sich die Last aus",
+    ],
+    cues: ["Becken bleibt ruhig", "Lang machen beim Aufrichten", "Zwischen zwei Glasscheiben"],
   },
 ];

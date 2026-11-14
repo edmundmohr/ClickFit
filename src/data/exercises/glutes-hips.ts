@@ -18,6 +18,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Drücke die Hüfte über die Fersen nach oben, bis Oberkörper und Oberschenkel eine Linie bilden.",
       "Spanne oben das Gesäß an und senke die Hüfte kontrolliert ab, das Kinn bleibt leicht zur Brust geneigt.",
     ],
+    mistakes: [
+      "Hohlkreuz in der Endposition – Becken leicht einrollen, Rippen bleiben unten",
+      "Füße zu nah oder zu weit – Schienbeine oben etwa senkrecht",
+      "Druck über die Zehen – Gewicht auf die Fersen verlagern",
+    ],
+    cues: ["Kinn zur Brust", "Durch die Fersen drücken", "Oben Gesäß fest"],
   },
   {
     id: "dumbbell-hip-thrust",
@@ -35,6 +41,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Drücke die Hüfte nach oben, bis die Knie 90 Grad gebeugt sind.",
       "Senke die Hüfte langsam ab und halte die Hantel mit den Händen fest.",
     ],
+    mistakes: [
+      "Hantel rutscht zur Seite – mit beiden Händen mittig im Hüftknick halten",
+      "Hüfte oben überstreckt – Bewegung endet, wenn Rumpf und Oberschenkel eine Linie bilden",
+      "Rücken rutscht über die Bank – Schulterblätter bleiben an der Kante",
+    ],
+    cues: ["Rippen unten", "Fersen in den Boden", "Oben kurz halten"],
   },
   {
     id: "smith-machine-hip-thrust",
@@ -52,6 +64,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Entriegle die Stange und drücke die Hüfte nach oben, bis sie gestreckt ist.",
       "Senke die Hüfte kontrolliert ab und verriegle die Stange am Ende.",
     ],
+    mistakes: [
+      "Stange liegt auf dem Bauch – Stange in den Hüftknick legen, Polster nutzen",
+      "Hohlkreuz statt Hüftstreckung – Becken oben leicht nach hinten kippen",
+      "Stange unten abgelegt – Bewegung knapp über dem Boden umkehren",
+    ],
+    cues: ["Stange im Hüftknick", "Becken einrollen", "Fersen drücken"],
   },
   {
     id: "hip-thrust-machine",
@@ -69,6 +87,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Drücke die Hüfte nach oben, bis sie vollständig gestreckt ist.",
       "Senke das Gewicht langsam ab und halte die Spannung im Gesäß.",
     ],
+    mistakes: [
+      "Füße zu weit vorn – Füße so stellen, dass die Schienbeine oben senkrecht stehen",
+      "Bewegung aus dem unteren Rücken – Rippen unten, Becken leicht einrollen",
+      "Gewicht fällt nach unten – auch die Abwärtsbewegung bewusst bremsen",
+    ],
+    cues: ["Rücken ans Polster", "Hüfte ganz strecken", "Oben kurz halten"],
   },
   {
     id: "glute-bridge",
@@ -86,6 +110,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Drücke die Hüfte über die Fersen nach oben, bis Knie, Hüfte und Schultern eine Linie bilden.",
       "Spanne das Gesäß kurz an und senke die Hüfte langsam ab.",
     ],
+    mistakes: [
+      "Hohlkreuz oben – Bauch fest, Becken leicht einrollen",
+      "Knie fallen nach innen – Knie über den Füßen halten",
+      "Druck über die Zehen – Zehen leicht anheben, Gewicht auf die Fersen",
+    ],
+    cues: ["Fersen in den Boden", "Knie leicht nach außen", "Gesäß fest anspannen"],
   },
   {
     id: "single-leg-glute-bridge",
@@ -104,6 +134,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Drücke die Hüfte über die Ferse nach oben, das Becken bleibt gerade.",
       "Senke die Hüfte kontrolliert ab und wechsle nach dem Satz die Seite.",
     ],
+    mistakes: [
+      "Becken kippt zur freien Seite – beide Hüftknochen auf einer Höhe halten",
+      "Hohlkreuz statt Hüftstreckung – nur so hoch, wie das Becken neutral bleibt",
+      "Krampf im hinteren Oberschenkel – Fuß näher ans Gesäß setzen",
+    ],
+    cues: ["Becken waagerecht", "Durch die Ferse drücken", "Freies Bein ruhig"],
   },
   {
     id: "dumbbell-glute-bridge",
@@ -121,6 +157,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Drücke die Hüfte nach oben und spanne das Gesäß an.",
       "Senke die Hüfte langsam ab und halte die Hantel fest.",
     ],
+    mistakes: [
+      "Hantel liegt auf dem Bauch – Hantel in den Hüftknick legen",
+      "Schwung vom Boden – Gesäß kurz absetzen, dann kontrolliert hochdrücken",
+      "Hohlkreuz oben – Rippen unten halten, das Gesäß beendet die Bewegung",
+    ],
+    cues: ["Hantel im Hüftknick", "Fersen drücken", "Oben Gesäß fest"],
   },
   {
     id: "band-glute-bridge",
@@ -138,6 +180,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Drücke die Hüfte gegen den Bandzug nach oben.",
       "Halte kurz und senke die Hüfte langsam ab.",
     ],
+    mistakes: [
+      "Band rutscht Richtung Bauch – Band flach in den Hüftknick legen",
+      "Band zu locker – Enden so halten, dass schon unten Spannung besteht",
+      "Hohlkreuz gegen den Bandzug – Becken einrollen, Bauch fest",
+    ],
+    cues: ["Gegen das Band drücken", "Oben zwei Sekunden halten", "Rippen unten"],
   },
   {
     id: "cable-kickback",
@@ -156,6 +204,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Führe das Bein mit leicht gebeugtem Knie nach hinten oben.",
       "Bringe das Bein langsam zurück und vermeide ein Hohlkreuz.",
     ],
+    mistakes: [
+      "Hohlkreuz am Ende der Bewegung – Bein stoppen, bevor das Becken kippt",
+      "Schwung aus dem Bein – langsam führen, oben kurz halten",
+      "Hüfte dreht auf – beide Hüftknochen zeigen zum Gerät",
+    ],
+    cues: ["Ferse nach hinten oben", "Bauch fest", "Standbein leicht gebeugt"],
   },
   {
     id: "donkey-kick",
@@ -174,6 +228,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Hebe ein gebeugtes Bein, bis der Oberschenkel in einer Linie mit dem Rücken ist.",
       "Senke das Knie langsam ab und halte den Rücken ruhig.",
     ],
+    mistakes: [
+      "Hohlkreuz beim Heben – Bein nur bis zur Rückenlinie heben",
+      "Hüfte kippt zur Seite – Becken parallel zum Boden halten",
+      "Schwung statt Kontrolle – oben kurz halten, langsam absenken",
+    ],
+    cues: ["Fußsohle zur Decke", "Bauch fest", "Rücken wie ein Tisch"],
   },
   {
     id: "hip-abduction-machine",
@@ -191,6 +251,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Drücke die Beine so weit wie möglich nach außen.",
       "Führe die Beine langsam zurück, ohne das Gewicht abzusetzen.",
     ],
+    mistakes: [
+      "Oberkörper schwingt mit – Griffe festhalten, Rumpf ruhig",
+      "Zu kleiner Bewegungsweg – Gewicht so wählen, dass die volle Öffnung möglich ist",
+      "Gesäß hebt vom Sitz ab – Gesäß bleibt fest auf dem Polster",
+    ],
+    cues: ["Knie nach außen drücken", "Außen kurz halten", "Oberkörper ruhig"],
   },
   {
     id: "cable-hip-abduction",
@@ -209,6 +275,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Führe das gestreckte Bein seitlich vom Körper weg.",
       "Bringe das Bein kontrolliert zurück und halte den Oberkörper aufrecht.",
     ],
+    mistakes: [
+      "Oberkörper neigt sich zur Seite – aufrecht bleiben, nur das Bein bewegt sich",
+      "Fußspitze dreht nach oben – Fußspitze zeigt nach vorn",
+      "Zu viel Schwung – Bein langsam führen, außen kurz halten",
+    ],
+    cues: ["Fußspitze nach vorn", "Standbein fest", "Bein seitlich wegschieben"],
   },
   {
     id: "band-lateral-walk",
@@ -226,6 +298,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Mache kleine Schritte zur Seite und halte das Band gespannt.",
       "Halte die Fußspitzen nach vorn und gehe die gleiche Strecke zurück.",
     ],
+    mistakes: [
+      "Füße schließen ganz – Abstand zwischen den Füßen bleibt immer erhalten",
+      "Oberkörper wippt seitlich – Rumpf ruhig über der Hüfte halten",
+      "Knie fallen nach innen – Knie über den Füßen nach außen drücken",
+    ],
+    cues: ["Band immer gespannt", "Knie nach außen", "Hüfte bleibt tief"],
   },
   {
     id: "side-lying-leg-raise",
@@ -244,6 +322,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Hebe das obere Bein gestreckt nach oben, die Fußspitze zeigt nach vorn.",
       "Senke das Bein langsam ab, ohne es abzulegen.",
     ],
+    mistakes: [
+      "Bein wandert nach vorn – Bein in Verlängerung des Körpers oder leicht dahinter halten",
+      "Becken kippt nach hinten – Hüften übereinander stapeln",
+      "Bein zu hoch gerissen – nur so hoch, wie das Becken ruhig bleibt",
+    ],
+    cues: ["Ferse führt", "Hüften übereinander", "Bein lang machen"],
   },
   {
     id: "clamshell",
@@ -262,6 +346,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Hebe das obere Knie, ohne das Becken nach hinten zu kippen.",
       "Senke das Knie langsam ab und halte die Füße zusammen.",
     ],
+    mistakes: [
+      "Becken rollt nach hinten – Hüften übereinander, oberes Becken leicht nach vorn",
+      "Oberkörper dreht mit – Rumpf fest, nur der Oberschenkel dreht",
+      "Zu schnelles Tempo – oben kurz halten und langsam zurück",
+    ],
+    cues: ["Hüften übereinander", "Knie nach oben öffnen", "Fersen zusammen"],
   },
   {
     id: "hip-adduction-machine",
@@ -279,6 +369,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Drücke die Beine zusammen, bis sich die Polster fast berühren.",
       "Öffne die Beine langsam, nur so weit, wie es angenehm ist.",
     ],
+    mistakes: [
+      "Gewichte schlagen an – Polster kontrolliert öffnen, Spannung halten",
+      "Oberkörper beugt sich mit – aufrecht sitzen, Griffe halten",
+      "Schwung beim Zusammendrücken – innen kurz halten",
+    ],
+    cues: ["Aufrecht sitzen", "Knie zusammendrücken", "Langsam öffnen"],
   },
   {
     id: "cable-hip-adduction",
@@ -297,6 +393,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Ziehe das gestreckte Bein vor dem Standbein zur Körpermitte.",
       "Führe das Bein kontrolliert zurück und halte dich am Gerät fest.",
     ],
+    mistakes: [
+      "Oberkörper kippt mit – aufrecht stehen, Standbein stabil",
+      "Hüfte dreht mit – Becken bleibt nach vorn ausgerichtet",
+      "Bein wird zurückgerissen – Gewicht reduzieren, Rückweg bremsen",
+    ],
+    cues: ["Becken nach vorn", "Bein zur Mitte ziehen", "Kontrolliert zurück"],
   },
   {
     id: "copenhagen-plank",
@@ -311,10 +413,16 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
     priority: 2,
     unilateral: true,
     instructions: [
-      "Lege dich seitlich neben die Bank und lege das obere Bein mit Knie oder Fuß auf die Bank.",
+      "Lege dich seitlich neben die Bank, das obere Bein mit dem Knie (leichter) oder Fuß (schwerer) auf der Bank.",
       "Stütze dich auf den Unterarm und hebe die Hüfte, bis der Körper eine gerade Linie bildet.",
       "Halte die Position und drücke das obere Bein aktiv auf die Bank.",
     ],
+    mistakes: [
+      "Hüfte sinkt ab – Hüfte aktiv nach oben drücken",
+      "Schulter sinkt ein – Ellbogen unter der Schulter, Boden wegdrücken",
+      "Zu lange Haltezeiten zu früh – mit kurzen Sätzen von 10 bis 20 Sekunden beginnen",
+    ],
+    cues: ["Oberes Bein in die Bank", "Hüfte hoch", "Körper wie ein Brett"],
   },
   {
     id: "side-lying-hip-adduction",
@@ -333,6 +441,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Hebe das untere, gestreckte Bein so weit wie möglich an.",
       "Senke es langsam ab, ohne es ganz abzulegen.",
     ],
+    mistakes: [
+      "Becken rollt nach hinten – Oberkörper gerade auf der Seite halten",
+      "Fußspitze dreht zur Decke – Fußspitze zeigt nach vorn",
+      "Schwung beim Heben – oben kurz halten",
+    ],
+    cues: ["Innenseite nach oben", "Bein lang machen", "Becken ruhig"],
   },
   {
     id: "cossack-squat",
@@ -351,6 +465,12 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Verlagere das Gewicht auf ein Bein und gehe dort tief in die Hocke, das andere Bein bleibt gestreckt.",
       "Drücke dich zurück in die Mitte und wechsle die Seite.",
     ],
+    mistakes: [
+      "Ferse des Standbeins hebt ab – ganzer Fuß bleibt am Boden, Tiefe anpassen",
+      "Rundrücken in der Tiefe – nur so tief, wie der Rücken gerade bleibt",
+      "Knie fällt nach innen – Knie folgt der Fußspitze",
+    ],
+    cues: ["Gesäß nach hinten", "Brust aufrecht", "Ferse am Boden"],
   },
   {
     id: "dumbbell-sumo-squat",
@@ -368,5 +488,11 @@ export const GLUTES_HIPS_EXERCISES: Exercise[] = [
       "Gehe in die Hocke und drücke die Knie in Richtung der Zehen nach außen.",
       "Drücke dich wieder hoch und halte den Oberkörper aufrecht.",
     ],
+    mistakes: [
+      "Oberkörper kippt nach vorn – Hantel hängt senkrecht unter den Schultern",
+      "Fersen heben ab – Gewicht über den ganzen Fuß verteilen",
+      "Stand zu breit – nur so breit, dass die Knie über den Füßen bleiben",
+    ],
+    cues: ["Knie nach außen", "Brust hoch", "Durch die Fersen hoch"],
   },
 ];

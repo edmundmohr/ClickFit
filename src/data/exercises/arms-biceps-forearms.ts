@@ -18,6 +18,13 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Arme und führe die Stange zu den Schultern, die Ellbogen bleiben am Körper.",
       "Senke die Stange langsam ab und hole keinen Schwung aus dem Oberkörper.",
     ],
+    mistakes: [
+      "Oberkörper schwingt mit – Knie leicht gebeugt, Rumpf fest",
+      "Unten nicht ganz gestreckt – Arme unten vollständig strecken",
+      "Handgelenke knicken ein – Handgelenke gerade halten",
+      "Schultern rollen nach vorn – Brust raus, Schultern hinten",
+    ],
+    cues: ["Ellbogen an die Seiten", "Brust raus", "Langsam ablassen"],
   },
   {
     id: "ez-bar-curl",
@@ -35,6 +42,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Arme, bis die Stange auf Schulterhöhe ist.",
       "Senke sie kontrolliert ab, bis die Arme fast gestreckt sind.",
     ],
+    mistakes: [
+      "Schwung aus der Hüfte – Gesäß anspannen, Oberkörper ruhig",
+      "Ellbogen wandern nach vorn – Oberarme bleiben senkrecht",
+      "Oben Spannung verloren – vor der Schulter stoppen, Bizeps anspannen",
+    ],
+    cues: ["Ellbogen an die Seiten", "Gesäß fest", "Langsam runter"],
   },
   {
     id: "dumbbell-curl",
@@ -52,6 +65,13 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Arme und führe die Hanteln zu den Schultern.",
       "Senke sie langsam ab und halte die Ellbogen eng am Körper.",
     ],
+    mistakes: [
+      "Hanteln werden geschwungen – Gewicht reduzieren, Oberkörper ruhig",
+      "Hand dreht sich ein – Handfläche zeigt nach oben",
+      "Ellbogen wandern nach vorn – Oberarme ruhig neben dem Körper",
+      "Unten nicht ganz gestreckt – Arme unten vollständig strecken",
+    ],
+    cues: ["Handflächen zur Decke drehen", "Ellbogen an die Seiten", "Langsam ablassen"],
   },
   {
     id: "hammer-curl",
@@ -69,6 +89,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Arme, ohne die Handgelenke zu drehen.",
       "Senke die Hanteln kontrolliert ab und lass die Oberarme ruhig.",
     ],
+    mistakes: [
+      "Hanteln werden geschwungen – Oberkörper ruhig, Gewicht anpassen",
+      "Handgelenk knickt ab – Handgelenk gerade, Daumen zeigt nach oben",
+      "Ellbogen wandern nach vorn – Oberarme neben dem Körper",
+    ],
+    cues: ["Daumen nach oben", "Ellbogen fest", "Langsam ablassen"],
   },
   {
     id: "incline-dumbbell-curl",
@@ -86,6 +112,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Arme und führe die Hanteln zu den Schultern, die Oberarme bleiben senkrecht.",
       "Senke die Hanteln langsam ab, bis die Arme gestreckt sind.",
     ],
+    mistakes: [
+      "Schultern ziehen nach vorn – Schultern an der Lehne lassen",
+      "Ziehen vorn in der Schulter – Bank etwas steiler stellen, Gewicht leichter wählen",
+      "Kopf hebt von der Lehne ab – Kopf und Rücken bleiben angelehnt",
+    ],
+    cues: ["Schultern an die Lehne", "Arme hängen lassen", "Unten volle Dehnung"],
   },
   {
     id: "concentration-curl",
@@ -104,6 +136,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge den Arm und führe die Hantel zur Schulter.",
       "Senke sie langsam ab, ohne den Oberkörper zu bewegen.",
     ],
+    mistakes: [
+      "Hantel fällt nach unten – langsam absenken, Spannung halten",
+      "Handgelenk knickt ein – Handgelenk gerade halten",
+      "Rundrücken – aus der Hüfte vorbeugen, Rücken lang",
+    ],
+    cues: ["Oben Bizeps anspannen", "Langsam ablassen", "Ellbogen fest am Bein"],
   },
   {
     id: "preacher-curl-machine",
@@ -121,6 +159,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Arme und ziehe die Griffe zu den Schultern.",
       "Senke das Gewicht langsam ab, ohne die Ellbogen ganz durchzustrecken.",
     ],
+    mistakes: [
+      "Oberarme heben vom Polster ab – Oberarme liegen ganz auf",
+      "Gesäß hebt vom Sitz ab – sitzen bleiben, Gewicht reduzieren",
+      "Schultern rollen nach vorn – Brust ans Polster, Schultern hinten",
+    ],
+    cues: ["Oberarme aufs Polster", "Langsam runter", "Oben kurz halten"],
   },
   {
     id: "ez-bar-preacher-curl",
@@ -138,6 +182,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Arme, bis die Unterarme fast senkrecht stehen.",
       "Senke die Stange langsam ab und strecke die Ellbogen nicht ruckartig.",
     ],
+    mistakes: [
+      "Oberarme heben vom Polster ab – Achseln an die Polsterkante",
+      "Handgelenke knicken nach hinten – Handgelenke gerade halten",
+      "Zu schweres Gewicht in der Dehnung – leichter wählen, unten Spannung halten",
+    ],
+    cues: ["Achseln ans Polster", "Unten langsam", "Handgelenke gerade"],
   },
   {
     id: "cable-curl",
@@ -155,6 +205,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Arme und ziehe die Stange zu den Schultern.",
       "Lass die Stange kontrolliert ab und halte die Ellbogen am Körper.",
     ],
+    mistakes: [
+      "Oberkörper lehnt sich zurück – aufrecht stehen, Gesäß fest",
+      "Zu nah am Kabelzug – einen kleinen Schritt zurück, damit oben Spannung bleibt",
+      "Gewicht schlägt unten im Stapel an – Arme langsam strecken, Spannung halten",
+    ],
+    cues: ["Ellbogen an die Seiten", "Oben anspannen", "Langsam strecken"],
   },
   {
     id: "band-curl",
@@ -172,6 +228,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Arme und führe die Hände zu den Schultern.",
       "Senke die Hände langsam ab und halte die Ellbogen eng am Körper.",
     ],
+    mistakes: [
+      "Band rutscht unter den Füßen – mittig und fest daraufstellen",
+      "Oberkörper lehnt sich zurück – aufrecht stehen, Bauch fest",
+      "Band schnellt zurück – Hände langsam absenken",
+    ],
+    cues: ["Ellbogen an die Seiten", "Oben kurz halten", "Langsam ablassen"],
   },
   {
     id: "reverse-curl",
@@ -189,6 +251,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Arme und führe die Stange nach oben, die Handgelenke bleiben gerade.",
       "Senke die Stange langsam ab und halte die Ellbogen am Körper.",
     ],
+    mistakes: [
+      "Handgelenke knicken ab – Handrücken in Linie mit dem Unterarm",
+      "Zu schwer, mit Schwung – leichter wählen, der Obergriff begrenzt die Last",
+      "Ellbogen wandern nach vorn – Oberarme neben dem Körper",
+    ],
+    cues: ["Handrücken nach oben", "Ellbogen fest", "Langsam ablassen"],
   },
   {
     id: "suspension-curl",
@@ -206,6 +274,13 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Arme und ziehe die Hände zur Stirn, die Ellbogen bleiben oben.",
       "Strecke die Arme langsam wieder und halte den Körper gerade.",
     ],
+    mistakes: [
+      "Hüfte sackt ab – Bauch und Gesäß fest, Körper gerade",
+      "Ellbogen sinken ab – Ellbogen auf Schulterhöhe halten",
+      "Zu flache Neigung für das eigene Niveau – aufrechter stehen",
+      "Schwung aus der Hüfte – nur die Arme beugen",
+    ],
+    cues: ["Körper wie ein Brett", "Hände zur Stirn", "Ellbogen oben"],
   },
   {
     id: "wrist-curl",
@@ -223,6 +298,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Handgelenke und rolle die Hanteln nach oben.",
       "Senke die Hände langsam ab, die Unterarme bleiben liegen.",
     ],
+    mistakes: [
+      "Zu kleiner Bewegungsweg – unten die Hantel bis in die Finger rollen lassen",
+      "Zu schwer, mit Schwung – leicht wählen und langsam bewegen",
+      "Handgelenke liegen auf dem Bein – Handgelenke frei über die Knie hinaus",
+    ],
+    cues: ["Handgelenke frei", "Bis in die Finger rollen", "Langsam hoch"],
   },
   {
     id: "reverse-wrist-curl",
@@ -240,6 +321,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Hebe die Handrücken so weit wie möglich nach oben.",
       "Senke die Hände kontrolliert ab und wähle ein leichtes Gewicht.",
     ],
+    mistakes: [
+      "Unterarme heben mit ab – Unterarme fest auf den Oberschenkeln",
+      "Handgelenke liegen auf – Handgelenke frei über die Knie hinaus",
+      "Zu schnell abgesenkt – Abwärtsbewegung langsam führen",
+    ],
+    cues: ["Handrücken nach oben", "Langsam ablassen", "Unterarme fest"],
   },
   {
     id: "barbell-wrist-curl",
@@ -257,6 +344,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Beuge die Handgelenke und hebe die Stange nach oben.",
       "Senke die Stange langsam ab, ohne die Unterarme von der Bank zu heben.",
     ],
+    mistakes: [
+      "Handgelenke liegen auf der Bank – Handgelenke frei über die Kante hinaus",
+      "Zu kleiner Bewegungsweg – Stange unten bis in die Finger rollen",
+      "Zu schwer, mit Schwung – leichteres Gewicht, gleichmäßiges Tempo",
+    ],
+    cues: ["Unterarme fest auf die Bank", "Langsam hoch und runter", "Bis in die Finger"],
   },
   {
     id: "dead-hang",
@@ -274,6 +367,12 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Halte die Schultern leicht aktiv, statt ganz durchzuhängen.",
       "Halte die Position, solange der Griff sicher ist, und steige kontrolliert ab.",
     ],
+    mistakes: [
+      "Schultern hängen passiv an den Ohren – Schultern leicht nach unten ziehen",
+      "Körper schaukelt – Beine ruhig, Bauch leicht fest",
+      "Unkontrolliert abspringen – Füße auf Kasten oder Boden absetzen",
+    ],
+    cues: ["Stange fest zusammendrücken", "Schultern weg von den Ohren", "Ruhig atmen"],
   },
   {
     id: "dumbbell-static-hold",
@@ -291,5 +390,11 @@ export const ARMS_BICEPS_FOREARMS_EXERCISES: Exercise[] = [
       "Halte die Hanteln mit festem Griff seitlich am Körper, die Schultern bleiben hinten.",
       "Setze die Hanteln kontrolliert ab, bevor der Griff aufgeht.",
     ],
+    mistakes: [
+      "Rundrücken beim Aufheben – aus der Hüfte beugen, Rücken neutral",
+      "Luft anhalten – gleichmäßig weiteratmen",
+      "Hanteln am Satzende fallen lassen – mit geradem Rücken in die Knie gehen und absetzen",
+    ],
+    cues: ["Griff fest zusammendrücken", "Brust raus", "Ruhig atmen"],
   },
 ];

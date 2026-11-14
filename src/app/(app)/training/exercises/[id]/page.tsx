@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { requireUser } from "@/features/auth/session";
 import { findExercise } from "@/features/training/catalog";
 import { ExerciseActions } from "@/features/training/components/exercise-actions";
+import { CueList, MistakeList } from "@/features/training/components/exercise-coaching";
 import { ExerciseNoteForm } from "@/features/training/components/exercise-note-form";
 import { getTrainingContext } from "@/features/training/services/context-service";
 import { getUserCatalog, isCustomExerciseId } from "@/features/training/services/exercise-service";
@@ -124,6 +125,26 @@ export default async function ExerciseDetailPage({ params }: PageProps<"/trainin
             )}
           </CardContent>
         </Card>
+        {exercise.cues.length > 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("training.library.cues")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CueList cues={exercise.cues} />
+            </CardContent>
+          </Card>
+        ) : null}
+        {exercise.mistakes.length > 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("training.library.mistakes")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MistakeList mistakes={exercise.mistakes} />
+            </CardContent>
+          </Card>
+        ) : null}
         <Card>
           <CardHeader>
             <CardTitle>{t("training.library.noteTitle")}</CardTitle>

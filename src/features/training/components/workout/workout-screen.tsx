@@ -18,7 +18,7 @@ import { useRestPush } from "@/features/notifications/use-rest-push";
 import { getSyncEngine, tellServiceWorker } from "@/lib/offline/client";
 import { deleteWorkoutAction } from "../../actions";
 import type { WorkoutView } from "../../services/workout-view";
-import { ConfirmDialog, ExerciseNoteDialog, SetOptionsDialog } from "./dialogs";
+import { ConfirmDialog, ExerciseInfoDialog, ExerciseNoteDialog, SetOptionsDialog } from "./dialogs";
 import { ExerciseCard, type InvalidField } from "./exercise-card";
 import { useAlertSignal, useNow, useRestTimer, useWakeLock } from "./hooks";
 import { PlateDialog } from "./plate-dialog";
@@ -71,6 +71,7 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
   const [optionsFor, setOptionsFor] = useState<SetRef | null>(null);
   const [noteFor, setNoteFor] = useState<string | null>(null);
   const [platesFor, setPlatesFor] = useState<string | null>(null);
+  const [infoFor, setInfoFor] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<"finish" | "delete" | null>(null);
   const [forgottenDismissed, setForgottenDismissed] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -284,6 +285,7 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
   const noteExercise = exercises.find((exercise) => exercise.exerciseId === noteFor) ?? null;
   const title = view.name ?? (view.focus ? t(`training.focus.${view.focus}`) : t("training.focus.free"));
   const platesExercise = exercises.find((exercise) => exercise.id === platesFor) ?? null;
+  const infoExercise = exercises.find((exercise) => exercise.id === infoFor) ?? null;
   const renderCard = (exercise: (typeof exercises)[number]) => (
     <ExerciseCard
       key={exercise.id}
@@ -295,6 +297,7 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
       onAddSet={() => addSet(exercise.id)}
       onAddWarmup={() => addWarmup(exercise.id)}
       onEditNote={() => setNoteFor(exercise.exerciseId)}
+      onOpenInfo={() => setInfoFor(exercise.id)}
       onOpenPlates={exercise.bar ? () => setPlatesFor(exercise.id) : undefined}
     />
   );
@@ -422,6 +425,7 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
         onClose={() => setOptionsFor(null)}
       />
       <PlateDialog exercise={platesExercise} onClose={() => setPlatesFor(null)} />
+      <ExerciseInfoDialog exercise={infoExercise} onClose={() => setInfoFor(null)} />
       <ExerciseNoteDialog
         exercise={noteExercise}
         onSaved={(note) => noteFor && dispatch({ type: "note", catalogExerciseId: noteFor, note })}

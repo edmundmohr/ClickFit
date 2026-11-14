@@ -18,6 +18,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Ziehe die Schulterblätter nach unten und zieh dich hoch, bis das Kinn über der Stange ist.",
       "Senke dich kontrolliert ab, bis die Arme wieder gestreckt sind.",
     ],
+    mistakes: [
+      "Halbe Wiederholungen – unten Arme ganz strecken, oben Kinn über die Stange",
+      "Schwung aus den Beinen – Beine ruhig, Rumpf fest",
+      "Schultern ziehen zu den Ohren – Schulterblätter zuerst nach unten ziehen",
+    ],
+    cues: ["Brust zur Stange", "Ellbogen in die Hosentaschen", "Ruhig ablassen"],
   },
   {
     id: "chin-up",
@@ -35,6 +41,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Zieh dich hoch, bis das Kinn über der Stange ist, die Ellbogen bleiben nah am Körper.",
       "Lass dich langsam ab und vermeide Schwung aus den Beinen.",
     ],
+    mistakes: [
+      "Kinn wird nach vorn gereckt – Brust zur Stange, Kopf neutral",
+      "Unten nicht ausgestreckt – jede Wiederholung aus dem Hang beginnen",
+      "Hohlkreuz und Beinschwung – Beine leicht vor dem Körper, Bauch fest",
+    ],
+    cues: ["Ellbogen nach unten", "Brust hoch", "Langsam ablassen"],
   },
   {
     id: "band-assisted-pull-up",
@@ -52,6 +64,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Zieh dich hoch, bis das Kinn über der Stange ist.",
       "Senke dich langsam ab und steige am Ende vorsichtig aus dem Band.",
     ],
+    mistakes: [
+      "Unten aus dem Band federn – kontrolliert umkehren, nicht wippen",
+      "Band zu stark gewählt – nur so viel Hilfe wie für saubere Wiederholungen nötig",
+      "Schultern ziehen hoch – zuerst Schulterblätter nach unten ziehen",
+    ],
+    cues: ["Schultern runter", "Brust zur Stange", "Unten nicht wippen"],
   },
   {
     id: "assisted-pull-up-machine",
@@ -69,6 +87,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Zieh dich hoch, bis das Kinn auf Griffhöhe ist.",
       "Lass dich kontrolliert ab, bis die Arme fast gestreckt sind.",
     ],
+    mistakes: [
+      "Zu viel Unterstützung – Gegengewicht schrittweise verringern",
+      "Oberkörper kippt nach vorn – aufrecht bleiben, Brust zu den Griffen",
+      "Schultern rollen oben nach vorn – Brust raus, Schulterblätter nach unten",
+    ],
+    cues: ["Schultern runter", "Ellbogen zur Hüfte", "Kontrolliert nach oben"],
   },
   {
     id: "lat-pulldown",
@@ -86,6 +110,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Ziehe die Stange zur oberen Brust und führe die Ellbogen nach unten hinten.",
       "Lass die Stange langsam nach oben, ohne den Oberkörper weit zurückzulehnen.",
     ],
+    mistakes: [
+      "Stange hinter den Nacken gezogen – immer vor dem Kopf zur Brust ziehen",
+      "Schwung aus dem Oberkörper – leicht zurückgelehnt und ruhig bleiben",
+      "Nur mit den Armen gezogen – Schultern zuerst nach unten, Ellbogen führen",
+    ],
+    cues: ["Brust zur Stange", "Ellbogen nach unten", "Schultern weg von Ohren"],
   },
   {
     id: "close-grip-lat-pulldown",
@@ -103,6 +133,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Ziehe den Griff zur Brust und halte die Ellbogen nah am Körper.",
       "Strecke die Arme kontrolliert nach oben, bis der Latissimus gedehnt ist.",
     ],
+    mistakes: [
+      "Oberkörper schwingt weit zurück – nur leicht zurücklehnen, ruhig bleiben",
+      "Schultern rollen nach vorn – Brust aufrecht, Schultern unten",
+      "Handgelenke abgeknickt – Handgelenke gerade, mit den Ellbogen ziehen",
+    ],
+    cues: ["Ellbogen an die Rippen", "Brust zum Griff", "Oben lang machen"],
   },
   {
     id: "reverse-grip-lat-pulldown",
@@ -120,6 +156,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Ziehe die Stange zur oberen Brust, die Ellbogen zeigen nach unten.",
       "Lass die Stange kontrolliert zurück und bleib mit dem Oberkörper aufrecht.",
     ],
+    mistakes: [
+      "Nur der Bizeps zieht – an die Ellbogen denken, nicht an die Hände",
+      "Handgelenke abgeknickt – Handgelenke gerade halten",
+      "Zu weit zurückgelehnt – Oberkörper nur leicht nach hinten neigen",
+    ],
+    cues: ["Ellbogen zur Hüfte", "Brust raus", "Schultern runter"],
   },
   {
     id: "lat-pulldown-machine",
@@ -137,6 +179,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Ziehe die Griffe nach unten, bis die Hände etwa auf Schulterhöhe sind.",
       "Führe die Griffe langsam zurück nach oben und halte die Brust aufgerichtet.",
     ],
+    mistakes: [
+      "Oberschenkel nicht fixiert – Polster fest auf die Oberschenkel stellen",
+      "Gewicht schnellt nach oben – langsam bis zur Dehnung zurückführen",
+      "Schultern rollen nach vorn – Brust raus, Schultern tief",
+    ],
+    cues: ["Ellbogen nach unten", "Brust raus", "Langsam nach oben"],
   },
   {
     id: "straight-arm-pulldown",
@@ -154,6 +202,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Ziehe den Griff in einem Bogen zu den Oberschenkeln, die Arme bleiben gestreckt.",
       "Führe den Griff langsam zurück auf Schulterhöhe und halte den Rumpf stabil.",
     ],
+    mistakes: [
+      "Arme beugen sich – Ellbogen leicht gebeugt fixieren",
+      "Oberkörper nickt mit – Rumpf fest, nur die Arme bewegen",
+      "Schultern ziehen nach vorn oben – Schultern tief halten",
+    ],
+    cues: ["Arme lang", "Hände zu den Oberschenkeln", "Rippen runter"],
   },
   {
     id: "band-lat-pulldown",
@@ -171,6 +225,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Ziehe die Enden zu den Schultern und führe die Ellbogen nach unten hinten.",
       "Strecke die Arme langsam wieder nach oben, ohne ins Hohlkreuz zu fallen.",
     ],
+    mistakes: [
+      "Band nicht sicher befestigt – Anker vor dem Satz fest prüfen",
+      "Schultern ziehen hoch – Schultern zuerst nach unten ziehen",
+      "Band schnellt nach oben – Rückweg langsam führen",
+    ],
+    cues: ["Ellbogen nach unten", "Brust aufrecht", "Schultern runter"],
   },
   {
     id: "band-straight-arm-pulldown",
@@ -188,6 +248,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Ziehe die Hände in einem Bogen zu den Oberschenkeln.",
       "Führe die Arme kontrolliert zurück und halte die Schultern unten.",
     ],
+    mistakes: [
+      "Arme werden gebeugt – Ellbogen leicht gebeugt, aber fest",
+      "Oberkörper beugt sich mit – aufrecht stehen, Bauch fest",
+      "Zu wenig Spannung – etwas weiter zurücktreten",
+    ],
+    cues: ["Arme lang", "Hände zu den Oberschenkeln", "Bauch fest"],
   },
   {
     id: "prone-lat-pulldown",
@@ -205,6 +271,12 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Ziehe die Ellbogen seitlich zum Körper, als würdest du eine Stange zur Brust ziehen.",
       "Strecke die Arme wieder nach vorn und halte den Blick zum Boden.",
     ],
+    mistakes: [
+      "Kopf in den Nacken – Blick zum Boden, Nacken lang",
+      "Brust und Arme sinken zwischendurch ab – Spannung über den ganzen Satz halten",
+      "Schultern ziehen zu den Ohren – Schulterblätter nach unten hinten",
+    ],
+    cues: ["Ellbogen zu den Rippen", "Schulterblätter zusammen", "Nacken lang"],
   },
   {
     id: "dumbbell-pullover",
@@ -222,5 +294,11 @@ export const BACK_VERTICAL_EXERCISES: Exercise[] = [
       "Senke die Hantel mit leicht gebeugten Armen hinter den Kopf, bis du eine Dehnung spürst.",
       "Ziehe die Hantel im gleichen Bogen zurück über die Brust und halte den Rücken auf der Bank.",
     ],
+    mistakes: [
+      "Arme beugen sich stark – Ellbogenwinkel konstant halten",
+      "Hohlkreuz in der Dehnung – nur so weit senken, wie die Rippen unten bleiben",
+      "Zu schwere Hantel – Gewicht wählen, das du sicher über dem Gesicht hältst",
+    ],
+    cues: ["Rippen unten", "Langer Bogen", "Hantel fest umgreifen"],
   },
 ];

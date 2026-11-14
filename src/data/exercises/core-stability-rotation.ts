@@ -18,6 +18,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Spanne Bauch und Gesäß an, sodass der Körper eine gerade Linie bildet.",
       "Halte die Position, atme ruhig weiter und lass die Hüfte nicht durchhängen.",
     ],
+    mistakes: [
+      "Gesäß zu hoch – Schultern, Hüfte und Fersen auf eine Linie",
+      "Schultern sinken ein – Unterarme aktiv in den Boden drücken",
+      "Kopf hängt – Blick zum Boden, Nacken lang",
+    ],
+    cues: ["Ellbogen zu den Füßen ziehen", "Gesäß fest", "Rippen runter"],
   },
   {
     id: "side-plank",
@@ -36,6 +42,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Hebe die Hüfte, bis der Körper eine gerade Linie bildet.",
       "Halte die Position und lass die Hüfte weder absinken noch nach hinten kippen.",
     ],
+    mistakes: [
+      "Schulter sinkt ein – Boden aktiv wegdrücken",
+      "Oberkörper dreht nach vorn – Schultern und Hüften übereinander",
+      "Kopf kippt ab – Kopf in Verlängerung der Wirbelsäule",
+    ],
+    cues: ["Hüfte zur Decke", "Körper wie ein Brett", "Ruhig weiteratmen"],
   },
   {
     id: "dead-bug",
@@ -53,6 +65,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Senke langsam einen Arm und das gegenüberliegende Bein Richtung Boden.",
       "Kehre zurück, wechsle die Seite und drücke den unteren Rücken die ganze Zeit in den Boden.",
     ],
+    mistakes: [
+      "Zu schnelles Tempo – Arm und Bein in zwei bis drei Sekunden absenken",
+      "Luft angehalten – beim Strecken ausatmen",
+      "Bein zu tief – nur so weit absenken, wie der Rücken am Boden bleibt",
+    ],
+    cues: ["Rücken in den Boden", "Langsam strecken", "Rippen unten"],
   },
   {
     id: "bird-dog",
@@ -70,6 +88,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Strecke einen Arm nach vorn und das gegenüberliegende Bein nach hinten.",
       "Halte kurz, kehre zurück und wechsle die Seite, ohne das Becken zu verdrehen.",
     ],
+    mistakes: [
+      "Bein zu hoch – Bein nur bis zur Rückenlinie heben, kein Hohlkreuz",
+      "Gewicht schiebt zur Seite – Hüfte über den Knien zentriert halten",
+      "Schnelles Wechseln – Endposition zwei Sekunden halten",
+    ],
+    cues: ["Ferse nach hinten schieben", "Rücken flach wie ein Tisch", "Glas Wasser auf dem Rücken"],
   },
   {
     id: "hollow-hold",
@@ -87,6 +111,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Hebe Schultern, Arme und gestreckte Beine leicht vom Boden.",
       "Halte die Position und beuge die Knie, falls der Rücken abhebt.",
     ],
+    mistakes: [
+      "Beine zu tief – Beine nur so tief, wie der Rücken am Boden bleibt",
+      "Schultern liegen ab – Schulterblätter knapp vom Boden lösen",
+      "Luft angehalten – flach und gleichmäßig weiteratmen",
+    ],
+    cues: ["Rücken in den Boden", "Rippen zum Becken", "Zehen lang ziehen"],
   },
   {
     id: "ab-wheel-rollout",
@@ -104,6 +134,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Rolle langsam nach vorn, so weit du den Rücken gerade halten kannst.",
       "Ziehe dich mit Bauchspannung zurück und vermeide ein Hohlkreuz.",
     ],
+    mistakes: [
+      "Hüfte knickt ein – Becken eingerollt lassen, Gesäß fest",
+      "Zu weite Strecke zu früh – Weg schrittweise steigern, anfangs gegen eine Wand rollen",
+      "Rückweg mit der Hüfte zuerst – Bauch und Arme ziehen gemeinsam zurück",
+    ],
+    cues: ["Becken einrollen", "Gesäß fest", "Rippen unten"],
   },
   {
     id: "mountain-climber",
@@ -121,6 +157,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Ziehe abwechselnd ein Knie schnell Richtung Brust.",
       "Halte die Hüfte tief und den Rumpf fest angespannt.",
     ],
+    mistakes: [
+      "Gesäß zu hoch – Schultern über den Händen, Rumpf flach",
+      "Hüfte wippt auf und ab – Becken stabil, nur die Beine bewegen sich",
+      "Hohlkreuz bei hohem Tempo – nur so schnell, wie der Rumpf stabil bleibt",
+    ],
+    cues: ["Schultern über den Händen", "Knie zur Brust", "Bauch fest"],
   },
   {
     id: "plank-shoulder-tap",
@@ -138,6 +180,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Tippe abwechselnd mit einer Hand an die gegenüberliegende Schulter.",
       "Halte die Hüfte dabei möglichst ruhig und parallel zum Boden.",
     ],
+    mistakes: [
+      "Hüfte schaukelt seitlich – langsamer tippen, Gesäß fest",
+      "Gesäß nach oben geschoben – Körper bleibt eine gerade Linie",
+      "Stützarm knickt ein – Boden mit der Stützhand wegdrücken",
+    ],
+    cues: ["Hüfte ruhig", "Langsam tippen", "Boden wegdrücken"],
   },
   {
     id: "turkish-get-up",
@@ -157,6 +205,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Gehe auf demselben Weg kontrolliert zurück in die Rückenlage.",
       "Übe den Ablauf zuerst ohne oder mit sehr leichtem Gewicht.",
     ],
+    mistakes: [
+      "Arm mit der Kettlebell knickt ein – Ellbogen gestreckt, Handgelenk gerade",
+      "Hastiger Ablauf – jede Position kurz stabil halten, dann weiter",
+      "Schulter zieht zum Ohr – Schulter tief und gepackt halten",
+    ],
+    cues: ["Arm senkrecht und gestreckt", "Schulter gepackt", "Eine Position nach der anderen"],
   },
   {
     id: "russian-twist",
@@ -174,6 +228,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Drehe den Oberkörper abwechselnd nach rechts und links.",
       "Bewege dich kontrolliert aus dem Rumpf und halte die Brust aufgerichtet.",
     ],
+    mistakes: [
+      "Nur die Arme bewegen sich – Schultern drehen mit, Blick folgt den Händen",
+      "Zu schnelles Tempo – Drehung kontrollieren, an jeder Seite kurz stoppen",
+      "Beine wackeln mit – Knie und Füße bleiben ruhig",
+    ],
+    cues: ["Brust lang", "Schultern drehen mit", "Knie ruhig"],
   },
   {
     id: "bicycle-crunch",
@@ -191,6 +251,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Führe abwechselnd einen Ellbogen zum gegenüberliegenden Knie und strecke das andere Bein.",
       "Drehe aus dem Oberkörper und ziehe nicht am Kopf.",
     ],
+    mistakes: [
+      "Nur die Ellbogen bewegen sich – Schulter zum Knie drehen",
+      "Hektisches Tempo – langsam drehen, kurz halten",
+      "Gestrecktes Bein zu tief – Bein höher halten, wenn der Rücken abhebt",
+    ],
+    cues: ["Schulter zum Knie", "Bein lang wegstrecken", "Rücken unten"],
   },
   {
     id: "pallof-press",
@@ -209,6 +275,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Strecke die Arme gerade nach vorn und lass dich nicht zum Gerät drehen.",
       "Führe die Hände langsam zurück zur Brust und wechsle nach dem Satz die Seite.",
     ],
+    mistakes: [
+      "Zu nah am Kabel – so weit weg stellen, dass schon vor der Brust Spannung besteht",
+      "Hüfte dreht zum Gerät – Gesäß fest, Hüfte nach vorn",
+      "Hohlkreuz beim Strecken – Rippen unten halten",
+    ],
+    cues: ["Gegen die Drehung halten", "Gesäß fest", "Vorn kurz halten"],
   },
   {
     id: "band-pallof-press",
@@ -227,6 +299,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Strecke die Arme nach vorn und halte Hüfte und Schultern gerade.",
       "Führe die Hände kontrolliert zurück und wechsle nach dem Satz die Seite.",
     ],
+    mistakes: [
+      "Band zu locker – weiter weg stellen, bis vor der Brust Spannung besteht",
+      "Oberkörper weicht zur Seite aus – Schultern bleiben über der Hüfte",
+      "Knie durchgestreckt – Knie leicht beugen, stabil stehen",
+    ],
+    cues: ["Hände zur Körpermitte", "Rumpf fest", "Vorn zwei Sekunden halten"],
   },
   {
     id: "cable-woodchop",
@@ -245,6 +323,12 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Ziehe den Griff diagonal vor dem Körper nach unten zur gegenüberliegenden Hüfte.",
       "Führe ihn langsam zurück und drehe dabei über Rumpf und hinteren Fuß mit.",
     ],
+    mistakes: [
+      "Zug aus den Armen – Arme bleiben fast gestreckt, der Rumpf dreht",
+      "Rundrücken beim Ziehen – Brust aufgerichtet, Wirbelsäule lang",
+      "Kabel zieht zurück – Rückweg genauso kontrolliert wie der Zug",
+    ],
+    cues: ["Arme lang", "Brust führt", "Hinteren Fuß mitdrehen"],
   },
   {
     id: "dumbbell-woodchop",
@@ -263,5 +347,11 @@ export const CORE_STABILITY_ROTATION_EXERCISES: Exercise[] = [
       "Führe die Hantel diagonal nach oben über die gegenüberliegende Schulter.",
       "Senke sie kontrolliert zurück und drehe aus Rumpf und Hüfte, nicht aus dem unteren Rücken.",
     ],
+    mistakes: [
+      "Rundrücken unten – in die Knie gehen statt den Rücken zu beugen",
+      "Arme heben die Hantel – Drehung aus Hüfte und Rumpf führt",
+      "Hantel schwingt über – oben kontrolliert stoppen",
+    ],
+    cues: ["Hinteren Fuß mitdrehen", "Arme lang", "Aus den Beinen starten"],
   },
 ];

@@ -28,6 +28,11 @@ const PATTERNS_NEEDED_WITHOUT_GEAR: MovementPattern[] = [
   "core_stability",
 ];
 const MINIMAL_GEAR: Equipment[] = ["resistance_band"];
+/** Typische Fehler und Kurzbefehle: je Übung 2 bis 4 Einträge. */
+const MIN_COACHING_ITEMS = 2;
+const MAX_COACHING_ITEMS = 4;
+/** Kurzbefehle müssen sich im Training mit einem Blick lesen lassen. */
+const MAX_CUE_WORDS = 6;
 
 describe("exercise catalogue", () => {
   it("contains enough exercises with unique kebab-case ids", () => {
@@ -89,6 +94,25 @@ describe("exercise catalogue", () => {
         (exercise) => exercise.pattern === pattern && exercise.priority === 1,
       );
       expect(staples.length, pattern).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it("has typical mistakes and short cues for every exercise", () => {
+    for (const exercise of EXERCISES) {
+      const label = exercise.id;
+      for (const list of [exercise.mistakes, exercise.cues]) {
+        expect(list.length, label).toBeGreaterThanOrEqual(MIN_COACHING_ITEMS);
+        expect(list.length, label).toBeLessThanOrEqual(MAX_COACHING_ITEMS);
+        for (const item of list) {
+          expect(item.trim(), label).toBe(item);
+          expect(item.length, label).toBeGreaterThan(3);
+        }
+        expect(new Set(list.map((item) => item.toLowerCase())).size, label).toBe(list.length);
+      }
+      for (const mistake of exercise.mistakes) expect(mistake, label).toContain(" – ");
+      for (const cue of exercise.cues) {
+        expect(cue.split(/\s+/).length, `${label}: ${cue}`).toBeLessThanOrEqual(MAX_CUE_WORDS);
+      }
     }
   });
 });

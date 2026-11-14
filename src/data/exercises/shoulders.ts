@@ -18,6 +18,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Spanne Bauch und Gesäß an und drücke die Stange gerade über den Kopf.",
       "Senke die Stange kontrolliert zur oberen Brust und vermeide ein Hohlkreuz.",
     ],
+    mistakes: [
+      "Hohlkreuz beim Drücken – Gesäß und Bauch fest anspannen, Rippen unten",
+      "Stange läuft im Bogen um den Kopf – Kopf kurz zurücknehmen, Stange senkrecht führen",
+      "Ellbogen weit hinter der Stange – Unterarme senkrecht unter der Stange",
+    ],
+    cues: ["Rippen runter", "Kopf durchs Fenster", "Stange über Mittelfuß"],
   },
   {
     id: "dumbbell-shoulder-press",
@@ -35,6 +41,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Drücke die Hanteln über den Kopf, bis die Arme fast gestreckt sind.",
       "Senke sie langsam bis auf Ohrhöhe ab und halte den Rücken an der Lehne.",
     ],
+    mistakes: [
+      "Hanteln schlagen oben zusammen – oben knapp auseinander halten, Spannung behalten",
+      "Gesäß rutscht nach vorn – Gesäß und Schultern bleiben an der Lehne",
+      "Zu kurzer Bewegungsweg – jedes Mal bis Ohrhöhe absenken",
+    ],
+    cues: ["Unterarme senkrecht", "Hanteln über die Schultern", "Langsam bis Ohrhöhe"],
   },
   {
     id: "standing-dumbbell-shoulder-press",
@@ -52,6 +64,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Drücke die Hanteln gerade nach oben, Bauch und Gesäß bleiben angespannt.",
       "Senke sie kontrolliert ab und lehne dich nicht nach hinten.",
     ],
+    mistakes: [
+      "Oberkörper kippt nach hinten – Gesäß fest, Rippen nach unten",
+      "Schwung aus den Beinen – Knie bleiben ruhig, sonst wird es ein Push Press",
+      "Hanteln driften nach vorn – Hanteln senkrecht über den Schultern drücken",
+    ],
+    cues: ["Körper wie eine Säule", "Gesäß fest", "Gerade nach oben drücken"],
   },
   {
     id: "arnold-press",
@@ -69,6 +87,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Drücke die Hanteln nach oben und drehe die Handflächen dabei nach vorn.",
       "Senke die Hanteln ab und drehe sie in die Ausgangsposition zurück.",
     ],
+    mistakes: [
+      "Drehung erst ganz oben – Hanteln gleichmäßig während des Drückens drehen",
+      "Ellbogen bleiben vor dem Körper – Ellbogen beim Drehen seitlich öffnen",
+      "Zu schweres Gewicht mit Schwung – leichter wählen und flüssig führen",
+    ],
+    cues: ["Drehen und drücken", "Ellbogen nach außen öffnen", "Unten Handflächen zu dir"],
   },
   {
     id: "shoulder-press-machine",
@@ -86,6 +110,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Drücke die Griffe nach oben, ohne die Ellbogen ganz durchzustrecken.",
       "Senke die Griffe langsam ab und halte den Rücken am Polster.",
     ],
+    mistakes: [
+      "Sitz zu tief oder zu hoch – Griffe starten etwa auf Schulterhöhe",
+      "Ellbogen oben durchgedrückt – kurz vor dem Strecken umkehren",
+      "Gewicht unten abgelegt – kurz vor dem Aufsetzen wieder drücken",
+    ],
+    cues: ["Rücken ans Polster", "Beide Seiten gleichmäßig", "Langsam ablassen"],
   },
   {
     id: "smith-machine-shoulder-press",
@@ -103,6 +133,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Entriegle die Stange und drücke sie nach oben, bis die Arme fast gestreckt sind.",
       "Senke sie bis auf Kinnhöhe ab und verriegle sie nach dem Satz.",
     ],
+    mistakes: [
+      "Bank falsch platziert – Stange muss knapp vor dem Gesicht laufen",
+      "Stange hinter den Kopf geführt – vor dem Gesicht bleiben, das schont die Schulter",
+      "Ellbogen weit nach hinten gedreht – Ellbogen leicht vor dem Körper halten",
+    ],
+    cues: ["Kinn leicht zurück", "Ellbogen unter der Stange", "Kontrolliert bis Kinnhöhe"],
   },
   {
     id: "kettlebell-overhead-press",
@@ -121,6 +157,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Drücke sie senkrecht über den Kopf und spanne den Rumpf fest an.",
       "Senke sie kontrolliert zurück vor die Schulter.",
     ],
+    mistakes: [
+      "Handgelenk knickt nach hinten – Griff tief in die Handfläche, Handgelenk gerade",
+      "Ausweichen zur Seite – Gesäß und Bauch fest, Hüfte bleibt gerade",
+      "Ellbogen zeigt beim Start nach außen – Ellbogen vor dem Körper, dann drücken",
+    ],
+    cues: ["Faust fest", "Freie Hand zur Faust", "Bizeps neben das Ohr"],
   },
   {
     id: "pike-push-up",
@@ -138,6 +180,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Beuge die Arme und senke den Kopf zwischen die Hände Richtung Boden.",
       "Drücke dich wieder hoch und halte die Hüfte dabei oben.",
     ],
+    mistakes: [
+      "Hüfte sinkt ab – Hüfte hoch, Gewicht über die Hände bringen",
+      "Ellbogen weit abgespreizt – Ellbogen leicht nach hinten führen",
+      "Kopf senkt sich direkt zwischen die Hände – Kopf vor die Hände, Dreieck bilden",
+    ],
+    cues: ["Hüfte hoch", "Kopf vor die Hände", "Boden wegdrücken"],
   },
   {
     id: "incline-pike-push-up",
@@ -155,6 +203,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Beuge die Arme und führe den Kopf Richtung Kante.",
       "Drücke dich zurück in die Ausgangsposition und halte den Rücken gerade.",
     ],
+    mistakes: [
+      "Erhöhung rutscht oder kippt – nur feste, rutschfeste Unterlage nutzen",
+      "Hüfte zu tief – Oberkörper möglichst steil über die Hände bringen",
+      "Nur genickt statt gebeugt – Arme wirklich beugen, Kopf zur Kante",
+    ],
+    cues: ["Hüfte über die Hände", "Stirn Richtung Kante", "Hände fest drücken"],
   },
   {
     id: "wall-handstand-push-up",
@@ -172,6 +226,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Senke den Kopf kontrolliert Richtung Boden, am besten auf eine weiche Unterlage.",
       "Drücke dich wieder hoch, bis die Arme gestreckt sind, und halte den Rumpf fest.",
     ],
+    mistakes: [
+      "Hohlkreuz an der Wand – Bauch und Gesäß fest, Rippen einziehen",
+      "Kopf setzt ungebremst auf – langsam absenken, weiche Unterlage nutzen",
+      "Ohne Vorstufen versucht – erst Pike-Liegestütz und Handstand sicher beherrschen",
+    ],
+    cues: ["Körper lang und fest", "Langsam absenken", "Boden wegdrücken"],
   },
   {
     id: "band-overhead-press",
@@ -189,6 +249,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Drücke die Hände gerade über den Kopf, bis die Arme fast gestreckt sind.",
       "Senke die Hände langsam zurück und spanne den Bauch an.",
     ],
+    mistakes: [
+      "Band zu kurz gegriffen – Spannung so wählen, dass die Arme oben fast strecken",
+      "Hohlkreuz am Ende – Rippen nach unten, Gesäß fest",
+      "Band zieht die Hände zurück – auch das Absenken langsam führen",
+    ],
+    cues: ["Rippen runter", "Gerade nach oben", "Langsam zurück"],
   },
   {
     id: "dumbbell-lateral-raise",
@@ -206,6 +272,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Hebe die Arme seitlich an, bis sie etwa auf Schulterhöhe sind.",
       "Senke die Hanteln langsam ab und zieh die Schultern nicht hoch.",
     ],
+    mistakes: [
+      "Schwung aus dem Oberkörper – leichteres Gewicht, Oberkörper ruhig",
+      "Schultern ziehen zu den Ohren – Schultern tief, Hals lang",
+      "Hände höher als die Ellbogen – Ellbogen führen, Hände folgen",
+    ],
+    cues: ["Ellbogen führen", "Weit nach außen", "Schultern weg von Ohren"],
   },
   {
     id: "cable-lateral-raise",
@@ -224,6 +296,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Hebe den Arm seitlich bis auf Schulterhöhe, der Ellbogen bleibt leicht gebeugt.",
       "Senke den Arm kontrolliert ab und halte den Oberkörper ruhig.",
     ],
+    mistakes: [
+      "Oberkörper lehnt zur Seite – aufrecht bleiben, freie Hand stützt leicht",
+      "Ruckartiger Start – aus der Dehnung langsam anheben",
+      "Schulter zieht nach oben – Schulter tief halten, mit dem Ellbogen führen",
+    ],
+    cues: ["Ellbogen nach außen", "Spannung unten halten", "Schulter bleibt tief"],
   },
   {
     id: "lateral-raise-machine",
@@ -241,6 +319,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Hebe die Arme seitlich bis auf Schulterhöhe.",
       "Lass die Polster langsam zurück, ohne das Gewicht abzusetzen.",
     ],
+    mistakes: [
+      "Sitzhöhe falsch – Schultergelenk auf Höhe der Drehachse",
+      "Mit den Händen gezogen – mit den Ellbogen gegen die Polster drücken",
+      "Schultern ziehen hoch – Schultern tief, Brust aufrecht",
+    ],
+    cues: ["Ellbogen ins Polster", "Schultern tief", "Langsam zurück"],
   },
   {
     id: "band-lateral-raise",
@@ -258,6 +342,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Hebe die leicht gebeugten Arme seitlich bis auf Schulterhöhe.",
       "Senke die Arme langsam ab und halte die Schultern tief.",
     ],
+    mistakes: [
+      "Band zu straff – Spannung so wählen, dass du Schulterhöhe sauber erreichst",
+      "Schwung aus den Knien – Beine und Oberkörper bleiben ruhig",
+      "Handgelenke abgeknickt – Handgelenke gerade, Ellbogen führen",
+    ],
+    cues: ["Ellbogen führen", "Schultern tief", "Oben kurz halten"],
   },
   {
     id: "dumbbell-front-raise",
@@ -275,6 +365,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Hebe die fast gestreckten Arme nach vorn bis auf Schulterhöhe.",
       "Senke die Hanteln kontrolliert ab und hole keinen Schwung aus dem Rücken.",
     ],
+    mistakes: [
+      "Oberkörper lehnt nach hinten – Bauch fest, Knie leicht gebeugt",
+      "Hanteln weit über Kopfhöhe – auf Schulterhöhe stoppen",
+      "Schultern ziehen hoch – Schultern tief und hinten halten",
+    ],
+    cues: ["Arme fast gestreckt", "Bis Schulterhöhe", "Oberkörper ruhig"],
   },
   {
     id: "upright-row",
@@ -292,6 +388,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Ziehe die Stange nah am Körper nach oben, bis die Ellbogen auf Schulterhöhe sind.",
       "Senke die Stange langsam ab und zieh die Ellbogen nicht über Schulterhöhe.",
     ],
+    mistakes: [
+      "Zu enger Griff – mindestens schulterbreit greifen, das schont die Schulter",
+      "Handgelenke stark abgeknickt – Ellbogen führen, Hände folgen",
+      "Schmerzen im Schultergelenk übergangen – Bewegung verkürzen oder auf Seitheben ausweichen",
+    ],
+    cues: ["Ellbogen führen", "Stange nah am Körper", "Bis Schulterhöhe"],
   },
   {
     id: "reverse-pec-deck",
@@ -309,6 +411,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Führe die Arme mit leicht gebeugten Ellbogen in einem Bogen nach hinten.",
       "Bringe die Arme langsam wieder nach vorn und halte die Schultern unten.",
     ],
+    mistakes: [
+      "Schulterblätter stark zusammengezogen – Arme nur bis zur Körperlinie führen",
+      "Ellbogen beugen sich zunehmend – Armwinkel über den ganzen Satz gleich halten",
+      "Brust löst sich vom Polster – Brust bleibt angelehnt, kein Schwung",
+    ],
+    cues: ["Arme weit nach außen", "Brust ans Polster", "Breit ziehen, nicht zusammen"],
   },
   {
     id: "dumbbell-reverse-fly",
@@ -326,6 +434,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Hebe die leicht gebeugten Arme seitlich an, bis sie auf Schulterhöhe sind.",
       "Senke die Hanteln langsam ab und hole keinen Schwung.",
     ],
+    mistakes: [
+      "Oberkörper richtet sich beim Heben auf – Rückenwinkel konstant halten",
+      "Rundrücken – Brust raus, Hüfte nach hinten schieben",
+      "Zu schweres Gewicht – leicht wählen, sauber bis Schulterhöhe heben",
+    ],
+    cues: ["Hände breit nach außen", "Rücken bleibt flach", "Ellbogen nach außen"],
   },
   {
     id: "face-pull",
@@ -343,6 +457,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Ziehe das Seil zum Gesicht und führe die Ellbogen hoch und nach außen.",
       "Strecke die Arme langsam wieder und halte den Oberkörper aufrecht.",
     ],
+    mistakes: [
+      "Oberkörper lehnt sich zurück – Gewicht reduzieren, aufrecht stehen",
+      "Ellbogen fallen nach unten – Ellbogen auf Schulterhöhe halten",
+      "Seil zieht zum Hals – Seilenden neben die Ohren auseinanderziehen",
+    ],
+    cues: ["Seil auseinanderziehen", "Ellbogen hoch", "Hände neben die Ohren"],
   },
   {
     id: "cable-reverse-fly",
@@ -360,6 +480,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Ziehe die fast gestreckten Arme seitlich nach hinten auseinander.",
       "Führe die Arme kontrolliert vor dem Körper zurück.",
     ],
+    mistakes: [
+      "Arme beugen sich zum Rudern – Ellbogenwinkel konstant halten",
+      "Schultern ziehen hoch – Schultern tief, Hals lang",
+      "Oberkörper schwingt nach hinten – Rumpf fest, nur die Arme bewegen",
+    ],
+    cues: ["Weit auseinander", "Schultern tief", "Langsam zurück"],
   },
   {
     id: "band-pull-apart",
@@ -377,6 +503,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Ziehe das Band auseinander, bis es die Brust berührt, und drücke die Schulterblätter zusammen.",
       "Führe die Arme langsam zurück und zieh die Schultern nicht hoch.",
     ],
+    mistakes: [
+      "Hohlkreuz beim Auseinanderziehen – Rippen runter, Bauch fest",
+      "Arme stark gebeugt – Arme fast gestreckt lassen",
+      "Band schnellt zurück – Rückweg genauso langsam führen",
+    ],
+    cues: ["Band zur Brust", "Arme lang", "Rippen runter"],
   },
   {
     id: "band-face-pull",
@@ -394,6 +526,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Ziehe die Hände seitlich neben das Gesicht, die Ellbogen bleiben hoch.",
       "Strecke die Arme langsam wieder nach vorn.",
     ],
+    mistakes: [
+      "Band zu tief befestigt – Ankerpunkt etwa auf Gesichtshöhe",
+      "Ellbogen sinken ab – Ellbogen auf Schulterhöhe halten",
+      "Kopf wandert zum Band – Kopf bleibt neutral, Hände kommen zu dir",
+    ],
+    cues: ["Ellbogen hoch", "Hände neben die Ohren", "Brust aufrecht"],
   },
   {
     id: "prone-y-raise",
@@ -411,6 +549,12 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Hebe die Arme mit den Daumen nach oben so weit wie möglich vom Boden.",
       "Halte kurz, senke die Arme langsam ab und lass die Stirn nah am Boden.",
     ],
+    mistakes: [
+      "Kopf in den Nacken gezogen – Blick zum Boden, Nacken lang",
+      "Schultern ziehen zu den Ohren – Schulterblätter nach unten hinten",
+      "Schwung oder Zucken – langsam heben, oben kurz halten",
+    ],
+    cues: ["Daumen nach oben", "Schulterblätter nach unten", "Arme lang machen"],
   },
   {
     id: "suspension-face-pull",
@@ -428,5 +572,11 @@ export const SHOULDER_EXERCISES: Exercise[] = [
       "Ziehe die Hände neben die Ohren und führe die Ellbogen hoch und nach außen.",
       "Strecke die Arme kontrolliert und halte den Körper gerade.",
     ],
+    mistakes: [
+      "Hüfte hängt durch – Körper wie ein Brett, Gesäß fest",
+      "Ellbogen sinken ab – Ellbogen auf Schulterhöhe ziehen",
+      "Zu flacher Winkel zu früh – mit steilerem Stand beginnen und steigern",
+    ],
+    cues: ["Gesäß fest", "Ellbogen hoch", "Hände neben die Ohren"],
   },
 ];

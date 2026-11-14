@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Trash2Icon } from "lucide-react";
 import {
@@ -18,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Chip } from "@/components/forms/choice";
 import { SET_TYPES } from "@/domain/training/types";
+import { CueList, MistakeList } from "../exercise-coaching";
 import { ExerciseNoteForm } from "../exercise-note-form";
 import type { ExerciseDraft, SetDraft } from "./workout-state";
 
@@ -97,6 +99,44 @@ export function ExerciseNoteDialog({ exercise, onSaved, onClose }: ExerciseNoteD
               onClose();
             }}
           />
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface ExerciseInfoDialogProps {
+  exercise: ExerciseDraft | null;
+  onClose: () => void;
+}
+
+/** Kurzbefehle groß oben, typische Fehler darunter; die ganze Anleitung bleibt einen Tipp entfernt. */
+export function ExerciseInfoDialog({ exercise, onClose }: ExerciseInfoDialogProps) {
+  const t = useTranslations("training.library");
+  const hasCoaching = exercise !== null && (exercise.cues.length > 0 || exercise.mistakes.length > 0);
+  return (
+    <Dialog open={exercise !== null} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-h-[85dvh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="pr-8">{exercise?.name ?? ""}</DialogTitle>
+          {hasCoaching ? null : <DialogDescription>{t("noInstructions")}</DialogDescription>}
+        </DialogHeader>
+        {exercise && exercise.cues.length > 0 ? (
+          <section className="grid gap-2">
+            <h3 className="text-sm font-medium">{t("cues")}</h3>
+            <CueList cues={exercise.cues} />
+          </section>
+        ) : null}
+        {exercise && exercise.mistakes.length > 0 ? (
+          <section className="grid gap-2">
+            <h3 className="text-sm font-medium">{t("mistakes")}</h3>
+            <MistakeList mistakes={exercise.mistakes} />
+          </section>
+        ) : null}
+        {exercise ? (
+          <Button asChild variant="outline">
+            <Link href={`/training/exercises/${exercise.exerciseId}`}>{t("fullGuide")}</Link>
+          </Button>
         ) : null}
       </DialogContent>
     </Dialog>

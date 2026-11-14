@@ -40,6 +40,9 @@ function toExercise(row: CustomRow): Exercise {
     difficulty: "beginner",
     priority: 2,
     instructions: row.note ? row.note.split("\n").filter((line) => line.trim() !== "") : [],
+    // Fehler und Kurzbefehle gibt es nur für die eingebaute Bibliothek.
+    mistakes: [],
+    cues: [],
     custom: true,
     archived: row.archivedAt !== null,
   };

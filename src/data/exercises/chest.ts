@@ -18,6 +18,13 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Ziehe die Schulterblätter nach hinten unten und senke die Stange kontrolliert zur unteren Brust.",
       "Drücke die Stange nach oben, bis die Arme gestreckt sind, und lass das Gesäß dabei auf der Bank.",
     ],
+    mistakes: [
+      "Stange prallt von der Brust ab – kurz kontrolliert aufsetzen, dann drücken",
+      "Ellbogen weit abgespreizt – Ellbogen etwa 45 bis 70 Grad zum Oberkörper",
+      "Handgelenke nach hinten abgeknickt – Stange über dem Unterarm halten",
+      "Schwer ohne Sicherung trainieren – Sicherheitsablagen einstellen oder Partner sichern lassen",
+    ],
+    cues: ["Schulterblätter nach hinten unten", "Füße fest in den Boden", "Stange zur unteren Brust"],
   },
   {
     id: "incline-barbell-bench-press",
@@ -35,6 +42,13 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Senke die Stange kontrolliert zur oberen Brust, die Ellbogen zeigen leicht schräg nach außen.",
       "Drücke die Stange gerade nach oben und halte die Schulterblätter fest zusammengezogen.",
     ],
+    mistakes: [
+      "Bank zu steil eingestellt – etwa 30 Grad, sonst übernimmt die Schulter",
+      "Stange landet auf der Brustmitte – zur oberen Brust unter dem Schlüsselbein führen",
+      "Starkes Hohlkreuz macht die Bank flach – Gesäß und oberen Rücken auf der Bank lassen",
+      "Schwer ohne Sicherung trainieren – Sicherheitsablagen einstellen oder Partner sichern lassen",
+    ],
+    cues: ["Brust zur Stange heben", "Stange zum Schlüsselbein", "Unterarme senkrecht"],
   },
   {
     id: "decline-barbell-bench-press",
@@ -52,6 +66,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Senke die Stange kontrolliert zur unteren Brust.",
       "Drücke sie wieder nach oben und lass dir die Stange bei schweren Gewichten von einem Partner anreichen.",
     ],
+    mistakes: [
+      "Stange wandert Richtung Hals – zur unteren Brust senken",
+      "Daumen nicht um die Stange – Stange immer mit vollem Griff umschließen",
+      "Schulterblätter lösen sich – vor dem Ausheben fest zusammenziehen",
+    ],
+    cues: ["Schulterblätter nach hinten", "Unterarme senkrecht", "Langsam ablassen"],
   },
   {
     id: "dumbbell-bench-press",
@@ -69,6 +89,13 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Drücke beide Hanteln nach oben, bis die Arme fast gestreckt sind.",
       "Senke sie langsam ab, bis die Oberarme etwa auf Höhe der Bank sind, und halte die Schulterblätter zusammen.",
     ],
+    mistakes: [
+      "Hanteln am Satzende seitlich fallen lassen – zur Brust nehmen und kontrolliert absetzen",
+      "Hanteln oben zusammenschlagen – über den Schultern ohne Kontakt stoppen",
+      "Ellbogen in einer Linie mit den Schultern – Ellbogen etwa 45 Grad zum Körper",
+      "Handgelenke abgeknickt – Unterarme senkrecht unter den Hanteln",
+    ],
+    cues: ["Hanteln mit den Knien hochbringen", "Brust raus", "Unterarme senkrecht"],
   },
   {
     id: "incline-dumbbell-bench-press",
@@ -86,6 +113,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Drücke die Hanteln senkrecht nach oben, bis die Arme fast gestreckt sind.",
       "Senke sie kontrolliert ab und halte die Handgelenke über den Ellbogen.",
     ],
+    mistakes: [
+      "Bank zu steil – höchstens 45 Grad, sonst arbeitet vor allem die Schulter",
+      "Rücken löst sich vom Polster – Schulterblätter und Gesäß fest auf der Bank",
+      "Nur halbe Wiederholungen – Hanteln bis auf Höhe der oberen Brust senken",
+    ],
+    cues: ["Brust hoch", "Ellbogen unter die Hanteln", "Schulterblätter in die Bank"],
   },
   {
     id: "dumbbell-floor-press",
@@ -103,6 +136,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Senke die Hanteln, bis die Oberarme den Boden leicht berühren.",
       "Drücke sie ohne Schwung wieder nach oben und halte die Handgelenke gerade.",
     ],
+    mistakes: [
+      "Ellbogen prallen auf den Boden – Oberarme sanft ablegen",
+      "Ellbogen seitlich abgespreizt – etwa 45 Grad zum Körper",
+      "Spannung am Boden verloren – kurz pausieren, Spannung halten, dann drücken",
+    ],
+    cues: ["Füße flach aufstellen", "Kurz am Boden pausieren", "Hanteln über die Brust"],
   },
   {
     id: "smith-machine-bench-press",
@@ -120,6 +159,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Entriegle die Stange und senke sie kontrolliert bis knapp über die Brust.",
       "Drücke sie nach oben und verriegle sie am Ende des Satzes sicher in den Haken.",
     ],
+    mistakes: [
+      "Sicherheitsstopps nicht eingestellt – Anschläge knapp unter Brusthöhe setzen",
+      "Stange prallt von der Brust ab – knapp über der Brust kontrolliert umkehren",
+      "Gesäß hebt von der Bank ab – Füße fest aufsetzen, Gesäß bleibt liegen",
+    ],
+    cues: ["Schulterblätter zusammen", "Füße fest in den Boden", "Langsam runter, kräftig hoch"],
   },
   {
     id: "chest-press-machine",
@@ -137,6 +182,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Drücke die Griffe nach vorn, bis die Arme fast gestreckt sind, der Rücken bleibt am Polster.",
       "Führe die Griffe langsam zurück, ohne das Gewicht abzusetzen.",
     ],
+    mistakes: [
+      "Schultern rollen nach vorn – Schulterblätter am Polster lassen",
+      "Ellbogen am Ende ruckartig durchgedrückt – kurz vor der Streckung stoppen",
+      "Handgelenke abgeknickt – Handgelenke gerade hinter den Griffen",
+    ],
+    cues: ["Brust raus", "Schulterblätter ans Polster", "Langsam zurück"],
   },
   {
     id: "incline-chest-press-machine",
@@ -154,6 +205,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Drücke die Griffe schräg nach oben, ohne die Ellbogen ganz durchzustrecken.",
       "Lass die Griffe kontrolliert zurückkommen und halte die Schultern unten.",
     ],
+    mistakes: [
+      "Rücken löst sich vom Polster – Gesäß und Schulterblätter angelehnt lassen",
+      "Zu kurzer Bewegungsweg – Griffe bis zu einer leichten Dehnung in der Brust zurückführen",
+      "Ein Arm drückt stärker – beide Griffe gleichmäßig führen",
+    ],
+    cues: ["Brust hoch", "Schultern weg von den Ohren", "Griffe schräg nach oben"],
   },
   {
     id: "push-up",
@@ -171,6 +228,13 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Senke den Körper als gerade Linie ab, bis die Brust fast den Boden berührt.",
       "Drücke dich wieder hoch und halte Bauch und Gesäß die ganze Zeit angespannt.",
     ],
+    mistakes: [
+      "Hüfte sackt ab oder ragt hoch – Körper bleibt von Kopf bis Ferse eine Linie",
+      "Ellbogen weit seitlich abgespreizt – Ellbogen etwa 45 Grad zum Körper",
+      "Kopf hängt nach unten – Blick leicht vor die Hände, Nacken lang",
+      "Nur halbe Bewegung – Brust bis knapp über den Boden senken",
+    ],
+    cues: ["Körper wie ein Brett", "Boden wegdrücken", "Ellbogen schräg nach hinten"],
   },
   {
     id: "knee-push-up",
@@ -188,6 +252,13 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Senke die Brust Richtung Boden, Oberkörper und Oberschenkel bilden eine Linie.",
       "Drücke dich wieder hoch, ohne die Hüfte nach hinten zu schieben.",
     ],
+    mistakes: [
+      "Hände zu weit vorn – Hände unter oder knapp neben den Schultern aufsetzen",
+      "Ellbogen seitlich abgespreizt – Ellbogen schräg nach hinten führen",
+      "Kopf führt die Bewegung – Brust zuerst Richtung Boden, Kopf in Verlängerung",
+      "Knie schmerzen auf hartem Boden – Matte oder Handtuch unterlegen",
+    ],
+    cues: ["Bauch fest", "Brust zum Boden", "Hüfte gestreckt"],
   },
   {
     id: "incline-push-up",
@@ -205,6 +276,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Senke die Brust zur Kante, der Körper bleibt von Kopf bis Ferse gerade.",
       "Drücke dich wieder hoch und wähle mit der Zeit eine niedrigere Fläche.",
     ],
+    mistakes: [
+      "Unterlage rutscht weg – Bank an die Wand stellen oder fest fixieren",
+      "Hüfte hängt durch – Bauch und Gesäß anspannen",
+      "Ellbogen weit abgespreizt – Ellbogen schräg nach hinten führen",
+    ],
+    cues: ["Bauch fest", "Brust zur Kante", "Kräftig wegdrücken"],
   },
   {
     id: "decline-push-up",
@@ -222,6 +299,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Senke den Oberkörper kontrolliert ab, bis das Gesicht fast den Boden erreicht.",
       "Drücke dich hoch und vermeide ein Hohlkreuz durch feste Bauchspannung.",
     ],
+    mistakes: [
+      "Hüfte sackt ab – Bauch und Gesäß fest, Körper als Linie",
+      "Kopf voran zum Boden – Brust führt, Nacken bleibt lang",
+      "Füße rutschen von der Erhöhung – stabile, rutschfeste Erhöhung wählen",
+    ],
+    cues: ["Gesäß fest", "Brust zum Boden", "Ellbogen leicht angelegt"],
   },
   {
     id: "band-chest-press",
@@ -239,6 +322,13 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Drücke die Hände nach vorn, bis die Arme fast gestreckt sind.",
       "Führe die Hände langsam zurück und halte den Rumpf stabil.",
     ],
+    mistakes: [
+      "Band rutscht am Rücken – unter den Achseln über die Schulterblätter führen",
+      "Schultern schieben sich am Ende nach vorn – Schulterblätter hinten lassen",
+      "Band schnellt zurück – Rückweg genauso langsam wie das Drücken",
+      "Hohlkreuz im Stand – Schrittstellung einnehmen, Bauch fest",
+    ],
+    cues: ["Bauch fest", "Hände auf Brusthöhe", "Langsam gegen das Band"],
   },
   {
     id: "suspension-push-up",
@@ -256,6 +346,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Senke die Brust zwischen die Hände und halte den Körper gerade.",
       "Drücke dich zurück und halte die Griffe dabei möglichst ruhig.",
     ],
+    mistakes: [
+      "Griffe driften auseinander – Hände aktiv zueinander ziehen",
+      "Hüfte sackt durch – Bauch und Gesäß fest, Körper als Linie",
+      "Zu tief abgesenkt, die Schulter zieht – nur bis die Hände neben der Brust sind",
+    ],
+    cues: ["Körper wie ein Brett", "Griffe ruhig halten", "Brust zwischen die Hände"],
   },
   {
     id: "dip",
@@ -273,6 +369,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Senke dich ab, bis die Oberarme etwa parallel zum Boden sind.",
       "Drücke dich wieder hoch und zieh die Schultern nicht zu den Ohren.",
     ],
+    mistakes: [
+      "Zu tief abgesenkt – nur so tief, wie die Schulter beschwerdefrei bleibt",
+      "Schwung mit den Beinen – Beine ruhig, Bewegung kontrolliert",
+      "Ellbogen weit nach außen – Ellbogen nach hinten führen",
+    ],
+    cues: ["Schultern weg von den Ohren", "Brust leicht nach vorn", "Kontrolliert absenken"],
   },
   {
     id: "assisted-dip-machine",
@@ -290,6 +392,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Senke dich ab, bis die Oberarme etwa parallel zum Boden sind.",
       "Drücke dich hoch, bis die Arme gestreckt sind, und halte die Schultern unten.",
     ],
+    mistakes: [
+      "Unterstützung bleibt immer gleich – Gegengewicht schrittweise reduzieren",
+      "Schwung aus dem Polster nutzen – unten kurz stoppen, dann drücken",
+      "Zu tief abgesenkt – nur so tief, wie die Schulter beschwerdefrei bleibt",
+    ],
+    cues: ["Schultern tief", "Brust leicht nach vorn", "Langsam absenken"],
   },
   {
     id: "dumbbell-fly",
@@ -307,6 +415,13 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Öffne die Arme in einem weiten Bogen, bis du eine Dehnung in der Brust spürst.",
       "Führe die Hanteln im gleichen Bogen zurück und halte den Ellbogenwinkel konstant.",
     ],
+    mistakes: [
+      "Arme zu tief geöffnet – nur bis die Ellbogen etwa auf Bankhöhe sind",
+      "Bewegung wird zum Drücken – Gewicht senken, Ellbogenwinkel halten",
+      "Hanteln oben zusammenschlagen – über der Brust ohne Kontakt stoppen",
+      "Schultern heben sich von der Bank – Schulterblätter zusammen und unten",
+    ],
+    cues: ["Wie einen Baum umarmen", "Ellbogen leicht gebeugt", "Dehnung in der Brust"],
   },
   {
     id: "incline-dumbbell-fly",
@@ -324,6 +439,13 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Senke die Arme mit leicht gebeugten Ellbogen seitlich ab.",
       "Führe die Hanteln über der Brust wieder zusammen, ohne Schwung zu holen.",
     ],
+    mistakes: [
+      "Bank zu steil – etwa 30 Grad, sonst übernimmt die vordere Schulter",
+      "Arme zu tief abgesenkt – nur bis zu einer deutlichen Dehnung in der Brust",
+      "Ellbogen strecken sich beim Absenken – Winkel konstant leicht gebeugt",
+      "Hanteln driften Richtung Gesicht – Bogen über der oberen Brust führen",
+    ],
+    cues: ["Weiter Bogen", "Wie einen Baum umarmen", "Oben Brust anspannen"],
   },
   {
     id: "cable-crossover",
@@ -341,6 +463,13 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Führe die Hände mit leicht gebeugten Armen in einem Bogen vor dem Körper zusammen.",
       "Lass die Arme langsam zurück nach außen und halte den Oberkörper ruhig.",
     ],
+    mistakes: [
+      "Oberkörper pumpt mit – Schrittstellung, Rumpf fest",
+      "Arme beugen sich zum Drücken – Ellbogenwinkel gleich halten",
+      "Schultern rollen nach vorn – Brust raus, Schulterblätter hinten",
+      "Arme zu weit nach hinten gelassen – nur bis die Hände auf Körperhöhe sind",
+    ],
+    cues: ["Brust raus", "Hände vor dem Körper zusammen", "Langsam öffnen"],
   },
   {
     id: "low-to-high-cable-fly",
@@ -358,6 +487,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Führe die Hände mit leicht gebeugten Armen von unten nach oben bis auf Brusthöhe zusammen.",
       "Senke die Arme kontrolliert ab, ohne die Schultern hochzuziehen.",
     ],
+    mistakes: [
+      "Bizeps zieht mit – Arme leicht gebeugt, Winkel nicht verändern",
+      "Hände steigen über Kopfhöhe – auf Höhe der oberen Brust enden",
+      "Schwung aus dem Oberkörper – Rumpf fest, Bewegung nur aus den Schultern",
+    ],
+    cues: ["Hände nach oben schöpfen", "Brust hoch", "Oben kurz halten"],
   },
   {
     id: "pec-deck",
@@ -375,6 +510,12 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Führe die Arme vor der Brust zusammen und halte kurz die Spannung.",
       "Öffne die Arme langsam, nur so weit, wie es für die Schultern angenehm ist.",
     ],
+    mistakes: [
+      "Kopf und Schultern lösen sich vom Polster – Rücken angelehnt lassen",
+      "Gewichtsplatten schlagen an – Arme langsam öffnen, Spannung halten",
+      "Schultern ziehen nach vorn oben – Schultern tief, Brust raus",
+    ],
+    cues: ["Brust raus", "Vorn kurz zusammendrücken", "Langsam öffnen"],
   },
   {
     id: "band-chest-fly",
@@ -392,5 +533,11 @@ export const CHEST_EXERCISES: Exercise[] = [
       "Führe die fast gestreckten Arme in einem Bogen vor der Brust zusammen.",
       "Öffne die Arme langsam wieder, bis du eine leichte Dehnung spürst.",
     ],
+    mistakes: [
+      "Band ungesichert an der Tür – Türanker nutzen und Tür schließen",
+      "Arme werden zum Drücken gebeugt – Ellbogenwinkel konstant halten",
+      "Band zu stark, die Arme knicken ein – leichteres Band wählen oder näher zum Anker gehen",
+    ],
+    cues: ["Weiter Bogen", "Brust raus", "Langsam öffnen"],
   },
 ];

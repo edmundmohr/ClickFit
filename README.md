@@ -129,6 +129,11 @@ Typprüfung nicht an ihnen scheitert.
 
 - **Übungsbibliothek:** 232 Übungen liegen als Daten im Code (`src/data/exercises`). Sie brauchen
   keinen Seed und keine Migration. Trainingsdaten verweisen über die Kennung der Übung darauf.
+- **Ausführungshinweise:** Jede eingebaute Übung hat neben der Anleitung 2–4 typische Fehler
+  (`mistakes`, Format „Fehler – Korrektur“) und 2–4 Kurzbefehle (`cues`, höchstens etwa fünf
+  Wörter). Die Übungsseite zeigt sie als eigene Abschnitte, im Trainingsmodus öffnet das
+  Info-Symbol sie als Dialog, ohne das Training zu verlassen. Eigene Übungen haben keine.
+  `tests/domain/exercise-catalog.test.ts` prüft Anzahl, Format und Dubletten.
 - **Fragebogen:** unter `/onboarding`. Daraus entsteht der Plan; „Plan neu erstellen“ erzeugt ihn
   aus dem gespeicherten Profil erneut.
 - **Plan-Generator:** `src/domain/training/plan-generator`. Gleiche Eingaben ergeben immer

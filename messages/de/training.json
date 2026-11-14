@@ -195,6 +195,9 @@
     "deleteCustomText": "Die Übung verschwindet aus der Auswahl. Bereits geloggte Trainings behalten sie.",
     "customDeleted": "Übung gelöscht.",
     "noInstructions": "Für diese Übung ist keine Anleitung hinterlegt.",
+    "cues": "Kurzbefehle",
+    "mistakes": "Typische Fehler",
+    "fullGuide": "Ganze Anleitung und Alternativen",
     "pattern": "Bewegung"
   },
   "history": {

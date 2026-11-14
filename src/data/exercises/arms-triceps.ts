@@ -18,6 +18,13 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Drücke die Stange nach unten, bis die Arme gestreckt sind.",
       "Lass die Stange langsam bis auf Brusthöhe zurück, die Oberarme bleiben ruhig.",
     ],
+    mistakes: [
+      "Oberkörper beugt sich über die Stange – aufrecht stehen, nur leicht vorgeneigt",
+      "Schultern drücken mit – Schultern tief und hinten halten",
+      "Handgelenke knicken ab – Handgelenke gerade, Druck über die Handballen",
+      "Stange schnellt nach oben – nur bis etwa Brusthöhe zurücklassen",
+    ],
+    cues: ["Ellbogen festnageln", "Unten ganz strecken", "Langsam hoch"],
   },
   {
     id: "rope-pushdown",
@@ -35,6 +42,12 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Drücke das Seil nach unten und ziehe die Enden unten leicht auseinander.",
       "Führe das Seil kontrolliert zurück, ohne die Ellbogen nach vorn wandern zu lassen.",
     ],
+    mistakes: [
+      "Ellbogen spreizen nach außen – Ellbogen eng an den Seiten",
+      "Ganzer Körper drückt mit – Oberkörper ruhig, nur die Unterarme bewegen",
+      "Hände kommen zu hoch zurück – nur bis die Unterarme etwa waagerecht sind",
+    ],
+    cues: ["Seil unten auseinander", "Ellbogen am Körper", "Unten Trizeps anspannen"],
   },
   {
     id: "overhead-cable-triceps-extension",
@@ -52,6 +65,12 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Strecke die Arme nach vorn oben, die Oberarme bleiben neben dem Kopf.",
       "Beuge die Arme langsam zurück und halte den Rumpf stabil.",
     ],
+    mistakes: [
+      "Ellbogen spreizen weit auseinander – Ellbogen etwa schulterbreit nach vorn",
+      "Hohlkreuz beim Strecken – Schrittstellung, Bauch fest",
+      "Gewicht zieht die Arme nach hinten – leichter wählen, die Schulter bleibt ruhig",
+    ],
+    cues: ["Ellbogen nach vorn", "Rippen runter", "Volle Dehnung hinten"],
   },
   {
     id: "skull-crusher",
@@ -69,6 +88,13 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Beuge nur die Ellbogen und senke die Stange kontrolliert Richtung Stirn.",
       "Strecke die Arme wieder, die Oberarme bleiben dabei senkrecht.",
     ],
+    mistakes: [
+      "Stange fällt unkontrolliert zur Stirn – langsam senken, Gewicht vorsichtig steigern",
+      "Ellbogen wandern nach außen – Ellbogen schulterbreit halten",
+      "Handgelenke abgeknickt – Handgelenke gerade halten",
+      "Druck im Ellbogen – leichter wählen oder Stange knapp hinter den Kopf senken",
+    ],
+    cues: ["Ellbogen zur Decke", "Langsam zur Stirn", "Oberarme fest"],
   },
   {
     id: "overhead-dumbbell-triceps-extension",
@@ -86,6 +112,13 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Senke die Hantel hinter den Kopf, die Ellbogen zeigen nach vorn oben.",
       "Strecke die Arme wieder und halte die Oberarme nah am Kopf.",
     ],
+    mistakes: [
+      "Hantel locker gegriffen – Hände fest unter die obere Hantelscheibe legen",
+      "Ellbogen klappen nach außen – Ellbogen eng nach vorn oben",
+      "Hohlkreuz – Bauch fest, Rippen nach unten",
+      "Zu kurze Bewegung – tief hinter den Kopf, bis der Trizeps gedehnt ist",
+    ],
+    cues: ["Rippen runter", "Ellbogen nach vorn", "Tief dehnen"],
   },
   {
     id: "triceps-kickback",
@@ -104,6 +137,12 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Strecke den Unterarm nach hinten, bis der Arm gerade ist.",
       "Beuge den Arm langsam zurück, der Oberarm bleibt ruhig.",
     ],
+    mistakes: [
+      "Hantel wird geschwungen – langsam strecken, oben kurz halten",
+      "Rundrücken – Brust raus, mit der freien Hand abstützen",
+      "Arm wird nicht ganz gestreckt – leichteres Gewicht wählen",
+    ],
+    cues: ["Oberarm fest", "Oben kurz halten", "Rücken gerade"],
   },
   {
     id: "close-grip-bench-press",
@@ -121,6 +160,12 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Senke die Stange zur unteren Brust, die Ellbogen bleiben nah am Körper.",
       "Drücke die Stange nach oben und halte die Handgelenke gerade.",
     ],
+    mistakes: [
+      "Griff zu eng, Hände fast aneinander – etwa schulterbreit greifen",
+      "Stange prallt von der Brust ab – kontrolliert aufsetzen, dann drücken",
+      "Schwer ohne Sicherung trainieren – Sicherheitsablagen einstellen oder Partner sichern lassen",
+    ],
+    cues: ["Ellbogen zu den Rippen", "Schulterblätter zusammen", "Stange zur unteren Brust"],
   },
   {
     id: "bench-dip",
@@ -138,6 +183,13 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Beuge die Arme und senke das Gesäß nah an der Bank ab, höchstens bis die Oberarme waagerecht sind.",
       "Drücke dich wieder hoch und lass die Schultern nicht nach vorn kippen.",
     ],
+    mistakes: [
+      "Ellbogen spreizen nach außen – Ellbogen zeigen nach hinten",
+      "Mit den Beinen hochdrücken – Beine nur zur Balance, die Arme arbeiten",
+      "Finger zeigen zur Seite – Finger nach vorn um die Bankkante",
+      "Schultern ziehen zu den Ohren – Schultern tief, Brust raus",
+    ],
+    cues: ["Ellbogen nach hinten", "Brust raus", "Nah an der Bank"],
   },
   {
     id: "diamond-push-up",
@@ -155,6 +207,12 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Senke die Brust zu den Händen, die Ellbogen bleiben nah am Körper.",
       "Drücke dich wieder hoch und halte den Körper gerade.",
     ],
+    mistakes: [
+      "Hüfte hängt durch – Bauch und Gesäß fest",
+      "Handgelenke schmerzen – Hände etwas weiter öffnen statt Diamantgriff erzwingen",
+      "Halbe Wiederholungen – Brust bis knapp über die Hände senken",
+    ],
+    cues: ["Ellbogen an die Rippen", "Körper wie ein Brett", "Brust zu den Händen"],
   },
   {
     id: "bodyweight-triceps-extension",
@@ -172,6 +230,13 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Beuge nur die Ellbogen und senke die Stirn Richtung Hände.",
       "Strecke die Arme wieder und halte den Körper wie ein Brett.",
     ],
+    mistakes: [
+      "Hüfte knickt ein – Bauch und Gesäß fest, Körper als Linie",
+      "Ellbogen spreizen nach außen – Ellbogen schulterbreit nach unten",
+      "Zu flache Position für das eigene Niveau – höhere Kante wählen",
+      "Unterlage rutscht – nur feste, rutschfeste Kanten nutzen",
+    ],
+    cues: ["Stirn zu den Händen", "Ellbogen eng", "Bauch fest"],
   },
   {
     id: "band-triceps-pushdown",
@@ -189,6 +254,12 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Drücke die Hände nach unten, bis die Arme gestreckt sind.",
       "Lass die Hände langsam zurückkommen, die Oberarme bleiben ruhig.",
     ],
+    mistakes: [
+      "Band ungesichert befestigt – Türanker nutzen und Tür schließen",
+      "Oberkörper beugt sich mit – aufrecht stehen, nur die Unterarme bewegen",
+      "Band schnellt nach oben – Rückweg langsam führen",
+    ],
+    cues: ["Ellbogen festnageln", "Unten ganz strecken", "Langsam zurück"],
   },
   {
     id: "band-overhead-triceps-extension",
@@ -206,6 +277,12 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Strecke die Arme nach oben, die Ellbogen zeigen nach vorn.",
       "Senke die Hände langsam hinter den Kopf zurück.",
     ],
+    mistakes: [
+      "Hohlkreuz beim Strecken – Bauch fest, Rippen nach unten",
+      "Ellbogen spreizen weit – Ellbogen nah am Kopf",
+      "Band rutscht unter dem Fuß weg – Fuß mittig und fest auf das Band",
+    ],
+    cues: ["Ellbogen zur Decke", "Bauch fest", "Oben ganz strecken"],
   },
   {
     id: "triceps-dip-machine",
@@ -223,5 +300,11 @@ export const ARMS_TRICEPS_EXERCISES: Exercise[] = [
       "Drücke die Griffe nach unten, bis die Arme fast gestreckt sind.",
       "Lass die Griffe langsam nach oben und halte die Schultern tief.",
     ],
+    mistakes: [
+      "Ellbogen spreizen nach außen – Ellbogen eng am Körper",
+      "Gewicht schlägt oben an – Griffe langsam zurückführen",
+      "Schultern rollen nach vorn – Brust raus, Schulterblätter hinten",
+    ],
+    cues: ["Brust raus", "Ellbogen am Körper", "Unten Trizeps anspannen"],
   },
 ];

@@ -45,6 +45,9 @@ export interface WorkoutExerciseView {
   /** Stange und Scheiben für den Scheiben-Rechner; `null` bei Übungen ohne Scheiben. */
   bar: BarSetup | null;
   note: string;
+  /** Kurzbefehle und typische Fehler aus der Bibliothek; bei eigenen Übungen leer. */
+  cues: string[];
+  mistakes: string[];
   previous: PreviousPerformance | null;
   bests: ExerciseBests | null;
   sets: WorkoutSetView[];
@@ -128,6 +131,8 @@ export async function getWorkoutView(
           incrementKg: ladder.incrementKg,
           bar: usesPlates(exercise.equipment) ? barSetupOf(gym, ladder.unit) : null,
           note: notes.get(row.exerciseId) ?? "",
+          cues: exercise.cues,
+          mistakes: exercise.mistakes,
           previous: previous.get(row.exerciseId) ?? null,
           bests: bests.get(row.exerciseId) ?? null,
           sets: setRows

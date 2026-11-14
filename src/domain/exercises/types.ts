@@ -122,6 +122,10 @@ export interface Exercise {
   unilateral?: boolean;
   /** Kurze Anleitung auf Deutsch, ein Schritt pro Eintrag. */
   instructions: string[];
+  /** Typische Ausführungsfehler mit Korrektur („Fehler – Korrektur“). Bei eigenen Übungen leer. */
+  mistakes: string[];
+  /** Kurzbefehle fürs Training, höchstens etwa fünf Wörter. Bei eigenen Übungen leer. */
+  cues: string[];
   /** Vom Nutzer selbst angelegte Übung. */
   custom?: boolean;
   /** Gelöschte eigene Übung: nur noch für den Verlauf sichtbar. */

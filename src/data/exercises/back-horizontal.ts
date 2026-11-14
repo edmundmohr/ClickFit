@@ -18,6 +18,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe die Stange zum Bauchnabel und führe die Ellbogen eng nach hinten.",
       "Senke die Stange kontrolliert ab und halte den Rücken die ganze Zeit gerade.",
     ],
+    mistakes: [
+      "Rundrücken – Brust raus, Hüfte nach hinten, Rücken neutral",
+      "Oberkörper richtet sich beim Ziehen auf – Rückenwinkel konstant halten",
+      "Schwung aus Hüfte und Knien – Gewicht reduzieren, sauber ziehen",
+    ],
+    cues: ["Brust raus", "Ellbogen nach hinten", "Stange zum Bauchnabel"],
   },
   {
     id: "t-bar-row",
@@ -35,6 +41,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Beuge dich mit geradem Rücken vor und ziehe das beladene Ende zur Brust.",
       "Senke das Gewicht langsam ab, ohne den Oberkörper aufzurichten.",
     ],
+    mistakes: [
+      "Rundrücken – Brust raus, Rücken neutral halten",
+      "Gewicht mit Hüftschwung hochgerissen – nur aus Rücken und Armen ziehen",
+      "Gewicht unten abgelegt – kurz vor dem Boden umkehren",
+    ],
+    cues: ["Brust raus", "Ellbogen eng", "Schulterblätter zusammen"],
   },
   {
     id: "dumbbell-row",
@@ -53,6 +65,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe die Hantel zur Hüfte und führe den Ellbogen nah am Körper nach hinten.",
       "Senke die Hantel langsam ab und verdrehe den Oberkörper nicht.",
     ],
+    mistakes: [
+      "Oberkörper dreht auf – Schultern und Hüfte parallel zur Bank",
+      "Hantel zur Brust gezogen – Richtung Hüfte ziehen",
+      "Schulter zieht nach oben – Schulter tief, Hals lang",
+    ],
+    cues: ["Ellbogen zur Hüfte", "Rücken flach", "Unten lang machen"],
   },
   {
     id: "dumbbell-bent-over-row",
@@ -70,6 +88,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe beide Hanteln seitlich zum Bauch und drücke die Schulterblätter zusammen.",
       "Lass die Hanteln kontrolliert ab und halte die Rumpfspannung.",
     ],
+    mistakes: [
+      "Rundrücken – Brust raus, Rücken neutral",
+      "Oberkörper kommt beim Ziehen hoch – Rückenwinkel halten",
+      "Ellbogen weit abgespreizt – Ellbogen nah am Körper führen",
+    ],
+    cues: ["Brust raus", "Ellbogen nach hinten", "Schulterblätter zusammen"],
   },
   {
     id: "chest-supported-dumbbell-row",
@@ -87,6 +111,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe die Hanteln zur Hüfte und drücke die Schulterblätter zusammen.",
       "Senke die Hanteln langsam ab, die Brust bleibt auf dem Polster.",
     ],
+    mistakes: [
+      "Kinn hoch, Nacken überstreckt – Blick nach unten, Nacken lang",
+      "Schultern ziehen zu den Ohren – Schultern tief, Ellbogen führen",
+      "Zu kurzer Weg – unten Arme ganz strecken, Schulterblätter nach vorn lassen",
+    ],
+    cues: ["Ellbogen nach hinten", "Brust ins Polster", "Unten lang machen"],
   },
   {
     id: "seated-cable-row",
@@ -104,6 +134,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe den Griff zum Bauch und drücke die Schulterblätter zusammen.",
       "Strecke die Arme langsam nach vorn, ohne den Rücken rund zu machen.",
     ],
+    mistakes: [
+      "Oberkörper schaukelt vor und zurück – Oberkörper bleibt aufrecht",
+      "Schultern ziehen hoch – Schultern tief, Ellbogen führen",
+      "Knie durchgedrückt – Knie leicht gebeugt lassen",
+    ],
+    cues: ["Brust raus", "Ellbogen nach hinten", "Schulterblätter zusammen"],
   },
   {
     id: "seated-row-machine",
@@ -121,6 +157,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe die Griffe zum Körper und führe die Ellbogen nach hinten.",
       "Führe die Griffe kontrolliert zurück, die Brust bleibt am Polster.",
     ],
+    mistakes: [
+      "Brustpolster zu nah – Arme müssen vorn fast ganz strecken können",
+      "Schultern rollen nach vorn – Brust raus, Schultern tief",
+      "Gewicht prallt zurück – kontrolliert umkehren, nicht ablegen",
+    ],
+    cues: ["Ellbogen nach hinten", "Brust ans Polster", "Hinten kurz halten"],
   },
   {
     id: "inverted-row",
@@ -138,6 +180,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe die Brust zur Stange und halte den Körper wie ein Brett.",
       "Senke dich langsam ab, bis die Arme wieder gestreckt sind.",
     ],
+    mistakes: [
+      "Hüfte hängt durch – Gesäß und Bauch fest",
+      "Kinn zur Stange gereckt – Brust zur Stange, Kopf neutral",
+      "Stange nicht sicher eingehängt – Ablagen vor dem Satz prüfen",
+    ],
+    cues: ["Körper wie ein Brett", "Brust zur Stange", "Schulterblätter zusammen"],
   },
   {
     id: "table-inverted-row",
@@ -155,6 +203,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe die Brust zur Tischkante, der Körper bleibt gerade oder die Knie sind zur Erleichterung gebeugt.",
       "Senke dich kontrolliert ab, bis die Arme wieder gestreckt sind.",
     ],
+    mistakes: [
+      "Hüfte hängt durch – Gesäß anspannen, Körper gerade",
+      "Kinn zur Kante gereckt – Brust führt, Kopf neutral",
+      "Nur halbe Bewegung – unten Arme ganz strecken",
+    ],
+    cues: ["Brust zur Kante", "Gesäß fest", "Schulterblätter zusammen"],
   },
   {
     id: "doorframe-row",
@@ -172,6 +226,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Lehne dich mit gestreckten Armen und geradem Körper nach hinten.",
       "Ziehe die Brust zum Rahmen und drücke die Schulterblätter zusammen.",
     ],
+    mistakes: [
+      "Hände rutschen ab – trockene Hände, fest greifen",
+      "Hüfte knickt ein – Körper gerade, Gesäß fest",
+      "Ruckartiges Fallenlassen – langsam zurücklehnen",
+    ],
+    cues: ["Brust zum Rahmen", "Körper gerade", "Ellbogen nach hinten"],
   },
   {
     id: "suspension-row",
@@ -189,6 +249,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe die Brust zu den Händen und drücke die Schulterblätter zusammen.",
       "Strecke die Arme langsam wieder und stelle die Füße weiter nach vorn, um es schwerer zu machen.",
     ],
+    mistakes: [
+      "Hüfte hängt durch – Bauch und Gesäß fest",
+      "Ellbogen weit außen – Handflächen zueinander, Ellbogen eng",
+      "Bewegung zu kurz – Hände bis neben die Brust ziehen",
+    ],
+    cues: ["Körper wie ein Brett", "Brust zu den Händen", "Ellbogen nach hinten"],
   },
   {
     id: "band-seated-row",
@@ -206,6 +272,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe die Hände zum Bauch und führe die Ellbogen nah am Körper nach hinten.",
       "Strecke die Arme langsam und bleibe mit dem Oberkörper aufrecht.",
     ],
+    mistakes: [
+      "Rundrücken – aufrecht sitzen, Knie bei Bedarf leicht beugen",
+      "Band rutscht von den Füßen – Band mittig um die Fußsohlen legen",
+      "Oberkörper lehnt nach hinten – nur Arme und Schulterblätter bewegen",
+    ],
+    cues: ["Brust raus", "Ellbogen nach hinten", "Schulterblätter zusammen"],
   },
   {
     id: "band-bent-over-row",
@@ -223,6 +295,12 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe die Hände zur Hüfte und drücke die Schulterblätter zusammen.",
       "Lass die Arme kontrolliert ab und halte den Rücken gerade.",
     ],
+    mistakes: [
+      "Rundrücken – Brust raus, Hüfte nach hinten",
+      "Oberkörper richtet sich auf – Rückenwinkel halten",
+      "Band schnellt zurück – Arme langsam ablassen",
+    ],
+    cues: ["Rücken flach", "Ellbogen zur Hüfte", "Schulterblätter zusammen"],
   },
   {
     id: "kettlebell-row",
@@ -241,5 +319,11 @@ export const BACK_HORIZONTAL_EXERCISES: Exercise[] = [
       "Ziehe die Kettlebell zur Hüfte, der Ellbogen bleibt nah am Körper.",
       "Senke sie langsam ab und halte den Rücken gerade.",
     ],
+    mistakes: [
+      "Oberkörper dreht auf – Schultern parallel zum Boden",
+      "Schulter zieht nach oben – Ellbogen Richtung Hüfte führen",
+      "Rundrücken – Brust raus, Rücken neutral",
+    ],
+    cues: ["Ellbogen zur Hüfte", "Rücken flach", "Stützarm fest"],
   },
 ];

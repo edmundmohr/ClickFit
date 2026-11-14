@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { CircleDotIcon, FlameIcon, InfoIcon, PlusIcon, StickyNoteIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +24,8 @@ interface ExerciseCardProps {
   onAddSet: () => void;
   onAddWarmup: () => void;
   onEditNote: () => void;
+  /** Öffnet Kurzbefehle und typische Fehler, ohne das Training zu verlassen. */
+  onOpenInfo: () => void;
   /** Öffnet den Scheiben-Rechner; nur bei Übungen mit Scheiben vorhanden. */
   onOpenPlates?: () => void;
 }
@@ -38,6 +39,7 @@ export function ExerciseCard({
   onAddSet,
   onAddWarmup,
   onEditNote,
+  onOpenInfo,
   onOpenPlates,
 }: ExerciseCardProps) {
   const t = useTranslations();
@@ -66,13 +68,14 @@ export function ExerciseCard({
       <CardHeader className="gap-1">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-lg leading-tight">{exercise.name}</CardTitle>
-          <Link
-            href={`/training/exercises/${exercise.exerciseId}`}
+          <button
+            type="button"
+            onClick={onOpenInfo}
             aria-label={t("workout.details")}
             className="text-muted-foreground -mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center"
           >
             <InfoIcon className="size-5" aria-hidden />
-          </Link>
+          </button>
         </div>
         <p className="text-muted-foreground text-sm">
           {t(isTimed ? "training.prescriptionSeconds" : "training.prescription", {

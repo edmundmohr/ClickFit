@@ -18,6 +18,12 @@ export const BACK_TRAPS_LOWER_EXERCISES: Exercise[] = [
       "Ziehe die Schultern gerade nach oben in Richtung Ohren und halte kurz.",
       "Senke die Schultern langsam ab, ohne sie zu kreisen.",
     ],
+    mistakes: [
+      "Arme ziehen mit – Arme bleiben lang, Bewegung nur aus den Schultern",
+      "Kopf schiebt nach vorn – Kopf neutral, Kinn leicht zurück",
+      "Zu schwer, kaum Bewegung – Gewicht reduzieren, ganz hochziehen",
+    ],
+    cues: ["Schultern zu den Ohren", "Oben kurz halten", "Arme lang"],
   },
   {
     id: "dumbbell-shrug",
@@ -35,6 +41,12 @@ export const BACK_TRAPS_LOWER_EXERCISES: Exercise[] = [
       "Ziehe die Schultern so hoch wie möglich, die Arme bleiben gestreckt.",
       "Lass die Schultern kontrolliert sinken und halte den Kopf gerade.",
     ],
+    mistakes: [
+      "Schultern rollen nach vorn – Brust aufrecht, gerade nach oben ziehen",
+      "Zu schnelle Wiederholungen – oben eine Sekunde halten",
+      "Kinn zur Brust gezogen – Blick geradeaus, Nacken lang",
+    ],
+    cues: ["Gerade hoch", "Oben halten", "Langsam ablassen"],
   },
   {
     id: "band-shrug",
@@ -52,6 +64,12 @@ export const BACK_TRAPS_LOWER_EXERCISES: Exercise[] = [
       "Ziehe die Schultern gerade nach oben und halte die Spannung kurz.",
       "Senke die Schultern langsam wieder ab.",
     ],
+    mistakes: [
+      "Band zu locker – enger greifen für mehr Spannung",
+      "Arme beugen sich – Arme lang lassen",
+      "Kopf schiebt nach vorn – Kopf neutral halten",
+    ],
+    cues: ["Schultern hoch", "Oben halten", "Langsam zurück"],
   },
   {
     id: "back-extension",
@@ -69,6 +87,12 @@ export const BACK_TRAPS_LOWER_EXERCISES: Exercise[] = [
       "Senke den Oberkörper mit geradem Rücken nach vorn ab.",
       "Richte dich auf, bis der Körper eine gerade Linie bildet, und überstrecke nicht.",
     ],
+    mistakes: [
+      "Polster zu hoch eingestellt – Hüftknochen frei über dem Polster",
+      "Rundrücken beim Absenken – Bewegung aus der Hüfte, Rücken neutral",
+      "Schwung aus dem Oberkörper – langsam auf und ab",
+    ],
+    cues: ["Aus der Hüfte beugen", "Gesäß fest", "Oben gerade Linie"],
   },
   {
     id: "back-extension-machine",
@@ -86,6 +110,12 @@ export const BACK_TRAPS_LOWER_EXERCISES: Exercise[] = [
       "Drücke das Polster mit geradem Rücken nach hinten.",
       "Komm langsam nach vorn zurück und vermeide Schwung.",
     ],
+    mistakes: [
+      "Zu weit nach hinten gedrückt – nur bis zur aufrechten Position",
+      "Zu schweres Gewicht – moderat wählen, sauber bewegen",
+      "Hüfte rutscht im Sitz – Gurt und Fußpolster fest einstellen",
+    ],
+    cues: ["Rumpf fest", "Bis aufrecht", "Langsam nach vorn"],
   },
   {
     id: "superman",
@@ -103,6 +133,12 @@ export const BACK_TRAPS_LOWER_EXERCISES: Exercise[] = [
       "Hebe Arme, Brust und Beine gleichzeitig ein Stück vom Boden.",
       "Halte kurz, senke langsam ab und schaue dabei zum Boden.",
     ],
+    mistakes: [
+      "Zu hoch gerissen – nur ein Stück heben, Spannung halten",
+      "Gesäß locker – Gesäß bewusst anspannen",
+      "Atem angehalten – ruhig weiteratmen",
+    ],
+    cues: ["Lang machen", "Gesäß fest", "Oben kurz halten"],
   },
   {
     id: "prone-swimmer",
@@ -120,6 +156,12 @@ export const BACK_TRAPS_LOWER_EXERCISES: Exercise[] = [
       "Hebe abwechselnd den rechten Arm mit dem linken Bein und umgekehrt.",
       "Bewege dich ruhig und gleichmäßig und halte den Nacken lang.",
     ],
+    mistakes: [
+      "Becken kippt zur Seite – Hüfte bleibt ruhig am Boden",
+      "Brust und Beine sinken ab – Grundspannung halten",
+      "Kopf in den Nacken – Blick zum Boden",
+    ],
+    cues: ["Arme und Beine lang", "Diagonal heben", "Gesäß fest"],
   },
   {
     id: "reverse-hyperextension",
@@ -137,6 +179,12 @@ export const BACK_TRAPS_LOWER_EXERCISES: Exercise[] = [
       "Hebe die gestreckten Beine, bis sie eine Linie mit dem Oberkörper bilden.",
       "Senke die Beine kontrolliert ab und hole keinen Schwung.",
     ],
+    mistakes: [
+      "Beine schwingen über die Linie hinaus – nur bis zur Verlängerung des Oberkörpers",
+      "Knie beugen sich – Beine lang, das Gesäß arbeitet",
+      "Bank wackelt – stabile Bank nutzen und fest greifen",
+    ],
+    cues: ["Gesäß fest", "Beine lang", "Langsam absenken"],
   },
   {
     id: "rack-pull",
@@ -154,5 +202,11 @@ export const BACK_TRAPS_LOWER_EXERCISES: Exercise[] = [
       "Spanne den Rumpf an und richte dich mit geradem Rücken auf, bis die Hüfte gestreckt ist.",
       "Setze die Stange kontrolliert auf den Ablagen ab.",
     ],
+    mistakes: [
+      "Rundrücken – Brust raus, Rücken neutral, Stange nah am Körper",
+      "Überstrecken oben – aufrecht stehen, nicht nach hinten lehnen",
+      "Stange schwingt vom Körper weg – Stange an den Oberschenkeln entlangführen",
+    ],
+    cues: ["Brust raus", "Hüfte nach vorn", "Stange am Körper"],
   },
 ];

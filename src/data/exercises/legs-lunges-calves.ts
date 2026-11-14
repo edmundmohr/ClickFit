@@ -19,6 +19,13 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Mache einen großen Schritt nach vorn und senke das hintere Knie fast bis zum Boden.",
       "Drücke dich über das vordere Bein zurück in den Stand und wechsle die Seite.",
     ],
+    mistakes: [
+      "Vorderes Knie fällt nach innen – Knie über dem Mittelfuß halten",
+      "Schritt zu kurz, vordere Ferse hebt ab – größer ausschreiten, ganze Fußsohle vorn",
+      "Hinteres Knie knallt auf den Boden – kurz vor dem Boden umkehren",
+      "Oberkörper fällt nach vorn – aufrecht bleiben, Hanteln hängen locker",
+    ],
+    cues: ["Großer Schritt", "Hinteres Knie Richtung Boden", "Vorn über die Ferse hoch"],
   },
   {
     id: "barbell-lunge",
@@ -37,6 +44,12 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Mache einen Schritt nach vorn und senke das hintere Knie kontrolliert Richtung Boden.",
       "Drücke dich zurück in den Stand und halte den Oberkörper aufrecht.",
     ],
+    mistakes: [
+      "Füße auf einer Linie, Gleichgewicht wackelt – Füße hüftbreit wie auf Schienen",
+      "Stange kippt zur Seite – Rumpf fest, Stange fest in den Rücken ziehen",
+      "Abstoß mit dem hinteren Fuß – Kraft aus dem vorderen Bein",
+    ],
+    cues: ["Füße auf Schienen", "Rumpf fest", "Kontrolliert absenken"],
   },
   {
     id: "walking-lunge",
@@ -55,6 +68,13 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Senke das hintere Knie fast bis zum Boden.",
       "Drücke dich über das vordere Bein hoch und setze direkt zum nächsten Schritt an.",
     ],
+    mistakes: [
+      "Schritte auf einer Linie – Füße hüftbreit versetzt aufsetzen",
+      "Oberkörper schwankt nach vorn – Rumpf fest, Blick geradeaus",
+      "Schwung aus dem hinteren Bein – das vordere Bein drückt dich hoch",
+      "Schritte werden mit Ermüdung kürzer – gleichmäßig große Schritte halten",
+    ],
+    cues: ["Hüftbreit gehen", "Großer Schritt", "Aufrecht bleiben"],
   },
   {
     id: "bodyweight-lunge",
@@ -73,6 +93,12 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Mache einen großen Schritt nach vorn und beuge beide Knie auf etwa 90 Grad.",
       "Drücke dich zurück in den Stand und halte das vordere Knie über dem Fuß.",
     ],
+    mistakes: [
+      "Vordere Ferse hebt ab – Schritt länger, Gewicht auf die Ferse",
+      "Becken dreht sich zur Seite – Becken gerade nach vorn ausrichten",
+      "Hohlkreuz – Bauch fest, Becken leicht einrollen",
+    ],
+    cues: ["Senkrecht nach unten", "Vordere Ferse fest", "Becken gerade"],
   },
   {
     id: "reverse-lunge",
@@ -91,6 +117,12 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Senke das hintere Knie fast bis zum Boden, das Gewicht bleibt auf dem vorderen Fuß.",
       "Drücke dich über die vordere Ferse zurück in den Stand.",
     ],
+    mistakes: [
+      "Schritt zu kurz – hinteren Fuß weit genug zurücksetzen",
+      "Gewicht fällt aufs hintere Bein – vorderes Bein trägt die Last",
+      "Wackeln beim Zurücksetzen – Füße hüftbreit, Rumpf fest",
+    ],
+    cues: ["Weit zurücksteigen", "Gewicht vorn", "Vorderer Fuß bleibt fest"],
   },
   {
     id: "bulgarian-split-squat",
@@ -109,6 +141,13 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Senke dich ab, bis der vordere Oberschenkel etwa waagerecht ist.",
       "Drücke dich über die vordere Ferse hoch und halte den Oberkörper leicht nach vorn geneigt.",
     ],
+    mistakes: [
+      "Vorderer Fuß zu nah an der Bank – Abstand so wählen, dass die Ferse unten bleibt",
+      "Hinteres Bein drückt mit – hinterer Fuß liegt nur locker auf",
+      "Knie fällt nach innen – Knie über dem Fuß halten",
+      "Bank zu hoch – Ablage etwa auf Kniehöhe",
+    ],
+    cues: ["Gewicht aufs vordere Bein", "Hinterer Fuß locker", "Senkrecht nach unten"],
   },
   {
     id: "split-squat",
@@ -127,6 +166,12 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Senke das hintere Knie senkrecht Richtung Boden.",
       "Drücke dich wieder hoch, ohne die Füße zu versetzen.",
     ],
+    mistakes: [
+      "Vorderes Knie fällt nach innen – Knie über dem Mittelfuß",
+      "Oberkörper pendelt vor und zurück – Rumpf fest, senkrecht auf und ab",
+      "Füße auf einer Linie – hüftbreit stellen für mehr Stabilität",
+    ],
+    cues: ["Senkrecht runter", "Füße bleiben stehen", "Rumpf fest"],
   },
   {
     id: "dumbbell-step-up",
@@ -145,6 +190,12 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Drücke dich über das obere Bein hoch, bis du aufrecht auf der Box stehst.",
       "Steige langsam mit demselben Bein zurück und stoße dich unten nicht ab.",
     ],
+    mistakes: [
+      "Abdruck vom unteren Fuß – das obere Bein leistet die Arbeit",
+      "Knie fällt nach innen – Knie über dem Fuß halten",
+      "Box zu hoch – Knie in der Startposition höchstens auf Hüfthöhe",
+    ],
+    cues: ["Oberes Bein arbeitet", "Ferse oben fest", "Langsam zurück"],
   },
   {
     id: "lateral-lunge",
@@ -163,6 +214,12 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Beuge das äußere Bein und schiebe die Hüfte nach hinten, das andere Bein bleibt gestreckt.",
       "Drücke dich zurück in die Mitte und halte beide Fußsohlen am Boden.",
     ],
+    mistakes: [
+      "Knie fällt nach innen – Knie zeigt in Richtung Fußspitze",
+      "Rücken rundet sich – Brust raus, Rücken gerade",
+      "Ferse des belasteten Beins hebt ab – Hüfte weiter nach hinten setzen",
+    ],
+    cues: ["Hüfte nach hinten", "Gegenbein lang", "Brust aufrecht"],
   },
   {
     id: "standing-calf-raise-machine",
@@ -180,6 +237,13 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Drücke dich so hoch wie möglich auf die Zehenspitzen.",
       "Senke die Fersen langsam unter die Stufenhöhe ab, die Knie bleiben fast gestreckt.",
     ],
+    mistakes: [
+      "Wippende Teilwiederholungen – voller Weg von tief unten bis ganz oben",
+      "Knie beugen sich und schieben mit – Knie ruhig halten",
+      "Druck über die Außenkante – über den Großzehenballen drücken",
+      "Unten federn – unten kurz in der Dehnung halten",
+    ],
+    cues: ["Ganz hoch", "Unten kurz halten", "Großzehe drückt"],
   },
   {
     id: "seated-calf-raise",
@@ -197,6 +261,12 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Hebe die Fersen so hoch wie möglich.",
       "Senke die Fersen langsam tief ab und federe nicht.",
     ],
+    mistakes: [
+      "Kurzer Bewegungsweg – Fersen tief und ganz hoch",
+      "Oberkörper hilft mit – Oberkörper ruhig, nur das Sprunggelenk bewegt sich",
+      "Fußballen rutschen von der Stufe – Ballen mittig auf die Kante setzen",
+    ],
+    cues: ["Oben anspannen", "Tief dehnen", "Oberkörper ruhig"],
   },
   {
     id: "leg-press-calf-raise",
@@ -214,6 +284,12 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Drücke die Platte mit fast gestreckten Beinen aus den Sprunggelenken weg.",
       "Lass die Fersen langsam zurück und lass die Sicherung dabei eingerastet.",
     ],
+    mistakes: [
+      "Knie beugen und strecken mit – Knie fixieren, nur das Sprunggelenk arbeitet",
+      "Füße rutschen von der Platte – leichter beginnen, Ballen fest aufsetzen",
+      "Kurze Wippbewegungen – voller Weg, oben kurz halten",
+    ],
+    cues: ["Nur Sprunggelenk bewegen", "Weit wegdrücken", "Langsam zurück"],
   },
   {
     id: "dumbbell-calf-raise",
@@ -231,6 +307,12 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Drücke dich hoch auf die Zehenspitzen und halte kurz.",
       "Senke die Fersen langsam ab, am besten von einer Stufe für mehr Bewegungsumfang.",
     ],
+    mistakes: [
+      "Schnell und mit Schwung – oben eine Sekunde halten",
+      "Gewicht rollt zur Außenkante – Druck über den Großzehenballen",
+      "Knie wippen mit – Beine ruhig, fast gestreckt",
+    ],
+    cues: ["Hoch auf die Ballen", "Oben halten", "Langsam runter"],
   },
   {
     id: "bodyweight-calf-raise",
@@ -248,6 +330,12 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Drücke dich so hoch wie möglich auf die Zehenspitzen.",
       "Senke die Fersen langsam wieder ab.",
     ],
+    mistakes: [
+      "Mit den Händen hochziehen – Hände nur fürs Gleichgewicht",
+      "Nicht ganz hoch – bis auf die Zehenspitzen drücken",
+      "Sprunggelenke knicken nach außen – Gewicht mittig über die Großzehe",
+    ],
+    cues: ["Ganz nach oben", "Hände nur leicht", "Tief dehnen"],
   },
   {
     id: "single-leg-calf-raise",
@@ -266,6 +354,12 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Drücke dich auf dem Standbein hoch auf die Zehenspitzen.",
       "Senke die Ferse langsam unter die Stufenhöhe und wechsle nach dem Satz die Seite.",
     ],
+    mistakes: [
+      "Mit dem Arm hochziehen – Hand nur zur Balance",
+      "Sprunggelenk knickt nach außen – Druck über den Großzehenballen",
+      "Schwächere Seite schafft weniger – mit der schwächeren Seite beginnen",
+    ],
+    cues: ["Ganz hoch drücken", "Unten tief dehnen", "Hand nur zur Balance"],
   },
   {
     id: "smith-machine-calf-raise",
@@ -283,5 +377,11 @@ export const LEGS_LUNGES_CALVES_EXERCISES: Exercise[] = [
       "Entriegle die Stange und drücke dich hoch auf die Zehenspitzen.",
       "Senke die Fersen langsam ab und verriegle die Stange nach dem Satz.",
     ],
+    mistakes: [
+      "Kaum Bewegungsweg auf flachem Boden – Fußballen auf eine Hantelscheibe stellen",
+      "Knie wippen mit – Beine ruhig, fast gestreckt",
+      "Wippende Teilwiederholungen – voller Weg, oben kurz halten",
+    ],
+    cues: ["Senkrecht hochdrücken", "Oben halten", "Langsam absenken"],
   },
 ];
