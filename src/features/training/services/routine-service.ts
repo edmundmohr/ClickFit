@@ -1,9 +1,12 @@
 /**
- * Plan-Builder: Ordner und Routinen anlegen, bearbeiten, verschieben und löschen.
+ * Plan-Builder: Pläne und Routinen anlegen, bearbeiten, verschieben, archivieren und löschen;
+ * Rolle (Haupt-, Zusatz-, inaktiver Plan) und festen Ort eines Plans setzen.
  */
 import { and, eq, max } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
-import { planDay, planExercise, trainingPlan } from "@/db/schema";
+import { gymProfile, planDay, planExercise, trainingPlan } from "@/db/schema";
+import { PLAN_STATUSES, planStatusChange, type PlanStatus } from "@/domain/training/plan-roles";
+import { isOneOf } from "@/domain/training/types";
 import { normalizeGroups } from "@/domain/training/supersets";
 import { AppError } from "@/lib/errors";
 import { toLocalDate, type LocalDate } from "@/lib/dates";
@@ -16,11 +19,12 @@ import { recordRejection } from "./settings-service";
 /** Kennzeichen eigener Ordner und Routinen in den Spalten `split` und `focus`. */
 export const CUSTOM_MARK = "custom";
 
-async function getOwnedFolder(db: AppDatabase, userId: string, folderId: string) {
+/** Lädt einen Plan des Nutzers; Pläne im Archiv nur mit `includeArchived`. */
+async function getOwnedFolder(db: AppDatabase, userId: string, folderId: string, includeArchived = false) {
   const plan = await db.query.trainingPlan.findFirst({
     where: and(eq(trainingPlan.id, folderId), eq(trainingPlan.userId, userId)),
   });
-  if (!plan || plan.status === "archived") throw new AppError("NOT_FOUND");
+  if (!plan || (plan.status === "archived" && !includeArchived)) throw new AppError("NOT_FOUND");
   return plan;
 }
 
@@ -41,7 +45,7 @@ export async function createFolder(
     name,
     split: CUSTOM_MARK,
     source: "custom",
-    // Gibt es noch keinen Wochenplan, wird der erste eigene Ordner dazu.
+    // Gibt es noch keinen Hauptplan, wird der erste eigene Plan dazu.
     status: active ? "saved" : "active",
     startDate: today,
     // Eigene Pläne haben keine automatischen Deload-Wochen.
@@ -57,31 +61,56 @@ export async function renameFolder(db: AppDatabase, userId: string, folderId: st
   await db.update(trainingPlan).set({ name, updatedAt: new Date() }).where(eq(trainingPlan.id, folderId));
 }
 
-/** Löscht einen Ordner samt Routinen. Der Wochenplan lässt sich nicht löschen. */
+/** Löscht einen Plan samt Routinen endgültig. Der Hauptplan lässt sich nicht löschen. */
 export async function deleteFolder(db: AppDatabase, userId: string, folderId: string): Promise<void> {
-  const plan = await getOwnedFolder(db, userId, folderId);
+  const plan = await getOwnedFolder(db, userId, folderId, true);
   if (plan.status === "active") throw new AppError("PLAN_ACTIVE");
   await db.delete(trainingPlan).where(eq(trainingPlan.id, folderId));
 }
 
 /**
- * Macht einen Ordner zum Wochenplan; der bisherige bleibt als Ordner erhalten.
- * Der Plan beginnt am Tag der Aktivierung: Sonst gälten Tage seit dem Anlegen des Ordners im
- * Kalender rückwirkend als verpasst, und die Deload-Wochen zählten ab dem falschen Tag.
+ * Setzt die Rolle eines Plans: Hauptplan, Zusatzplan, inaktiv oder Archiv (siehe `planStatusChange`).
+ * Wird ein Plan Hauptplan, wird der bisherige inaktiv. Ein neu eingeplanter Plan beginnt heute.
  */
-export async function activateFolder(db: AppDatabase, userId: string, folderId: string, now = new Date()): Promise<void> {
-  const folder = await getOwnedFolder(db, userId, folderId);
-  if (folder.status === "active") return;
+export async function setPlanStatus(
+  db: AppDatabase,
+  userId: string,
+  folderId: string,
+  target: PlanStatus,
+  now = new Date(),
+): Promise<void> {
+  const folder = await getOwnedFolder(db, userId, folderId, true);
+  const current = isOneOf(PLAN_STATUSES, folder.status) ? folder.status : "saved";
+  const change = planStatusChange(current, target);
+  if (!change.ok) throw new AppError(change.error);
+  if (current === target) return;
+  const update = db
+    .update(trainingPlan)
+    .set({ status: target, updatedAt: now, ...(change.restart ? { startDate: toLocalDate(now) } : {}) })
+    .where(eq(trainingPlan.id, folderId));
+  if (!change.demoteMain) {
+    await update;
+    return;
+  }
   await db.batch([
     db
       .update(trainingPlan)
       .set({ status: "saved", updatedAt: now })
       .where(and(eq(trainingPlan.userId, userId), eq(trainingPlan.status, "active"))),
-    db
-      .update(trainingPlan)
-      .set({ status: "active", startDate: toLocalDate(now), updatedAt: now })
-      .where(eq(trainingPlan.id, folderId)),
+    update,
   ]);
+}
+
+/** Legt den festen Ort eines Plans fest; `null` = Ort des Tages. */
+export async function setPlanGym(db: AppDatabase, userId: string, folderId: string, gymId: string | null): Promise<void> {
+  await getOwnedFolder(db, userId, folderId);
+  if (gymId !== null) {
+    const gym = await db.query.gymProfile.findFirst({
+      where: and(eq(gymProfile.id, gymId), eq(gymProfile.userId, userId)),
+    });
+    if (!gym) throw new AppError("NOT_FOUND");
+  }
+  await db.update(trainingPlan).set({ gymProfileId: gymId, updatedAt: new Date() }).where(eq(trainingPlan.id, folderId));
 }
 
 async function nextPosition(db: AppDatabase, folderId: string): Promise<number> {

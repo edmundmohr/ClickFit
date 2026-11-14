@@ -77,8 +77,8 @@ export const gymProfile = sqliteTable(
 );
 
 /**
- * Ein Plan ist zugleich ein Ordner für Routinen (Plantage). Status `active` = Wochenplan,
- * `saved` = weiterer Ordner, `archived` = ersetzter, ausgeblendeter Plan.
+ * Trainingsplan mit seinen Routinen (Plantage). Status (`PLAN_STATUSES`): `active` = Hauptplan
+ * (genau einer), `extra` = Zusatzplan, `saved` = inaktiv, `archived` = im Archiv.
  */
 export const trainingPlan = sqliteTable(
   "training_plan",
@@ -90,6 +90,7 @@ export const trainingPlan = sqliteTable(
     split: text().notNull(),
     source: text().notNull().default("generated"),
     status: text().notNull().default("active"),
+    /** Fester Trainingsort des Plans; `null` = Ort des Tages. */
     gymProfileId: text().references(() => gymProfile.id, { onDelete: "set null" }),
     /** Erster Tag des Plans als lokales Datum (YYYY-MM-DD); Basis für die Deload-Wochen. */
     startDate: text().notNull(),

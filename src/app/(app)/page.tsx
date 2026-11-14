@@ -7,36 +7,22 @@ import { PageHeader } from "@/components/layout/page-header";
 import { requireUser } from "@/features/auth/session";
 import { DayChangeRefresh } from "@/features/dashboard/day-change-refresh";
 import { QuickActions } from "@/features/dashboard/quick-actions";
-import {
-  RecoveryWidget,
-  StreakWidget,
-  TrainingWidget,
-  WeekWidget,
-  WeightWidget,
-} from "@/features/dashboard/widgets";
+import { TrainingWidget } from "@/features/dashboard/training-widget";
+import { RecoveryWidget, StreakWidget, WeekWidget, WeightWidget } from "@/features/dashboard/widgets";
 import { NutritionWidget, WaterWidget } from "@/features/nutrition/components/today-nutrition";
 import { getDashboardWidgets, type DashboardWidget } from "@/features/progress/services/dashboard-service";
 import { OnboardingPrompt } from "@/features/training/components/onboarding-prompt";
 import { getTrainingStats, listSessionsBetween } from "@/features/training/services/history-service";
-import { getActivePlan, type PlanDayView } from "@/features/training/services/plan-service";
+import { getScheduledPlans } from "@/features/training/services/plan-service";
 import { getTrainingSettings } from "@/features/training/services/settings-service";
 import { getInProgressSession } from "@/features/training/services/workout-service";
-import { plannedWeekdays as fixedWeekdays } from "@/features/training/titles";
+import { folderTitle } from "@/features/training/titles";
+import { nextScheduledDay, scheduledWeekdays, todayOverview } from "@/domain/training/plan-roles";
 import { pauseDates } from "@/domain/training/vacation";
 import type { Meal } from "@/domain/nutrition/types";
 import { TIME_ZONE } from "@/i18n/config";
 import { toLocalDate, weekdayOf } from "@/lib/dates";
 import { getDb } from "@/lib/server/context";
-
-/** Nächster Trainingstag nach heute (innerhalb der kommenden Woche). */
-function nextPlanDay(days: PlanDayView[], todayWeekday: number): PlanDayView | null {
-  for (let offset = 1; offset <= 7; offset++) {
-    const weekday = ((todayWeekday - 1 + offset) % 7) + 1;
-    const match = days.find((day) => day.weekday === weekday);
-    if (match) return match;
-  }
-  return null;
-}
 
 /** Zur Uhrzeit passende Mahlzeit für den Schnellzugriff. */
 function mealForNow(now: Date): Meal {
@@ -54,13 +40,14 @@ export default async function TodayPage() {
   const now = new Date();
   const today = toLocalDate(now);
   const todayWeekday = weekdayOf(today);
-  const [plan, widgets, running, settings] = await Promise.all([
-    getActivePlan(db, user.id, today),
+  const [plans, widgets, running, settings] = await Promise.all([
+    getScheduledPlans(db, user.id, today),
     getDashboardWidgets(db, user.id),
     getInProgressSession(db, user.id),
     getTrainingSettings(db, user.id),
   ]);
-  const plannedWeekdays = fixedWeekdays(plan?.days ?? []);
+  const plan = plans.find((item) => item.status === "active") ?? null;
+  const plannedWeekdays = scheduledWeekdays(plans);
   const [stats, todaySessions] = await Promise.all([
     getTrainingStats(db, user.id, plannedWeekdays, today, pauseDates(settings.vacation)),
     listSessionsBetween(db, user.id, today, today),
@@ -73,9 +60,15 @@ export default async function TodayPage() {
           <TrainingWidget
             training={{
               running,
-              doneToday: todaySessions[0] ?? null,
-              todayDay: plan.days.find((day) => day.weekday === todayWeekday) ?? null,
-              upcoming: nextPlanDay(plan.days, todayWeekday),
+              // Die Liste ist neueste zuerst; die Zuordnung zu geplanten Einheiten geht chronologisch.
+              ...todayOverview(plans, todayWeekday, [...todaySessions].reverse()),
+              upcoming: nextScheduledDay(plans, todayWeekday),
+              planTitles:
+                plans.length > 1
+                  ? Object.fromEntries(
+                      plans.map((item) => [item.id, folderTitle(item, (split) => t(`training.splits.${split}`))]),
+                    )
+                  : {},
             }}
           />
         ),

@@ -18,8 +18,8 @@ import {
 } from "./schemas";
 import { archiveCustomExercise, createCustomExercise, updateCustomExercise } from "./services/exercise-service";
 import { createGym, deleteGym, setActiveGym, updateGym } from "./services/gym-service";
+import { PLAN_STATUSES } from "@/domain/training/plan-roles";
 import {
-  activateFolder,
   createFolder,
   createRoutine,
   deleteFolder,
@@ -27,6 +27,8 @@ import {
   duplicateRoutine,
   renameFolder,
   saveRoutine,
+  setPlanGym,
+  setPlanStatus,
 } from "./services/routine-service";
 import { saveInjuries, saveTrainingSettings, setExerciseExcluded } from "./services/settings-service";
 
@@ -124,10 +126,21 @@ export async function deleteFolderAction(folderId: string): Promise<ActionResult
   return result;
 }
 
-export async function activateFolderAction(folderId: string): Promise<ActionResult> {
+/** Rolle eines Plans: Hauptplan, Zusatzplan, inaktiv oder Archiv. */
+export async function setPlanStatusAction(folderId: string, status: unknown): Promise<ActionResult> {
   const user = await requireUser();
-  if (!idSchema.safeParse(folderId).success) return invalid;
-  const result = await attempt(() => activateFolder(getDb(), user.id, folderId));
+  const parsed = z.enum(PLAN_STATUSES).safeParse(status);
+  if (!parsed.success || !idSchema.safeParse(folderId).success) return invalid;
+  const result = await attempt(() => setPlanStatus(getDb(), user.id, folderId, parsed.data));
+  refresh();
+  return result;
+}
+
+/** Fester Ort eines Plans; `null` = Ort des Tages. */
+export async function setPlanGymAction(folderId: string, gymId: string | null): Promise<ActionResult> {
+  const user = await requireUser();
+  if (!idSchema.safeParse(folderId).success || !idSchema.nullable().safeParse(gymId).success) return invalid;
+  const result = await attempt(() => setPlanGym(getDb(), user.id, folderId, gymId));
   refresh();
   return result;
 }

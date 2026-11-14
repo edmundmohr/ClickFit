@@ -200,9 +200,24 @@ Typprüfung nicht an ihnen scheitert.
   sich Einheit (kg oder lbs), Sprung oder eine feste Liste vorhandener Gewichte festlegen; die
   Progression schlägt dann die nächste vorhandene Stufe vor. Beim Loggen ist jeder Wert
   erlaubt. Der Scheiben-Rechner probiert alle Kombinationen der vorhandenen Scheiben durch.
-- **Routinen und Ordner:** Ein Plan ist zugleich ein Ordner (`training_plan`), seine Tage sind
-  die Routinen (`plan_day`). Der aktive Ordner ist der Wochenplan. Der Builder unter
-  `/training/routines/<id>` speichert eine Routine immer vollständig.
+- **Pläne und Routinen:** Ein Plan (`training_plan`) enthält Routinen (`plan_day`). Unter
+  `/training/routines` (Tab „Pläne“) lassen sich beliebig viele Pläne anlegen, z. B. „Sommer“,
+  „Winter“, „Draußen“. Jeder Plan hat eine Rolle (`status`, Regeln in
+  `src/domain/training/plan-roles.ts`): genau ein **Hauptplan** (`active`), beliebig viele
+  **Zusatzpläne** (`extra`), **inaktive** Pläne (`saved`) und das **Archiv** (`archived`).
+  Haupt- und Zusatzpläne sind eingeplant: Ihre Routinen mit festem Wochentag stehen auf der
+  Heute-Seite, im Kalender und zählen für die Serie. So geht z. B. morgens eine Einheit aus
+  „Draußen“ und abends eine aus dem Hauptplan; die Heute-Kachel hakt jede einzeln ab. Der
+  Hauptplan lässt sich nicht archivieren oder löschen, erst ein anderer Plan muss ihn ablösen.
+  Ein neu eingeplanter Plan beginnt am Tag des Wechsels (Kalender, Deload-Wochen). Endgültig
+  löschen geht nur im Archiv; „Plan neu erstellen“ legt den bisherigen erzeugten Plan dort ab.
+  Der Builder unter `/training/routines/<id>` speichert eine Routine immer vollständig.
+- **Fester Ort pro Plan:** Optional hat ein Plan einen festen Trainingsort
+  (`training_plan.gym_profile_id`). Seine Routinen nutzen dann beim Start, in der Anzeige und
+  beim Tauschen das Equipment und die Gewichtsstufen dieses Orts, unabhängig vom aktiven Ort
+  (`withPlanGym` in `context-service.ts`). Ohne festen Ort gilt der Ort des Tages (im
+  Reise-Urlaub der Reiseort). Migration 0009 setzt den Ort aller bestehenden Pläne auf „kein
+  fester Ort“, damit sich für sie nichts ändert.
 - **Supersätze und Zirkel:** Übungen mit gleicher `group_id`. Die Pause startet erst, wenn alle
   Übungen der Gruppe den Durchgang haben (`src/domain/training/supersets.ts`).
 - **Eigene Übungen:** Tabelle `custom_exercise`, Kennung beginnt mit `custom-`. Gelöschte
@@ -218,7 +233,7 @@ Typprüfung nicht an ihnen scheitert.
   App stellt daraus eine einzelne Einheit zusammen (`src/domain/training/focus-day.ts`). Die
   Regionen kommen im Wechsel dran, damit bei wenig Zeit jede mindestens eine Übung bekommt;
   Grundübungen stehen vorne. Equipment des aktiven Orts, Ausschlüsse, Beschwerden und gelernte
-  Vorlieben gelten wie im Wochenplan. Die Einheit ändert den Plan nicht und läuft im Verlauf
+  Vorlieben gelten wie im Hauptplan. Die Einheit ändert den Plan nicht und läuft im Verlauf
   als „Fokus: …“.
 - **Abfrage nach jeder Übung:** Sind alle Arbeitssätze einer Übung abgehakt, fragt der
   Trainingsmodus freiwillig nach der Anstrengung (leicht, passend, schwer, am Limit) und dem RIR

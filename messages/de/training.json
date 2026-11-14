@@ -1,7 +1,7 @@
 {
   "tabs": {
     "plan": "Plan",
-    "routines": "Routinen",
+    "routines": "Pläne",
     "cardio": "Cardio",
     "mobility": "Mobility",
     "exercises": "Übungen",
@@ -130,7 +130,7 @@
     "swapDone": "Übung getauscht.",
     "regenerate": "Plan neu erstellen",
     "regenerateTitle": "Plan neu erstellen?",
-    "regenerateText": "Der aktuelle Wochenplan wird durch einen frisch erzeugten ersetzt. Der Generator berücksichtigt, welche Übungen du oft machst und welche Vorschläge du getauscht oder gelöscht hast. Dein Trainingsverlauf bleibt erhalten.",
+    "regenerateText": "Der aktuelle Hauptplan wird durch einen frisch erzeugten ersetzt und kommt ins Archiv, von wo du ihn zurückholen kannst. Der Generator berücksichtigt, welche Übungen du oft machst und welche Vorschläge du getauscht oder gelöscht hast. Dein Trainingsverlauf bleibt erhalten.",
     "regenerateConfirm": "Neu erstellen",
     "regenerated": "Dein Plan wurde neu erstellt.",
     "editProfile": "Fragebogen erneut ausfüllen",
@@ -140,7 +140,7 @@
     "startShort": "Kurz, ca. {minutes} min",
     "replaces": "statt {name}",
     "reasons": {
-      "equipment": "am aktuellen Ort nicht möglich",
+      "equipment": "an diesem Ort nicht möglich",
       "excluded": "ausgeschlossen",
       "injury": "wegen Beschwerden"
     },
@@ -161,7 +161,10 @@
       "superset": "Supersatz",
       "circuit": "Zirkel"
     },
-    "focusTraining": "Fokus-Training"
+    "focusTraining": "Fokus-Training",
+    "managePlans": "Pläne verwalten",
+    "extraTitle": "Zusatzplan: {name}",
+    "fixedLocation": "Trainiert wird am Ort „{name}“."
   },
   "library": {
     "title": "Übungen",
@@ -233,7 +236,7 @@
   },
   "focusTraining": {
     "title": "Fokus-Training",
-    "description": "Trainiere gezielt einzelne Körperregionen. Die Einheit läuft unabhängig von deinem Wochenplan.",
+    "description": "Trainiere gezielt einzelne Körperregionen. Die Einheit läuft unabhängig von deinen Plänen.",
     "needsProfile": "Für das Fokus-Training brauchen wir dein Profil mit Erfahrung und Equipment.",
     "areasLabel": "Körperregionen",
     "areasHint": "Mehrere Regionen sind möglich. Die Prozentzahl zeigt, wie erholt die Region ist.",

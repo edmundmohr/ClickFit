@@ -14,7 +14,7 @@ import { AppError } from "@/lib/errors";
 import { diffDays, toLocalDate } from "@/lib/dates";
 import { newId } from "@/lib/tokens";
 import type { SaveSetInput } from "../schemas";
-import { getTrainingContext, weightContext, type TrainingContext } from "./context-service";
+import { getTrainingContext, weightContext, withPlanGym, type TrainingContext } from "./context-service";
 import { getUserCatalog } from "./exercise-service";
 import { getOwnedDay } from "./plan-service";
 import { getOwnedSession, getOwnedWorkoutExercise, getPreviousPerformances } from "./workout-queries";
@@ -191,7 +191,8 @@ export function isOpenWorkoutConflict(error: unknown): boolean {
 /**
  * Startet das Training eines Plantags bzw. einer Routine. Läuft bereits ein Training, wird
  * dieses fortgesetzt: Es gibt immer höchstens ein offenes Workout pro Nutzer.
- * Übungen, die heute nicht passen (Ort, Beschwerden, Ausschlüsse), werden ersetzt.
+ * Übungen, die heute nicht passen (Ort, Beschwerden, Ausschlüsse), werden ersetzt. Maßgeblich
+ * ist der feste Ort des Plans, sonst der Ort des Tages.
  */
 export async function startWorkout(
   db: AppDatabase,
@@ -205,13 +206,15 @@ export async function startWorkout(
 
   const { day, plan } = await getOwnedDay(db, userId, planDayId);
   const today = toLocalDate(now);
-  const [planned, context] = await Promise.all([
+  const [planned, dayContext] = await Promise.all([
     db.query.planExercise.findMany({
       where: eq(planExercise.planDayId, planDayId),
       orderBy: asc(planExercise.position),
     }),
     getTrainingContext(db, userId, today),
   ]);
+  // Hat der Plan einen festen Ort (z. B. „Draußen“), wird dort trainiert, nicht am Ort des Tages.
+  const context = withPlanGym(dayContext, plan.gymProfileId);
 
   // Gelöschte eigene Übungen werden übersprungen (die Routine kann sie noch enthalten).
   const available = planned.filter((entry) => !context.catalog.find(entry.exerciseId)?.archived);

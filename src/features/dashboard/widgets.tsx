@@ -1,122 +1,20 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ActivityIcon, CheckCircle2Icon, CheckIcon, FlameIcon, MoonIcon, PlayIcon } from "lucide-react";
+import { ActivityIcon, CheckIcon, FlameIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Illustration } from "@/components/illustration";
 import { MUSCLES } from "@/domain/exercises/types";
 import { recoveryLevel } from "@/domain/progress/recovery";
 import { WEEKDAYS, type Weekday } from "@/domain/training/types";
 import { WeightCard } from "@/features/nutrition/components/weight-card";
 import { getWeightStatus } from "@/features/nutrition/services/tracking-service";
 import { getRecoverySnapshot } from "@/features/progress/services/recovery-service";
-import { StartWorkoutForm } from "@/features/training/components/start-workout-form";
 import { getUserCatalog } from "@/features/training/services/exercise-service";
-import { routineTitle } from "@/features/training/titles";
-import type { SessionSummary, TrainingStats } from "@/features/training/services/history-service";
-import type { PlanDayView } from "@/features/training/services/plan-service";
+import type { TrainingStats } from "@/features/training/services/history-service";
 import { addDays, startOfWeek, type LocalDate } from "@/lib/dates";
-import { formatTime } from "@/lib/format";
 import { getDb } from "@/lib/server/context";
 import type { UnitSystem } from "@/lib/units";
 import { cn } from "@/lib/utils";
-
-export interface TrainingToday {
-  running: { id: string; startedAt: Date } | null;
-  doneToday: SessionSummary | null;
-  todayDay: PlanDayView | null;
-  upcoming: PlanDayView | null;
-}
-
-/** Kachel „Heutiges Training“: laufendes, erledigtes oder geplantes Training bzw. Ruhetag. */
-export async function TrainingWidget({ training }: { training: TrainingToday }) {
-  const t = await getTranslations();
-  const { running, doneToday, todayDay, upcoming } = training;
-  if (running) {
-    return (
-      <Card className="border-primary">
-        <CardHeader>
-          <CardTitle>{t("training.plan.runningTitle")}</CardTitle>
-          <CardDescription>{t("training.plan.runningText", { time: formatTime(running.startedAt) })}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button asChild size="lg" className="w-full">
-            <Link href={`/workout/${running.id}`}>
-              <PlayIcon aria-hidden />
-              {t("training.plan.continue")}
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-  if (doneToday) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle2Icon className="text-primary size-5" aria-hidden />
-            {t("home.doneTitle")}
-          </CardTitle>
-          <CardDescription>
-            {t("home.doneText", { sets: doneToday.completedSets, minutes: doneToday.durationMinutes ?? 0 })}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button asChild variant="outline">
-            <Link href={`/workout/${doneToday.id}`}>{t("home.viewWorkout")}</Link>
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-  if (todayDay) {
-    return (
-      <Card className="border-primary">
-        <CardHeader>
-          <CardDescription>{t("home.todayWorkout")}</CardDescription>
-          <CardTitle className="text-xl">
-            {routineTitle(todayDay, (focus) => t(`training.focus.${focus}`))}
-          </CardTitle>
-          <CardDescription>
-            {t("training.plan.exercises", { count: todayDay.exercises.length })}
-            {" · "}
-            {t("training.plan.estimated", { minutes: todayDay.estimatedMinutes })}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <StartWorkoutForm planDayId={todayDay.id}>
-            <Button type="submit" size="lg" className="w-full">
-              <PlayIcon aria-hidden />
-              {t("training.plan.start")}
-            </Button>
-          </StartWorkoutForm>
-        </CardContent>
-      </Card>
-    );
-  }
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MoonIcon className="text-muted-foreground size-5" aria-hidden />
-          {t("home.restDayTitle")}
-        </CardTitle>
-        {upcoming && upcoming.weekday !== null ? (
-          <CardDescription>
-            {t("home.restDayText", {
-              weekday: t(`training.weekdays.${upcoming.weekday}`),
-              focus: routineTitle(upcoming, (focus) => t(`training.focus.${focus}`)),
-            })}
-          </CardDescription>
-        ) : null}
-      </CardHeader>
-      <CardContent>
-        <Illustration name="rest-day" />
-      </CardContent>
-    </Card>
-  );
-}
 
 export async function StreakWidget({ stats }: { stats: TrainingStats }) {
   const t = await getTranslations("home");

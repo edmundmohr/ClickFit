@@ -5,6 +5,7 @@
 import type { AppDatabase } from "@/db/client";
 import type { CandidateProfile } from "@/domain/training/plan-generator";
 import type { TrainingProfile } from "@/domain/training/types";
+import { resolvePlanGym } from "@/domain/training/plan-roles";
 import { isVacationActive } from "@/domain/training/vacation";
 import type { WeightContext, WeightUnit } from "@/domain/training/weights";
 import type { LocalDate } from "@/lib/dates";
@@ -44,6 +45,17 @@ export async function getTrainingContext(db: AppDatabase, userId: string, today:
   const base = stored ? toTrainingProfile(stored) : null;
   const profile = base && gym ? { ...base, equipment: gym.equipment } : base;
   return { profile, candidateProfile: profile, settings, gym, homeGym, gyms, catalog };
+}
+
+/**
+ * Kontext für die Routine eines Plans mit festem Ort: Equipment und Gewichtsstufen kommen von
+ * diesem Ort statt vom Ort des Tages. Ohne festen Ort bleibt der Kontext unverändert.
+ */
+export function withPlanGym(context: TrainingContext, planGymId: string | null): TrainingContext {
+  const gym = resolvePlanGym(planGymId, context.gyms, context.gym);
+  if (gym === context.gym) return context;
+  const profile = context.profile && gym ? { ...context.profile, equipment: gym.equipment } : context.profile;
+  return { ...context, gym, profile, candidateProfile: profile };
 }
 
 export function weightContext(context: Pick<TrainingContext, "gym">, defaultUnit: WeightUnit): WeightContext {
