@@ -48,6 +48,13 @@
 }
 
 :root {
+  /* Diagrammfarben (geprüfte Palette, siehe dataviz-Regeln): Serie, Vergleich, Status. */
+  --viz-1: #2a78d6;
+  --viz-2: #eb6834;
+  --viz-neutral: #8a8984;
+  --status-good: #0ca30c;
+  --status-warning: #c98500;
+  --status-critical: #d03b3b;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -83,6 +90,12 @@
 }
 
 .dark {
+  --viz-1: #3987e5;
+  --viz-2: #d95926;
+  --viz-neutral: #9c9b95;
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-critical: #e66767;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);

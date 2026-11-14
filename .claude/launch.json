@@ -29,6 +29,8 @@
         "dev",
         "--port",
         "3100",
+        "--local-upstream",
+        "localhost:3100",
         "--var",
         "APP_URL:http://localhost:3100"
       ],

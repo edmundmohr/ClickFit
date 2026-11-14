@@ -6,8 +6,8 @@ Läuft komplett auf Cloudflare (Workers, D1, R2) unter `clickfit.online`.
 - Anforderungen: [docs/SPEC.md](docs/SPEC.md)
 - Umsetzungsplan und Stand: [docs/ROADMAP.md](docs/ROADMAP.md)
 
-**Stand:** Phase 1 (Fundament), Phase 2 (Training-Kern) und Phase 3 (Ernährung) sind fertig.
-Fortschritt ist noch ein Platzhalter.
+**Stand:** Die Phasen 1 bis 4 sind fertig (Fundament, Training-Kern, Ernährung, Fortschritt).
+Als Nächstes folgt Phase 5 (Flexibilität).
 
 ## Technik
 
@@ -67,6 +67,14 @@ Die App läuft dann unter http://localhost:3000.
 
 ```bash
 npm run preview
+```
+
+Soll die Vorschau neben einem laufenden `npm run dev` laufen, braucht sie einen eigenen Port.
+Dabei ist `--local-upstream` wichtig, sonst schreibt Wrangler die Herkunft der Anfragen auf die
+Produktions-Domain um und die Anmeldung schlägt fehl:
+
+```bash
+npx wrangler dev --port 3100 --local-upstream localhost:3100 --var APP_URL:http://localhost:3100
 ```
 
 ## Nutzer und Passwörter
@@ -135,6 +143,24 @@ Das führt Typprüfung, ESLint, die Zeilenprüfung und die Tests aus. Einzeln:
   einem Lebensmittel oder Rezept verändern alte Einträge nicht.
 - **Barcode-Scan:** nutzt die Kamera über `@zxing/browser` (wird erst beim Öffnen geladen).
   Ohne Kamerafreigabe bleibt die Eingabe von Hand.
+
+## Fortschritt (Phase 4)
+
+- **Erholung:** `src/domain/progress/recovery.ts`. Jede Einheit erzeugt je Muskelgruppe Ermüdung
+  aus der Zahl der Sätze und ihrer Härte (RIR). Zehn harte Sätze gelten als volle Erschöpfung.
+  Die Ermüdung klingt linear ab, je nach Umfang über ein bis drei Tage. Ein von Hand gesetzter
+  Wert ersetzt die Berechnung bis zum nächsten Training.
+- **Kraftniveau:** `src/domain/progress/strength.ts`. Grobe Richtwerte aus dem Verhältnis von
+  geschätztem 1RM zu Körpergewicht, keine Wettkampfnormen.
+- **Plateau:** Sind die letzten drei Einheiten einer Übung über mindestens drei Wochen nicht
+  besser als die drei davor, gibt es einen Hinweis mit Vorschlag.
+- **Diagramme:** Recharts über `src/components/charts/series-chart.tsx`. Eine Achse pro
+  Diagramm, geprüfte Farben (`--viz-*` in `globals.css`), Tooltip und eine Tabelle für
+  Screenreader.
+- **Fotos:** Upload über `POST /api/photos`, Auslieferung über `GET /api/photos/<id>` nur an
+  den Besitzer. Bilder werden vor dem Upload im Browser auf 1600 px verkleinert. Erlaubt sind
+  JPEG, PNG und WebP bis 8 MB.
+- **Heute-Seite:** Reihenfolge und Sichtbarkeit der Kacheln unter `/dashboard`.
 
 ## Datenbank
 

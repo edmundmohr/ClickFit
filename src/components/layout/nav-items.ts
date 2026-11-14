@@ -18,7 +18,7 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/", labelKey: "today", icon: HouseIcon },
+  { href: "/", labelKey: "today", icon: HouseIcon, matches: ["/dashboard"] },
   { href: "/training", labelKey: "training", icon: DumbbellIcon },
   { href: "/nutrition", labelKey: "nutrition", icon: AppleIcon },
   { href: "/progress", labelKey: "progress", icon: LineChartIcon },
@@ -26,7 +26,8 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 export function isNavItemActive(item: NavItem, pathname: string): boolean {
-  if (item.href === "/") return pathname === "/";
-  const prefixes = [item.href, ...(item.matches ?? [])];
+  if (pathname === item.href) return true;
+  // Die Startseite hat keinen eigenen Pfad-Präfix; für sie zählen nur die Zusatzpfade.
+  const prefixes = item.href === "/" ? (item.matches ?? []) : [item.href, ...(item.matches ?? [])];
   return prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }

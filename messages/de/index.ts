@@ -3,7 +3,6 @@ import meta from "./meta.json";
 import nav from "./nav.json";
 import auth from "./auth.json";
 import home from "./home.json";
-import placeholders from "./placeholders.json";
 import more from "./more.json";
 import settings from "./settings.json";
 import admin from "./admin.json";
@@ -15,6 +14,7 @@ import training from "./training.json";
 import onboarding from "./onboarding.json";
 import workout from "./workout.json";
 import nutrition from "./nutrition.json";
+import progress from "./progress.json";
 
 const messages = {
   common,
@@ -22,7 +22,6 @@ const messages = {
   nav,
   auth,
   home,
-  placeholders,
   more,
   settings,
   admin,
@@ -34,6 +33,7 @@ const messages = {
   onboarding,
   workout,
   nutrition,
+  progress,
 };
 
 export default messages;

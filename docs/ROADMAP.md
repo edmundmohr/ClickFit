@@ -8,7 +8,7 @@ einschließlich der Ergänzungen aus Abschnitt 8.
 | 1 | Fundament | fertig |
 | 2 | Training-Kern | fertig |
 | 3 | Ernährung | fertig |
-| 4 | Fortschritt & Dashboard | offen |
+| 4 | Fortschritt & Dashboard | fertig |
 | 5 | Flexibilität | offen |
 | 6 | Offline & Export | offen |
 | 7 | Integrationen & optionale KI | offen |
@@ -68,16 +68,21 @@ Aus Phase 2 verschoben:
 Hinweis: Der Check-in schlägt neue Ziele vor und wendet sie erst nach einem Tipp an. Die
 Gewichtskurve als Diagramm folgt in Phase 4.
 
-## Phase 4 – Fortschritt & Dashboard
+## Phase 4 – Fortschritt & Dashboard (fertig)
 
-- Körpergewicht mit geglättetem Trend, Körperumfänge
-- Kraftentwicklung pro Übung (geschätztes 1RM, Volumen), Rekord-Übersicht
-- Muskelkarte (SVG vorne/hinten) mit Sätzen pro Woche und Erholungsstatus (0–100 %),
-  Historie je Muskelgruppe, Erholung manuell korrigierbar
-- Auswertungen: Sätze pro Muskelgruppe pro Woche, Volumenverteilung, meistgenutzte Übungen,
-  Kraftniveau-Einordnung, Plateau-Erkennung, Monatsbericht, Jahresrückblick
-- Fortschrittsfotos in R2 (privat), auch einem Workout zuordenbar
-- Anpassbares Dashboard (Widgets) und Schnellzugriffs-Leiste
+- Körpergewicht als Diagramm mit geglättetem Trend, Körperumfänge mit Verlauf
+- Kraftentwicklung pro Übung (geschätztes 1RM, Volumen), persönliche Rekorde
+- Kraftniveau für Kniebeuge, Bankdrücken und Kreuzheben relativ zum Körpergewicht
+- Plateau-Erkennung mit Vorschlag (Deload, mehr Volumen oder Variation)
+- Muskelkarte (vorne/hinten) mit Erholung, Sätzen pro Woche und Häufigkeit; Verlauf je
+  Muskelgruppe; Erholung von Hand korrigierbar
+- Verteilung der Sätze auf Körperbereiche, meistgenutzte Übungen
+- Fortschrittsfotos im privaten R2-Bucket, auch einem Training zuordenbar
+- Monatsbericht und Jahresrückblick
+- Heute-Seite mit frei anordenbaren Kacheln und Schnellzugriff
+
+Offen aus dieser Phase: Cardio und Zusatzsport fließen noch nicht in die Erholung ein (kommt
+mit dem Cardio-Logging in Phase 5).
 
 ## Phase 5 – Flexibilität
 

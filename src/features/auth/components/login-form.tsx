@@ -45,7 +45,8 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4">
+    // method="post": Sollte das Skript einmal nicht laden, landen die Zugangsdaten nie in der Adresszeile.
+    <form method="post" onSubmit={handleSubmit} className="grid gap-4">
       <Field
         id="username"
         name="username"

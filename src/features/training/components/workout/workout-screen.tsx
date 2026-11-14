@@ -4,7 +4,7 @@ import { useReducer, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ArrowLeftIcon, Trash2Icon } from "lucide-react";
+import { ArrowLeftIcon, CameraIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -297,9 +297,17 @@ export function WorkoutScreen({ view, unitSystem }: WorkoutScreenProps) {
         <SessionNote sessionId={view.id} initialNote={view.note} />
         <div className="flex flex-wrap gap-3">
           {inProgress ? null : (
-            <Button asChild variant="outline">
-              <Link href="/training">{t("workout.summary.toPlan")}</Link>
-            </Button>
+            <>
+              <Button asChild variant="outline">
+                <Link href="/training">{t("workout.summary.toPlan")}</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href={`/progress/photos?session=${view.id}`}>
+                  <CameraIcon aria-hidden />
+                  {t("progress.photos.addToWorkout")}
+                </Link>
+              </Button>
+            </>
           )}
           <Button variant="ghost" className="text-destructive" onClick={() => setConfirm("delete")} disabled={pending}>
             <Trash2Icon aria-hidden />

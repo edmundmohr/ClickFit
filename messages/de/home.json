@@ -13,6 +13,5 @@
   "streakValue": "{count, plural, one {# Training} other {# Trainings}} in Folge",
   "streakHint": "Ruhetage unterbrechen den Streak nicht.",
   "weekTitle": "Diese Woche",
-  "weekValue": "{done} von {planned} erledigt",
-  "moreSoon": "Gewichtsverlauf und Auswertungen erscheinen hier, sobald die nächste Phase fertig ist."
+  "weekValue": "{done} von {planned} erledigt"
 }
