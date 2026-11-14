@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Illustration } from "@/components/illustration";
 import { PageHeader } from "@/components/layout/page-header";
 import { requireUser } from "@/features/auth/session";
+import { TodayNutrition } from "@/features/nutrition/components/today-nutrition";
 import { startWorkoutAction } from "@/features/training/actions";
 import { OnboardingPrompt } from "@/features/training/components/onboarding-prompt";
 import { getTrainingStats, listSessionsBetween } from "@/features/training/services/history-service";
@@ -39,11 +40,14 @@ export default async function TodayPage() {
     return (
       <>
         <PageHeader title={t("home.greeting", { name: user.name })} />
-        <OnboardingPrompt
-          title={t("home.onboardingTitle")}
-          text={t("home.onboardingText")}
-          action={t("home.onboardingStart")}
-        />
+        <div className="grid gap-4">
+          <OnboardingPrompt
+            title={t("home.onboardingTitle")}
+            text={t("home.onboardingText")}
+            action={t("home.onboardingStart")}
+          />
+          <TodayNutrition db={db} userId={user.id} today={today} />
+        </div>
       </>
     );
   }
@@ -187,6 +191,7 @@ export default async function TodayPage() {
           </CardContent>
         </Card>
         <p className="text-muted-foreground text-sm">{t("home.streakHint")}</p>
+        <TodayNutrition db={db} userId={user.id} today={today} />
         <p className="text-muted-foreground text-sm">{t("home.moreSoon")}</p>
       </div>
     </>

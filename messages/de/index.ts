@@ -14,6 +14,7 @@ import equipment from "./equipment.json";
 import training from "./training.json";
 import onboarding from "./onboarding.json";
 import workout from "./workout.json";
+import nutrition from "./nutrition.json";
 
 const messages = {
   common,
@@ -32,6 +33,7 @@ const messages = {
   training,
   onboarding,
   workout,
+  nutrition,
 };
 
 export default messages;

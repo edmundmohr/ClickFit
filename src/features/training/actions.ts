@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getDb } from "@/lib/server/context";
-import { toErrorCode, type ErrorCode } from "@/lib/errors";
+import { fail, invalid, ok, type ActionResult } from "@/lib/action-result";
 import { toLocalDate } from "@/lib/dates";
 import { requireUser } from "@/features/auth/session";
 import type { Exercise } from "@/domain/exercises/types";
@@ -21,11 +21,6 @@ import {
   startWorkout,
 } from "./services/workout-service";
 
-export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: ErrorCode };
-
-const ok = <T>(data: T): ActionResult<T> => ({ ok: true, data });
-const fail = (error: unknown): ActionResult<never> => ({ ok: false, error: toErrorCode(error) });
-const invalid: ActionResult<never> = { ok: false, error: "VALIDATION" };
 
 const idSchema = z.string().min(1).max(80);
 const noteSchema = z.string().max(500);

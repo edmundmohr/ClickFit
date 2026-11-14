@@ -1,0 +1,37 @@
+/** Obst, Trockenfrüchte, Nüsse und Samen: Durchschnittswerte pro 100 g. */
+import type { BasicFood } from "@/domain/nutrition/types";
+
+export const FRUIT_NUTS_FOODS: BasicFood[] = [
+  { id: "apple", name: "Apfel", category: "fruit", basis: "g", kcal: 54, proteinG: 0.3, carbsG: 11.8, fatG: 0.2, servingSize: 150, servingLabel: "1 Apfel (mittelgroß)" },
+  { id: "banana", name: "Banane", category: "fruit", basis: "g", kcal: 90, proteinG: 1.1, carbsG: 20.5, fatG: 0.2, servingSize: 120, servingLabel: "1 Banane (ohne Schale)" },
+  { id: "orange", name: "Orange", category: "fruit", basis: "g", kcal: 47, proteinG: 0.9, carbsG: 9.2, fatG: 0.2, servingSize: 150, servingLabel: "1 Orange (ohne Schale)" },
+  { id: "mandarin", name: "Mandarine", category: "fruit", basis: "g", kcal: 50, proteinG: 0.7, carbsG: 10.1, fatG: 0.3, servingSize: 70, servingLabel: "1 Mandarine (ohne Schale)" },
+  { id: "strawberries", name: "Erdbeeren", category: "fruit", basis: "g", kcal: 32, proteinG: 0.8, carbsG: 5.5, fatG: 0.4, servingSize: 150, servingLabel: "1 Portion (150 g)" },
+  { id: "blueberries", name: "Heidelbeeren", category: "fruit", basis: "g", kcal: 50, proteinG: 0.7, carbsG: 10, fatG: 0.4, servingSize: 125, servingLabel: "1 Schale (125 g)" },
+  { id: "raspberries", name: "Himbeeren", category: "fruit", basis: "g", kcal: 43, proteinG: 1.3, carbsG: 5, fatG: 0.3, servingSize: 125, servingLabel: "1 Schale (125 g)" },
+  { id: "grapes", name: "Weintrauben", category: "fruit", basis: "g", kcal: 70, proteinG: 0.7, carbsG: 15.6, fatG: 0.3, servingSize: 125, servingLabel: "1 Portion (125 g)" },
+  { id: "pear", name: "Birne", category: "fruit", basis: "g", kcal: 55, proteinG: 0.5, carbsG: 12.4, fatG: 0.3, servingSize: 160, servingLabel: "1 Birne (mittelgroß)" },
+  { id: "kiwi", name: "Kiwi", category: "fruit", basis: "g", kcal: 58, proteinG: 1, carbsG: 10.5, fatG: 0.6, servingSize: 75, servingLabel: "1 Kiwi (ohne Schale)" },
+  { id: "mango", name: "Mango", category: "fruit", basis: "g", kcal: 60, proteinG: 0.7, carbsG: 13, fatG: 0.4, servingSize: 150, servingLabel: "1 Portion (150 g)" },
+  { id: "pineapple", name: "Ananas", category: "fruit", basis: "g", kcal: 55, proteinG: 0.5, carbsG: 12.4, fatG: 0.2, servingSize: 150, servingLabel: "1 Portion (150 g)" },
+  { id: "watermelon", name: "Wassermelone", category: "fruit", basis: "g", kcal: 35, proteinG: 0.6, carbsG: 7.8, fatG: 0.2, servingSize: 250, servingLabel: "1 Stück (250 g)" },
+  { id: "peach", name: "Pfirsich", category: "fruit", basis: "g", kcal: 41, proteinG: 0.8, carbsG: 8.9, fatG: 0.1, servingSize: 120, servingLabel: "1 Pfirsich (ohne Stein)" },
+  { id: "cherries-sweet", name: "Kirschen (süß)", category: "fruit", basis: "g", kcal: 62, proteinG: 0.9, carbsG: 13.3, fatG: 0.3, servingSize: 125, servingLabel: "1 Portion (125 g)" },
+  { id: "lemon", name: "Zitrone", category: "fruit", basis: "g", kcal: 32, proteinG: 0.8, carbsG: 4.5, fatG: 0.4 },
+  { id: "dates-dried", name: "Datteln (getrocknet)", category: "fruit", basis: "g", kcal: 285, proteinG: 2, carbsG: 65, fatG: 0.5, servingSize: 30, servingLabel: "1 Portion (30 g)" },
+  { id: "raisins", name: "Rosinen", category: "fruit", basis: "g", kcal: 300, proteinG: 2.5, carbsG: 69, fatG: 0.5, servingSize: 25, servingLabel: "1 Portion (25 g)" },
+
+  { id: "almonds", name: "Mandeln", category: "nuts", basis: "g", kcal: 600, proteinG: 21, carbsG: 7, fatG: 52, servingSize: 25, servingLabel: "1 Handvoll (25 g)" },
+  { id: "walnuts", name: "Walnüsse", category: "nuts", basis: "g", kcal: 675, proteinG: 15, carbsG: 7, fatG: 65, servingSize: 25, servingLabel: "1 Handvoll (25 g)" },
+  { id: "hazelnuts", name: "Haselnüsse", category: "nuts", basis: "g", kcal: 645, proteinG: 14.5, carbsG: 7, fatG: 61.5, servingSize: 25, servingLabel: "1 Handvoll (25 g)" },
+  { id: "cashews", name: "Cashewkerne", category: "nuts", basis: "g", kcal: 585, proteinG: 18, carbsG: 27, fatG: 45, servingSize: 25, servingLabel: "1 Handvoll (25 g)" },
+  { id: "peanuts-roasted-salted", name: "Erdnüsse (geröstet, gesalzen)", category: "nuts", basis: "g", kcal: 610, proteinG: 26, carbsG: 10, fatG: 50, servingSize: 25, servingLabel: "1 Handvoll (25 g)" },
+  { id: "trail-mix", name: "Studentenfutter", category: "nuts", basis: "g", kcal: 480, proteinG: 13, carbsG: 40, fatG: 29, servingSize: 25, servingLabel: "1 Handvoll (25 g)" },
+  { id: "peanut-butter", name: "Erdnussbutter", category: "nuts", basis: "g", kcal: 610, proteinG: 25, carbsG: 13, fatG: 50, servingSize: 15, servingLabel: "1 EL (15 g)" },
+  { id: "almond-butter", name: "Mandelmus", category: "nuts", basis: "g", kcal: 630, proteinG: 22, carbsG: 6, fatG: 56, servingSize: 15, servingLabel: "1 EL (15 g)" },
+  { id: "chia-seeds", name: "Chiasamen", category: "nuts", basis: "g", kcal: 440, proteinG: 21, carbsG: 4.5, fatG: 31, servingSize: 10, servingLabel: "1 EL (10 g)" },
+  { id: "flaxseed", name: "Leinsamen", category: "nuts", basis: "g", kcal: 490, proteinG: 20, carbsG: 2, fatG: 38, servingSize: 10, servingLabel: "1 EL (10 g)" },
+  { id: "sunflower-seeds", name: "Sonnenblumenkerne", category: "nuts", basis: "g", kcal: 590, proteinG: 21, carbsG: 11.5, fatG: 51, servingSize: 10, servingLabel: "1 EL (10 g)" },
+  { id: "pumpkin-seeds", name: "Kürbiskerne", category: "nuts", basis: "g", kcal: 575, proteinG: 30, carbsG: 4.5, fatG: 48, servingSize: 10, servingLabel: "1 EL (10 g)" },
+  { id: "coconut-flakes", name: "Kokosraspel", category: "nuts", basis: "g", kcal: 660, proteinG: 6.5, carbsG: 6.5, fatG: 64, servingSize: 10, servingLabel: "1 EL (10 g)" },
+];

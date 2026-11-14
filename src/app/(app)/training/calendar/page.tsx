@@ -5,6 +5,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { requireUser } from "@/features/auth/session";
 import { SessionList } from "@/features/training/components/session-list";
+import { getDailyTotals } from "@/features/nutrition/services/diary-service";
 import { listSessionsBetween } from "@/features/training/services/history-service";
 import { getActivePlan } from "@/features/training/services/plan-service";
 import { dayStatus, type DayStatus } from "@/domain/training/calendar";
@@ -40,6 +41,7 @@ const monthParam = (value: { year: number; month: number }) =>
 export default async function CalendarPage({ searchParams }: PageProps<"/training/calendar">) {
   const user = await requireUser();
   const t = await getTranslations("training");
+  const mealLegend = (await getTranslations("nutrition"))("calendarLegend");
   const today = toLocalDate(new Date());
   const { m } = await searchParams;
   const { year, month } = parseMonthParam(typeof m === "string" ? m : undefined, today);
@@ -47,10 +49,12 @@ export default async function CalendarPage({ searchParams }: PageProps<"/trainin
   const days = calendar.weeks.flat().filter((day): day is string => day !== null);
 
   const db = getDb();
-  const [plan, sessions] = await Promise.all([
+  const [plan, sessions, foodDays] = await Promise.all([
     getActivePlan(db, user.id),
     listSessionsBetween(db, user.id, days[0], days[days.length - 1]),
+    getDailyTotals(db, user.id, days[0], days[days.length - 1]),
   ]);
+  const foodLogged = new Set(foodDays.map((row) => row.date));
   const completed = new Set(sessions.map((session) => session.date));
   const schedule = plan ? { startDate: plan.startDate, weekdays: plan.days.map((day) => day.weekday) } : null;
 
@@ -89,12 +93,15 @@ export default async function CalendarPage({ searchParams }: PageProps<"/trainin
               key={day}
               aria-label={t(`calendar.${STATUS_LABEL[status]}`, { date: formatDayLong(day) })}
               className={cn(
-                "flex aspect-square items-center justify-center rounded-full text-sm tabular-nums",
+                "relative flex aspect-square items-center justify-center rounded-full text-sm tabular-nums",
                 STATUS_CLASS[status],
                 day === today && "ring-ring ring-2 ring-offset-2 ring-offset-transparent",
               )}
             >
               {Number(day.slice(8))}
+              {foodLogged.has(day) ? (
+                <span aria-hidden className="absolute bottom-1 size-1.5 rounded-full bg-emerald-500" />
+              ) : null}
             </div>
           );
         })}
@@ -112,6 +119,10 @@ export default async function CalendarPage({ searchParams }: PageProps<"/trainin
         <li className="flex items-center gap-1.5">
           <span aria-hidden className={cn("size-3 rounded-full", STATUS_CLASS.missed)} />
           {t("calendar.legendMissed")}
+        </li>
+        <li className="flex items-center gap-1.5">
+          <span aria-hidden className="size-1.5 rounded-full bg-emerald-500" />
+          {mealLegend}
         </li>
       </ul>
 

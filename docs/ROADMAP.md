@@ -7,7 +7,7 @@ einschließlich der Ergänzungen aus Abschnitt 8.
 |---|---|---|
 | 1 | Fundament | fertig |
 | 2 | Training-Kern | fertig |
-| 3 | Ernährung | offen |
+| 3 | Ernährung | fertig |
 | 4 | Fortschritt & Dashboard | offen |
 | 5 | Flexibilität | offen |
 | 6 | Offline & Export | offen |
@@ -49,14 +49,24 @@ Aus Phase 2 verschoben:
   in der Bibliothek
 - Mahlzeiten im Kalender → Phase 3
 
-## Phase 3 – Ernährung
+## Phase 3 – Ernährung (fertig)
 
-- Kalorien- und Makroempfehlung (Mifflin-St-Jeor, Aktivitätsfaktor, Zielanpassung)
-- Adaptiver Energieverbrauch (TDEE) aus Zufuhr und Gewichtstrend, wöchentlicher Check-in
-- Mahlzeiten-Tracking mit Suche, zuletzt/häufig genutzt, Mahlzeiten kopieren und Vorlagen
-- Open Food Facts (Suche, Barcode-Scan), lokaler Cache
-- Eigene Lebensmittel (pro Portion, 100 g oder 100 ml), Rezepte (Portion/Gramm)
-- Ernährungsplan (Wochenplan), Wassertracker, Supplement-Tracker
+- Kalorien- und Makroziele: Mifflin-St-Jeor, Aktivitätsfaktor, Zuschlag fürs Krafttraining,
+  Anpassung an das Ziel; manuell überschreibbar
+- Adaptiver Energieverbrauch aus Zufuhr und geglättetem Gewichtstrend, wöchentlicher Check-in
+  mit Vorschlag für neue Ziele
+- Tagebuch mit vier Mahlzeiten, Menge ändern, Mahlzeit von gestern kopieren, Mahlzeit als
+  Rezept speichern
+- Lebensmittel: 218 eingebaute Grundnahrungsmittel, Open Food Facts (Suche und Barcode, lokal
+  zwischengespeichert), eigene Lebensmittel (pro 100 g, 100 ml oder Portion)
+- Suche mit „Zuletzt“ und „Häufig“, Barcode-Scan per Kamera mit Eingabe von Hand als Rückfall
+- Rezepte mit Portionen, Eintragen nach Portionen oder Gramm
+- Wochenplan je Wochentag mit Vergleich zum Kalorienziel, Übernahme ins Tagebuch
+- Wassertracker, Supplement-Tracker, Körpergewicht mit Trend
+- Heute-Seite mit Kalorien, Makros, Wasser und Streaks; Kalender markiert Tage mit Einträgen
+
+Hinweis: Der Check-in schlägt neue Ziele vor und wendet sie erst nach einem Tipp an. Die
+Gewichtskurve als Diagramm folgt in Phase 4.
 
 ## Phase 4 – Fortschritt & Dashboard
 

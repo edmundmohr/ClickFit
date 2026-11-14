@@ -1,0 +1,36 @@
+/** Milchprodukte, Pflanzendrinks, Käse und Eier: Durchschnittswerte pro 100 g bzw. 100 ml. */
+import type { BasicFood } from "@/domain/nutrition/types";
+
+export const DAIRY_EGGS_FOODS: BasicFood[] = [
+  { id: "milk-low-fat", name: "Milch 1,5 %", category: "dairy", basis: "ml", kcal: 47, proteinG: 3.4, carbsG: 4.9, fatG: 1.5, servingSize: 200, servingLabel: "1 Glas (200 ml)" },
+  { id: "milk-whole", name: "Milch 3,5 %", category: "dairy", basis: "ml", kcal: 65, proteinG: 3.4, carbsG: 4.8, fatG: 3.5, servingSize: 200, servingLabel: "1 Glas (200 ml)" },
+  { id: "oat-drink", name: "Haferdrink", category: "dairy", basis: "ml", kcal: 45, proteinG: 0.8, carbsG: 7, fatG: 1.5, servingSize: 200, servingLabel: "1 Glas (200 ml)" },
+  { id: "soy-drink-unsweetened", name: "Sojadrink (ungesüßt)", category: "dairy", basis: "ml", kcal: 36, proteinG: 3.3, carbsG: 1, fatG: 1.9, servingSize: 200, servingLabel: "1 Glas (200 ml)" },
+  { id: "yogurt-plain-low-fat", name: "Naturjoghurt 1,5 %", category: "dairy", basis: "g", kcal: 50, proteinG: 4.3, carbsG: 5, fatG: 1.5, servingSize: 150, servingLabel: "1 Becher (150 g)" },
+  { id: "yogurt-plain-whole", name: "Naturjoghurt 3,5 %", category: "dairy", basis: "g", kcal: 66, proteinG: 4, carbsG: 4.7, fatG: 3.5, servingSize: 150, servingLabel: "1 Becher (150 g)" },
+  { id: "yogurt-greek", name: "Griechischer Joghurt (10 %)", category: "dairy", basis: "g", kcal: 125, proteinG: 5, carbsG: 3.8, fatG: 10, servingSize: 150, servingLabel: "1 Becher (150 g)" },
+  { id: "yogurt-fruit", name: "Fruchtjoghurt", category: "dairy", basis: "g", kcal: 95, proteinG: 3.5, carbsG: 14.5, fatG: 2.5, servingSize: 150, servingLabel: "1 Becher (150 g)" },
+  { id: "skyr-plain", name: "Skyr (natur)", category: "dairy", basis: "g", kcal: 63, proteinG: 11, carbsG: 4, fatG: 0.2, servingSize: 150, servingLabel: "1 Portion (150 g)" },
+  { id: "quark-low-fat", name: "Magerquark", category: "dairy", basis: "g", kcal: 67, proteinG: 12, carbsG: 4, fatG: 0.3, servingSize: 250, servingLabel: "1 Becher (250 g)" },
+  { id: "quark-20", name: "Speisequark 20 %", category: "dairy", basis: "g", kcal: 105, proteinG: 11, carbsG: 3.5, fatG: 5, servingSize: 250, servingLabel: "1 Becher (250 g)" },
+  { id: "quark-40", name: "Speisequark 40 %", category: "dairy", basis: "g", kcal: 145, proteinG: 9.5, carbsG: 3, fatG: 10.5, servingSize: 250, servingLabel: "1 Becher (250 g)" },
+  { id: "cottage-cheese", name: "Hüttenkäse (körniger Frischkäse)", category: "dairy", basis: "g", kcal: 100, proteinG: 12.5, carbsG: 2.5, fatG: 4.3, servingSize: 200, servingLabel: "1 Becher (200 g)" },
+  { id: "gouda", name: "Gouda", category: "dairy", basis: "g", kcal: 360, proteinG: 25, carbsG: 0, fatG: 29, servingSize: 30, servingLabel: "1 Scheibe" },
+  { id: "emmental", name: "Emmentaler", category: "dairy", basis: "g", kcal: 385, proteinG: 28.5, carbsG: 0, fatG: 30, servingSize: 30, servingLabel: "1 Scheibe" },
+  { id: "mozzarella", name: "Mozzarella", category: "dairy", basis: "g", kcal: 250, proteinG: 18, carbsG: 1.5, fatG: 19, servingSize: 125, servingLabel: "1 Kugel (125 g)" },
+  { id: "feta", name: "Feta", category: "dairy", basis: "g", kcal: 270, proteinG: 16.5, carbsG: 0.7, fatG: 22.5, servingSize: 50, servingLabel: "1 Portion (50 g)" },
+  { id: "cream-cheese", name: "Frischkäse (Doppelrahmstufe)", category: "dairy", basis: "g", kcal: 250, proteinG: 5.5, carbsG: 3, fatG: 24, servingSize: 30, servingLabel: "1 Portion (30 g)" },
+  { id: "parmesan", name: "Parmesan", category: "dairy", basis: "g", kcal: 395, proteinG: 33, carbsG: 0, fatG: 29, servingSize: 10, servingLabel: "1 EL gerieben (10 g)" },
+  { id: "harzer-cheese", name: "Harzer Käse", category: "dairy", basis: "g", kcal: 125, proteinG: 29, carbsG: 0.1, fatG: 0.7, servingSize: 50, servingLabel: "1 Portion (50 g)" },
+  { id: "camembert", name: "Camembert", category: "dairy", basis: "g", kcal: 290, proteinG: 21, carbsG: 0.5, fatG: 22.5, servingSize: 30, servingLabel: "1 Portion (30 g)" },
+  { id: "whipping-cream", name: "Schlagsahne (30 %)", category: "dairy", basis: "ml", kcal: 292, proteinG: 2.4, carbsG: 3.2, fatG: 30, servingSize: 15, servingLabel: "1 EL (15 ml)" },
+  { id: "schmand", name: "Schmand (24 %)", category: "dairy", basis: "g", kcal: 240, proteinG: 2.5, carbsG: 3, fatG: 24, servingSize: 20, servingLabel: "1 EL (20 g)" },
+  { id: "buttermilk", name: "Buttermilch", category: "dairy", basis: "ml", kcal: 37, proteinG: 3.3, carbsG: 4, fatG: 0.5, servingSize: 200, servingLabel: "1 Glas (200 ml)" },
+
+  { id: "egg-whole", name: "Ei (ganz, roh)", category: "eggs", basis: "g", kcal: 150, proteinG: 12.8, carbsG: 0.7, fatG: 10.6, servingSize: 60, servingLabel: "1 Ei (Größe M)" },
+  { id: "egg-boiled", name: "Ei (gekocht)", category: "eggs", basis: "g", kcal: 153, proteinG: 12.8, carbsG: 0.9, fatG: 10.8, servingSize: 60, servingLabel: "1 Ei (Größe M)" },
+  { id: "egg-white", name: "Eiklar", category: "eggs", basis: "g", kcal: 50, proteinG: 11, carbsG: 0.7, fatG: 0.2, servingSize: 33, servingLabel: "1 Eiklar (Größe M)" },
+  { id: "egg-yolk", name: "Eigelb", category: "eggs", basis: "g", kcal: 335, proteinG: 16, carbsG: 0.6, fatG: 29.5, servingSize: 19, servingLabel: "1 Eigelb (Größe M)" },
+  { id: "scrambled-eggs", name: "Rührei", category: "eggs", basis: "g", kcal: 165, proteinG: 11, carbsG: 1.5, fatG: 12.5, servingSize: 120, servingLabel: "1 Portion aus 2 Eiern (120 g)" },
+  { id: "fried-egg", name: "Spiegelei", category: "eggs", basis: "g", kcal: 190, proteinG: 13.5, carbsG: 0.8, fatG: 15, servingSize: 50, servingLabel: "1 Spiegelei" },
+];

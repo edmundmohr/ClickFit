@@ -6,8 +6,8 @@ Läuft komplett auf Cloudflare (Workers, D1, R2) unter `clickfit.online`.
 - Anforderungen: [docs/SPEC.md](docs/SPEC.md)
 - Umsetzungsplan und Stand: [docs/ROADMAP.md](docs/ROADMAP.md)
 
-**Stand:** Phase 1 (Fundament) und Phase 2 (Training-Kern) sind fertig. Ernährung und
-Fortschritt sind noch Platzhalter.
+**Stand:** Phase 1 (Fundament), Phase 2 (Training-Kern) und Phase 3 (Ernährung) sind fertig.
+Fortschritt ist noch ein Platzhalter.
 
 ## Technik
 
@@ -95,7 +95,7 @@ Das führt Typprüfung, ESLint, die Zeilenprüfung und die Tests aus. Einzeln:
 | `npm run typecheck` | TypeScript |
 | `npm run lint` | ESLint inklusive i18n-Regel |
 | `npm run check:size` | 600-Zeilen-Regel |
-| `npm run test` | Tests (Rechte, Anmeldung, Plan-Generator, Progression, Rekorde, Streaks, Trainings-Dienste) |
+| `npm run test` | Tests (Rechte, Anmeldung, Plan-Generator, Progression, Rekorde, Streaks, Kalorien und Makros, adaptiver Verbrauch, Trainings- und Ernährungs-Dienste) |
 
 ## Training (Phase 2)
 
@@ -115,6 +115,27 @@ Das führt Typprüfung, ESLint, die Zeilenprüfung und die Tests aus. Einzeln:
 - **Grenzen am iPhone:** Vibration gibt es im Browser nicht. Der Ton am Pausenende braucht eine
   geöffnete App; Benachrichtigungen im Hintergrund folgen in Phase 6.
 
+## Ernährung (Phase 3)
+
+- **Ziele:** `src/domain/nutrition/energy.ts`. Grundumsatz nach Mifflin-St-Jeor, mal
+  Aktivitätsfaktor, plus Zuschlag fürs Krafttraining. Je nach Ziel −20 % (Fettabbau), −5 %
+  (Rekomposition), ±0 (Halten) oder +10 % (Muskelaufbau). Das erste Ziel entsteht automatisch
+  aus dem Fragebogen.
+- **Adaptiver Verbrauch:** `src/domain/nutrition/adaptive.ts`. Verbrauch = durchschnittliche
+  Zufuhr − Änderung des Gewichtstrends × 7700 kcal pro kg. Tage mit weniger als 800 kcal gelten
+  als unvollständig und zählen nicht. Bei dünner Datenlage bleibt der Wert nahe an der Formel.
+- **Lebensmittel:** drei Quellen.
+  - 218 Grundnahrungsmittel im Code (`src/data/foods`). Die Werte sind übliche
+    Durchschnittswerte, keine Laborwerte.
+  - Open Food Facts für Markenprodukte. Gefundene Produkte werden in D1 gespeichert und stehen
+    danach allen Nutzern ohne Netz zur Verfügung. An Open Food Facts gehen nur Suchbegriff
+    oder Barcode.
+  - Eigene Lebensmittel, nur für den jeweiligen Nutzer sichtbar.
+- **Tagebuch:** Einträge speichern die Nährwerte als Momentaufnahme. Spätere Änderungen an
+  einem Lebensmittel oder Rezept verändern alte Einträge nicht.
+- **Barcode-Scan:** nutzt die Kamera über `@zxing/browser` (wird erst beim Öffnen geladen).
+  Ohne Kamerafreigabe bleibt die Eingabe von Hand.
+
 ## Datenbank
 
 Das Schema steht in `src/db/schema`. Nach einer Änderung:
@@ -126,6 +147,9 @@ npm run db:generate
 ```bash
 npm run db:migrate
 ```
+
+Läuft `npm run dev` gerade, danach neu starten: Der Entwicklungsserver übernimmt ein
+geändertes Schema und neue Textdateien nicht zuverlässig im laufenden Betrieb.
 
 ## Deployment auf Cloudflare
 
@@ -174,6 +198,7 @@ scripts/             Seed, Icon-Erzeugung, Zeilenprüfung
 src/app/             Seiten und API-Routen
 src/components/      Layout, Formular-Bausteine, shadcn/ui
 src/data/exercises/  Übungsbibliothek
+src/data/foods/      Grundnahrungsmittel
 src/db/              Drizzle-Schema und Client
 src/domain/          reine Fachlogik ohne Framework (testbar)
 src/features/        Fachbereiche: Dienste, Server Actions, Komponenten

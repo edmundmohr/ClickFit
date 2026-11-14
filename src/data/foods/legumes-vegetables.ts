@@ -1,0 +1,37 @@
+/** Hülsenfrüchte, Sojaprodukte und Gemüse: Durchschnittswerte pro 100 g. */
+import type { BasicFood } from "@/domain/nutrition/types";
+
+export const LEGUMES_VEGETABLES_FOODS: BasicFood[] = [
+  { id: "lentils-cooked", name: "Linsen (gekocht)", category: "legumes", basis: "g", kcal: 108, proteinG: 9, carbsG: 13.5, fatG: 0.4, servingSize: 150, servingLabel: "1 Portion (150 g)" },
+  { id: "lentils-red-raw", name: "Rote Linsen (roh)", category: "legumes", basis: "g", kcal: 340, proteinG: 25, carbsG: 50, fatG: 1.5, servingSize: 60, servingLabel: "1 Portion (60 g roh)" },
+  { id: "chickpeas-canned", name: "Kichererbsen (Dose, abgetropft)", category: "legumes", basis: "g", kcal: 120, proteinG: 7, carbsG: 15, fatG: 2.2, servingSize: 240, servingLabel: "1 Dose (240 g abgetropft)" },
+  { id: "kidney-beans-canned", name: "Kidneybohnen (Dose, abgetropft)", category: "legumes", basis: "g", kcal: 105, proteinG: 7.5, carbsG: 13, fatG: 0.6, servingSize: 240, servingLabel: "1 Dose (240 g abgetropft)" },
+  { id: "white-beans-canned", name: "Weiße Bohnen (Dose, abgetropft)", category: "legumes", basis: "g", kcal: 92, proteinG: 6.5, carbsG: 11.5, fatG: 0.5, servingSize: 240, servingLabel: "1 Dose (240 g abgetropft)" },
+  { id: "peas-green", name: "Erbsen (grün, tiefgekühlt)", category: "legumes", basis: "g", kcal: 80, proteinG: 5.5, carbsG: 10, fatG: 0.7, servingSize: 150, servingLabel: "1 Portion (150 g)" },
+  { id: "tofu-plain", name: "Tofu (natur)", category: "legumes", basis: "g", kcal: 125, proteinG: 13, carbsG: 1.5, fatG: 7.5, servingSize: 200, servingLabel: "1 Block (200 g)" },
+  { id: "tofu-smoked", name: "Räuchertofu", category: "legumes", basis: "g", kcal: 172, proteinG: 18, carbsG: 2, fatG: 10, servingSize: 175, servingLabel: "1 Block (175 g)" },
+  { id: "tempeh", name: "Tempeh", category: "legumes", basis: "g", kcal: 170, proteinG: 19, carbsG: 3, fatG: 8.5, servingSize: 100, servingLabel: "1 Portion (100 g)" },
+  { id: "edamame-shelled", name: "Edamame (ohne Schote)", category: "legumes", basis: "g", kcal: 120, proteinG: 11.5, carbsG: 4, fatG: 5, servingSize: 100, servingLabel: "1 Portion (100 g)" },
+  { id: "hummus", name: "Hummus", category: "legumes", basis: "g", kcal: 260, proteinG: 7, carbsG: 10, fatG: 20.5, servingSize: 30, servingLabel: "1 EL (30 g)" },
+
+  { id: "broccoli", name: "Brokkoli", category: "vegetables", basis: "g", kcal: 34, proteinG: 3.3, carbsG: 2.7, fatG: 0.2, servingSize: 200, servingLabel: "1 Portion (200 g)" },
+  { id: "spinach", name: "Spinat", category: "vegetables", basis: "g", kcal: 22, proteinG: 2.8, carbsG: 1, fatG: 0.4, servingSize: 150, servingLabel: "1 Portion (150 g)" },
+  { id: "tomato", name: "Tomate", category: "vegetables", basis: "g", kcal: 18, proteinG: 0.9, carbsG: 2.6, fatG: 0.2, servingSize: 100, servingLabel: "1 Tomate (mittelgroß)" },
+  { id: "tomatoes-strained", name: "Passierte Tomaten", category: "vegetables", basis: "g", kcal: 28, proteinG: 1.4, carbsG: 4.5, fatG: 0.2 },
+  { id: "cucumber", name: "Gurke", category: "vegetables", basis: "g", kcal: 14, proteinG: 0.6, carbsG: 1.8, fatG: 0.2, servingSize: 400, servingLabel: "1 Salatgurke" },
+  { id: "bell-pepper", name: "Paprika", category: "vegetables", basis: "g", kcal: 30, proteinG: 1.1, carbsG: 5, fatG: 0.3, servingSize: 150, servingLabel: "1 Paprika (ohne Kerne)" },
+  { id: "carrot", name: "Karotte", category: "vegetables", basis: "g", kcal: 36, proteinG: 0.9, carbsG: 6.8, fatG: 0.2, servingSize: 80, servingLabel: "1 Karotte (mittelgroß)" },
+  { id: "zucchini", name: "Zucchini", category: "vegetables", basis: "g", kcal: 20, proteinG: 1.6, carbsG: 2.2, fatG: 0.3, servingSize: 200, servingLabel: "1 Zucchini (mittelgroß)" },
+  { id: "cauliflower", name: "Blumenkohl", category: "vegetables", basis: "g", kcal: 25, proteinG: 2.4, carbsG: 2.3, fatG: 0.3, servingSize: 200, servingLabel: "1 Portion (200 g)" },
+  { id: "mushrooms", name: "Champignons", category: "vegetables", basis: "g", kcal: 20, proteinG: 3.1, carbsG: 1, fatG: 0.3, servingSize: 100, servingLabel: "1 Portion (100 g)" },
+  { id: "onion", name: "Zwiebel", category: "vegetables", basis: "g", kcal: 33, proteinG: 1.2, carbsG: 6, fatG: 0.2, servingSize: 80, servingLabel: "1 Zwiebel (mittelgroß)" },
+  { id: "lettuce", name: "Blattsalat", category: "vegetables", basis: "g", kcal: 14, proteinG: 1.2, carbsG: 1.5, fatG: 0.2, servingSize: 80, servingLabel: "1 Portion (80 g)" },
+  { id: "avocado", name: "Avocado", category: "vegetables", basis: "g", kcal: 160, proteinG: 2, carbsG: 1.8, fatG: 14.7, servingSize: 70, servingLabel: "1/2 Avocado (ohne Schale und Kern)" },
+  { id: "sweetcorn-canned", name: "Mais (Dose, abgetropft)", category: "vegetables", basis: "g", kcal: 82, proteinG: 2.8, carbsG: 14, fatG: 1.3, servingSize: 140, servingLabel: "1 kleine Dose (140 g abgetropft)" },
+  { id: "green-beans", name: "Grüne Bohnen", category: "vegetables", basis: "g", kcal: 30, proteinG: 2.2, carbsG: 4, fatG: 0.2, servingSize: 150, servingLabel: "1 Portion (150 g)" },
+  { id: "beetroot-cooked", name: "Rote Bete (gekocht)", category: "vegetables", basis: "g", kcal: 44, proteinG: 1.5, carbsG: 8.5, fatG: 0.1, servingSize: 125, servingLabel: "1 Knolle (125 g)" },
+  { id: "pumpkin-hokkaido", name: "Kürbis (Hokkaido)", category: "vegetables", basis: "g", kcal: 63, proteinG: 1.7, carbsG: 12.6, fatG: 0.6, servingSize: 200, servingLabel: "1 Portion (200 g)" },
+  { id: "eggplant", name: "Aubergine", category: "vegetables", basis: "g", kcal: 22, proteinG: 1.2, carbsG: 2.8, fatG: 0.2, servingSize: 250, servingLabel: "1 Aubergine (mittelgroß)" },
+  { id: "white-cabbage", name: "Weißkohl", category: "vegetables", basis: "g", kcal: 25, proteinG: 1.3, carbsG: 4.2, fatG: 0.2, servingSize: 150, servingLabel: "1 Portion (150 g)" },
+  { id: "asparagus-white", name: "Spargel (weiß)", category: "vegetables", basis: "g", kcal: 18, proteinG: 1.9, carbsG: 2, fatG: 0.2, servingSize: 250, servingLabel: "1 Portion (250 g)" },
+];
