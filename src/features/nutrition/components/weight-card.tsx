@@ -15,7 +15,8 @@ import { saveWeightAction } from "../actions";
 import type { WeightStatus } from "../services/tracking-service";
 
 interface WeightCardProps {
-  date: LocalDate;
+  /** `null` speichert für „heute“ zum Zeitpunkt des Klicks. */
+  date: LocalDate | null;
   status: WeightStatus;
   unitSystem: UnitSystem;
 }

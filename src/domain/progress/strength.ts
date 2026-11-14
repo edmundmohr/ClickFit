@@ -1,7 +1,12 @@
 /**
  * Kraftentwicklung: Verlauf pro Übung, Einordnung des Kraftniveaus und Plateau-Erkennung.
+ *
+ * Unterstützte Übungen (z. B. Klimmzug-Maschine) haben kein 1RM und kein Volumen: Das Gewicht ist
+ * die Unterstützung. Ihr Verlauf ist die geringste Unterstützung je Einheit (weniger = besser), bei
+ * gleicher Unterstützung entscheiden die Wiederholungen. Daran misst auch die Plateau-Erkennung.
  */
-import { estimateOneRepMax, MAX_REPS_FOR_ONE_REP_MAX } from "@/domain/training/records";
+import type { ExerciseType } from "@/domain/exercises/types";
+import { estimateOneRepMax, isAssisted, MAX_REPS_FOR_ONE_REP_MAX } from "@/domain/training/records";
 import type { Sex } from "@/domain/training/types";
 import { diffDays, type LocalDate } from "@/lib/dates";
 import { isCountingSet } from "./muscle-load";
@@ -18,10 +23,30 @@ export interface SessionPoint {
   sets: number;
   /** Durchschnittliches RIR der Sätze mit Angabe; `null`, wenn keins eingetragen wurde. */
   avgRir: number | null;
+  /** Nur unterstützte Übungen: geringste Unterstützung der Einheit (0 = ohne Unterstützung). */
+  minAssistanceKg: number | null;
+  /** Meiste Wiederholungen bei dieser geringsten Unterstützung. */
+  repsAtMinAssistance: number | null;
+}
+
+/** Bester Satz einer unterstützten Übung: geringste Unterstützung, bei Gleichstand mehr Wiederholungen. */
+function bestAssisted(sets: readonly { weightKg: number | null; reps: number | null }[]) {
+  let best: { kg: number; reps: number } | null = null;
+  for (const set of sets) {
+    if (set.weightKg === null || set.weightKg < 0) continue;
+    const candidate = { kg: set.weightKg, reps: set.reps ?? 0 };
+    if (!best || candidate.kg < best.kg || (candidate.kg === best.kg && candidate.reps > best.reps)) best = candidate;
+  }
+  return best;
 }
 
 /** Verlauf einer Übung: ein Punkt pro Einheit, älteste zuerst. */
-export function exerciseSeries(sets: readonly TrainedSet[], exerciseId: string): SessionPoint[] {
+export function exerciseSeries(
+  sets: readonly TrainedSet[],
+  exerciseId: string,
+  exerciseType: ExerciseType = "weight_reps",
+): SessionPoint[] {
+  const assisted = isAssisted(exerciseType);
   const sessions = new Map<string, TrainedSet[]>();
   for (const set of sets) {
     if (set.exerciseId !== exerciseId || !isCountingSet(set)) continue;
@@ -29,7 +54,8 @@ export function exerciseSeries(sets: readonly TrainedSet[], exerciseId: string):
   }
   return [...sessions.entries()]
     .map(([sessionId, own]): SessionPoint => {
-      const weighted = own.filter((set) => (set.weightKg ?? 0) > 0);
+      const weighted = assisted ? [] : own.filter((set) => (set.weightKg ?? 0) > 0);
+      const assistance = assisted ? bestAssisted(own) : null;
       const estimates = weighted
         .filter((set) => (set.reps ?? 0) <= MAX_REPS_FOR_ONE_REP_MAX)
         .map((set) => estimateOneRepMax(set.weightKg ?? 0, set.reps ?? 0));
@@ -43,6 +69,8 @@ export function exerciseSeries(sets: readonly TrainedSet[], exerciseId: string):
         bestReps: Math.max(...own.map((set) => set.reps ?? 0)),
         sets: own.length,
         avgRir: rirs.length > 0 ? rirs.reduce((total, rir) => total + rir, 0) / rirs.length : null,
+        minAssistanceKg: assistance?.kg ?? null,
+        repsAtMinAssistance: assistance?.reps ?? null,
       };
     })
     .sort((a, b) => a.date.localeCompare(b.date) || a.sessionId.localeCompare(b.sessionId));
@@ -109,17 +137,33 @@ const PLATEAU_TOLERANCE = 1.01;
 const HARD_RIR = 1;
 const LOW_SETS = 3;
 
+/** Ist der beste Wert von `recent` besser als der von `before`? Je nach Übungsart per 1RM oder Unterstützung. */
+function improved(recent: readonly SessionPoint[], before: readonly SessionPoint[], byAssistance: boolean): boolean {
+  if (byAssistance) {
+    const toSet = (point: SessionPoint) => ({ weightKg: point.minAssistanceKg, reps: point.repsAtMinAssistance });
+    const now = bestAssisted(recent.map(toSet));
+    const then = bestAssisted(before.map(toSet));
+    if (!now || !then) return false;
+    return now.kg < then.kg || (now.kg === then.kg && now.reps > then.reps);
+  }
+  const best = (points: readonly SessionPoint[]) => Math.max(...points.map((point) => point.oneRepMaxKg ?? 0));
+  return best(recent) > best(before) * PLATEAU_TOLERANCE;
+}
+
 /**
  * Plateau: Die letzten drei Einheiten sind nicht besser als die drei davor, über mindestens
  * drei Wochen. Der Vorschlag richtet sich danach, wie hart und wie viel zuletzt trainiert wurde.
+ * Unterstützte Übungen werden an der geringsten Unterstützung gemessen (weniger = besser).
  */
 export function detectPlateau(series: readonly SessionPoint[]): Plateau | null {
-  const measurable = series.filter((point) => point.oneRepMaxKg !== null);
+  const byAssistance = !series.some((point) => point.oneRepMaxKg !== null);
+  const measurable = series.filter((point) =>
+    byAssistance ? point.minAssistanceKg !== null : point.oneRepMaxKg !== null,
+  );
   if (measurable.length < PLATEAU_WINDOW * 2) return null;
   const recent = measurable.slice(-PLATEAU_WINDOW);
   const before = measurable.slice(-PLATEAU_WINDOW * 2, -PLATEAU_WINDOW);
-  const best = (points: readonly SessionPoint[]) => Math.max(...points.map((point) => point.oneRepMaxKg ?? 0));
-  if (best(recent) > best(before) * PLATEAU_TOLERANCE) return null;
+  if (improved(recent, before, byAssistance)) return null;
   const days = diffDays(before[0].date, recent[recent.length - 1].date);
   if (days < PLATEAU_MIN_DAYS) return null;
 

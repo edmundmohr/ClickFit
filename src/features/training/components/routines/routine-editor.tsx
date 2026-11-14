@@ -26,12 +26,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Field } from "@/components/forms/field";
 import { WEEKDAYS } from "@/domain/training/types";
-import { groupKind } from "@/domain/training/supersets";
+import { groupKind, normalizeGroups } from "@/domain/training/supersets";
 import { useActionRunner } from "@/hooks/use-action-runner";
 import { deleteRoutineAction, duplicateRoutineAction, saveRoutineAction } from "../../flex-actions";
 import type { RoutineInput } from "../../schemas";
@@ -85,7 +86,8 @@ export function RoutineEditor({
   const [folderId, setFolderId] = useState(initialFolderId);
   const [items, setItems] = useState(initialItems);
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
-  const [dirty, setDirty] = useState(false);
+  // Enthält die Routine gelöschte Übungen, ist das Entfernen eine offene Änderung.
+  const [dirty, setDirty] = useState(() => initialItems.some((item) => item.archived));
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: DRAG_START_DISTANCE } }),
@@ -114,8 +116,11 @@ export function RoutineEditor({
     change(isLinkedToNext(items, index) ? unlinkFromNext(items, index, groupId) : linkWithNext(items, index, groupId));
   }
 
+  const archivedItems = items.filter((item) => item.archived);
+  const activeItems = items.filter((item) => !item.archived);
+
   function save() {
-    const invalid = items.find((item) => item.repMin > item.repMax);
+    const invalid = activeItems.find((item) => item.repMin > item.repMax);
     if (invalid) {
       toast.error(t("routines.editor.invalidRange", { name: invalid.name }));
       setExpandedKey(invalid.key);
@@ -125,7 +130,8 @@ export function RoutineEditor({
       name: name.trim(),
       weekday,
       folderId,
-      exercises: items.map(({ exerciseId, sets, repMin, repMax, targetRir, restSeconds, groupId }) => ({
+      // Gelöschte Übungen fallen beim Speichern heraus (siehe Hinweis über der Liste).
+      exercises: activeItems.map(({ exerciseId, sets, repMin, repMax, targetRir, restSeconds, groupId }) => ({
         exerciseId,
         sets,
         repMin,
@@ -138,6 +144,7 @@ export function RoutineEditor({
     run(
       () => saveRoutineAction(routineId, input),
       () => {
+        setItems(normalizeGroups(activeItems));
         setDirty(false);
         toast.success(t("routines.editor.saved"));
       },
@@ -207,6 +214,16 @@ export function RoutineEditor({
       <section className="grid gap-2">
         <h2 className="text-lg font-semibold">{t("routines.editor.exercises")}</h2>
         <p className="text-muted-foreground text-sm">{t("routines.editor.hint")}</p>
+        {archivedItems.length > 0 ? (
+          <Alert>
+            <AlertDescription>
+              {t("routines.editor.archivedNotice", {
+                count: archivedItems.length,
+                names: archivedItems.map((item) => item.name).join(", "),
+              })}
+            </AlertDescription>
+          </Alert>
+        ) : null}
         {items.length === 0 ? <p className="text-sm">{t("routines.editor.empty")}</p> : null}
         <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={items.map((item) => item.key)} strategy={verticalListSortingStrategy}>

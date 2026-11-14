@@ -9,6 +9,7 @@
  * - Zeigt die Benachrichtigung am Ende der Pause (Web Push).
  */
 import workoutTexts from "../../messages/de/workout.json";
+import { showsLogin } from "./session";
 
 export {};
 declare const self: ServiceWorkerGlobalScope;
@@ -104,12 +105,21 @@ async function storePage(url: URL, response: Response): Promise<void> {
   await trimPages(cache);
 }
 
+/**
+ * Speichert die Seite. Liefert der Server stattdessen die Anmeldeseite, ist niemand mehr
+ * angemeldet: Dann dürfen die gemerkten Seiten des vorigen Nutzers offline nicht mehr erscheinen.
+ */
+async function handlePageResponse(url: URL, response: Response): Promise<void> {
+  if (showsLogin(response.url)) await clearPages();
+  else await storePage(url, response);
+}
+
 /** Netz zuerst; ohne Netz der zuletzt gesehene Stand der Seite, sonst die Offline-Seite. */
 async function pageWithOfflineFallback(event: FetchEvent): Promise<Response> {
   const url = new URL(event.request.url);
   try {
     const response = await fetch(event.request);
-    event.waitUntil(storePage(url, response.clone()));
+    event.waitUntil(handlePageResponse(url, response.clone()));
     return response;
   } catch {
     const cache = await caches.open(PAGES_CACHE);
@@ -140,10 +150,10 @@ async function cachePage(path: string): Promise<void> {
   const url = new URL(path, self.location.origin);
   if (url.origin !== self.location.origin) return;
   const response = await fetch(url, { credentials: "same-origin", headers: { accept: "text/html" } });
-  await storePage(url, response);
+  await handlePageResponse(url, response);
 }
 
-/** Entfernt alle gemerkten Seiten (beim Abmelden), die Offline-Seite bleibt. */
+/** Entfernt alle gemerkten Seiten (Abmelden, Anmelden, abgelaufene Sitzung), die Offline-Seite bleibt. */
 async function clearPages(): Promise<void> {
   const cache = await caches.open(PAGES_CACHE);
   for (const request of await cache.keys()) {

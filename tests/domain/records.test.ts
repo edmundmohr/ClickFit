@@ -35,6 +35,11 @@ describe("session totals", () => {
     ]);
     expect(totals).toEqual({ completedSets: 3, volumeKg: 80 * 10 + 80 * 8 + 60 * 10 });
   });
+
+  it("does not count assistance as volume", () => {
+    const totals = sessionTotals([work(80, 10), { ...work(30, 8), assisted: true }]);
+    expect(totals).toEqual({ completedSets: 2, volumeKg: 80 * 10 });
+  });
 });
 
 describe("personal records", () => {
@@ -43,6 +48,7 @@ describe("personal records", () => {
     maxOneRepMaxKg: 100,
     maxReps: 12,
     maxSetVolumeKg: 800,
+    minAssistanceKg: null,
   };
 
   it("reports nothing on the very first session", () => {
@@ -76,8 +82,36 @@ describe("personal records", () => {
       maxOneRepMaxKg: null,
       maxReps: 12,
       maxSetVolumeKg: null,
+      minAssistanceKg: null,
     };
     expect(detectRecords([work(null, 15)], bodyweight)).toEqual([{ type: "reps", value: 15 }]);
     expect(detectRecords([work(40, 20)], previous).map((record) => record.type)).not.toContain("reps");
+  });
+});
+
+describe("records of assisted exercises", () => {
+  const ASSISTED = "assisted_bodyweight" as const;
+  const previous = bestsOf([work(30, 8)], ASSISTED);
+
+  it("tracks the least assistance instead of weight, 1RM and volume", () => {
+    expect(previous).toEqual({
+      maxWeightKg: null,
+      maxOneRepMaxKg: null,
+      maxReps: 8,
+      maxSetVolumeKg: null,
+      minAssistanceKg: 30,
+    });
+    // Ohne Unterstützung geschafft ist der beste Wert überhaupt.
+    expect(bestsOf([work(20, 8), work(0, 3)], ASSISTED).minAssistanceKg).toBe(0);
+  });
+
+  it("reports less assistance as a record", () => {
+    expect(detectRecords([work(20, 8)], previous, ASSISTED)).toEqual([{ type: "assistance", value: 20 }]);
+  });
+
+  it("does not report more assistance as a record", () => {
+    // Regressionstest: 35 kg Unterstützung nach 30 kg galt früher als Gewichts-, 1RM- und Volumenrekord.
+    expect(detectRecords([work(35, 8)], previous, ASSISTED)).toEqual([]);
+    expect(detectRecords([work(35, 12)], previous, ASSISTED)).toEqual([]);
   });
 });

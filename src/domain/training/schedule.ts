@@ -2,8 +2,9 @@
  * Streaks, Zeitschätzung im Training und Umgang mit vergessenen Workouts.
  */
 import { addDays, weekdayOf, type LocalDate } from "@/lib/dates";
-import { SET_WORK_SECONDS } from "./plan-generator/prescription";
-import type { Weekday } from "./types";
+import { EXERCISE_SETUP_SECONDS, SET_WORK_SECONDS } from "./plan-generator/prescription";
+import { groupConsecutive, groupRestSeconds } from "./supersets";
+import type { SetType, Weekday } from "./types";
 
 const MAX_STREAK_LOOKBACK_DAYS = 730;
 
@@ -36,14 +37,43 @@ export function trainingStreak(
 
 export interface RemainingSet {
   completed: boolean;
-  restSeconds: number;
+  /** Satzart; Aufwärm- und Drop-Sätze folgen ohne volle Pause. */
+  type?: SetType;
 }
 
-/** Voraussichtlich verbleibende Zeit: offene Sätze samt Pausen. */
-export function estimateRemainingSeconds(sets: readonly RemainingSet[]): number {
-  return sets
-    .filter((set) => !set.completed)
-    .reduce((total, set) => total + SET_WORK_SECONDS + set.restSeconds, 0);
+export interface RemainingExercise {
+  /** Gleiche Kennung bei benachbarten Übungen = Supersatz bzw. Zirkel. */
+  groupId: string | null;
+  restSeconds: number;
+  sets: readonly RemainingSet[];
+}
+
+/** Nach diesen Satzarten folgt keine volle Pause (Aufwärmen, direkt angehängter Drop-Satz). */
+const NO_REST_TYPES: readonly SetType[] = ["warmup", "drop"];
+
+/**
+ * Voraussichtlich verbleibende Zeit, gerechnet wie `estimateDaySeconds`:
+ * - jeder offene Satz dauert `SET_WORK_SECONDS`;
+ * - Pausen nur zwischen den Durchgängen, nicht nach dem letzten Satz einer Übung;
+ * - in Supersätzen und Zirkeln fällt die Pause einmal pro Durchgang an (die längste);
+ * - Aufwärm- und Drop-Sätze bringen keine eigene Pause mit;
+ * - zwischen zwei noch offenen Übungen bzw. Gruppen kommt die Wechselzeit dazu.
+ */
+export function estimateRemainingSeconds(exercises: readonly RemainingExercise[]): number {
+  let total = 0;
+  let openGroups = 0;
+  for (const group of groupConsecutive(exercises)) {
+    const open = group.items.map((item) => item.sets.filter((set) => !set.completed));
+    const openSets = open.reduce((sum, sets) => sum + sets.length, 0);
+    if (openSets === 0) continue;
+    openGroups++;
+    const rounds = Math.max(
+      ...open.map((sets) => sets.filter((set) => !set.type || !NO_REST_TYPES.includes(set.type)).length),
+    );
+    const rest = groupRestSeconds(group.items.map((item) => item.restSeconds));
+    total += openSets * SET_WORK_SECONDS + Math.max(rounds - 1, 0) * rest;
+  }
+  return total + Math.max(openGroups - 1, 0) * EXERCISE_SETUP_SECONDS;
 }
 
 export const FORGOTTEN_WORKOUT_AFTER_MS = 3 * 60 * 60 * 1000;

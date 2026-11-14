@@ -154,6 +154,12 @@ describe("body fat estimate", () => {
     expect(narrow!.highPercent).toBeGreaterThanOrEqual(20);
   });
 
+  it("keeps the minimum width at the edges of the allowed range", () => {
+    expect(normalizeBodyFatEstimate({ canEstimate: true, lowPercent: 59, highPercent: 60, note: "" })).toMatchObject({ lowPercent: 57, highPercent: 60 });
+    expect(normalizeBodyFatEstimate({ canEstimate: true, lowPercent: 60, highPercent: 60, note: "" })).toMatchObject({ lowPercent: 57, highPercent: 60 });
+    expect(normalizeBodyFatEstimate({ canEstimate: true, lowPercent: 3, highPercent: 4, note: "" })).toMatchObject({ lowPercent: 3, highPercent: 6 });
+  });
+
   it("rejects refusals, missing values and implausible numbers", () => {
     expect(normalizeBodyFatEstimate({ canEstimate: false, lowPercent: 18, highPercent: 22, note: "zu dunkel" })).toBeNull();
     expect(normalizeBodyFatEstimate({ canEstimate: true, lowPercent: null, highPercent: 22, note: "" })).toBeNull();

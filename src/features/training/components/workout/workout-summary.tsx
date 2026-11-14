@@ -15,7 +15,7 @@ interface WorkoutSummaryProps {
   unitSystem: UnitSystem;
 }
 
-const WEIGHT_RECORDS: RecordType[] = ["weight", "one_rep_max", "set_volume"];
+const WEIGHT_RECORDS: RecordType[] = ["weight", "one_rep_max", "set_volume", "assistance"];
 
 /** Zusammenfassung nach dem Training: Dauer, Volumen, Sätze und neue Rekorde. */
 export function WorkoutSummary({ exercises, durationMinutes, unitSystem }: WorkoutSummaryProps) {
@@ -27,7 +27,7 @@ export function WorkoutSummary({ exercises, durationMinutes, unitSystem }: Worko
   }));
   const totals = sessionTotals(logged.flatMap((entry) => entry.sets));
   const records = logged.flatMap((entry) =>
-    detectRecords(entry.sets, entry.exercise.bests).map((record) => ({ ...record, name: entry.exercise.name })),
+    detectRecords(entry.sets, entry.exercise.bests, entry.exercise.type).map((record) => ({ ...record, name: entry.exercise.name })),
   );
 
   const stats = [

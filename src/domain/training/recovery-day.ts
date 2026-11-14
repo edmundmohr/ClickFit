@@ -4,17 +4,27 @@
  */
 import { MUSCLES, type Exercise, type Muscle } from "@/domain/exercises/types";
 import { filterCandidates, pickForSlot, type PreferenceMap } from "./plan-generator";
-import { WARMUP_SECONDS, estimateExerciseSeconds, prescribe } from "./plan-generator/prescription";
+import {
+  MIN_EXERCISES_PER_DAY,
+  WARMUP_SECONDS,
+  estimateExerciseSeconds,
+  fillWithinBudget,
+  prescribe,
+  reduceSets,
+} from "./plan-generator/prescription";
 import { RECOVERY_SLOTS } from "./plan-generator/templates";
 import type { PlannedExercise, TrainingProfile } from "./types";
 
 /** Unter diesem Wert gilt eine Muskelgruppe als noch nicht bereit. */
 export const READY_PERCENT = 70;
-const MIN_EXERCISES = 3;
 /** Mehr Übungen werden auch dann nicht geplant, wenn die Zeit reichen würde. */
 const MAX_EXERCISES = 8;
 const FOCUS_MUSCLES = 4;
-/** Erholungswerte innerhalb einer Stufe gelten als gleich gut: Dann entscheidet die Wichtigkeit der Übung. */
+/**
+ * Erholungswerte innerhalb einer Stufe gelten als gleich gut: Dann entscheidet die Wichtigkeit der Übung.
+ * Die Stufen beginnen an der Bereitschaftsschwelle (70–84, 85–100, darunter 55–69 …), damit eine
+ * bereite und eine noch nicht bereite Muskelgruppe nie in derselben Stufe landen.
+ */
 const READINESS_BAND = 15;
 
 export interface RecoveryDay {
@@ -32,7 +42,7 @@ export function readiness(exercise: Pick<Exercise, "primary">, recovery: Record<
 }
 
 function band(ready: number): number {
-  return Math.floor(Math.min(ready, 99) / READINESS_BAND);
+  return Math.floor((Math.min(ready, 99) - READY_PERCENT) / READINESS_BAND);
 }
 
 export function buildRecoveryDay(
@@ -42,7 +52,6 @@ export function buildRecoveryDay(
   preferences?: PreferenceMap,
 ): RecoveryDay {
   const candidates = filterCandidates(profile, catalog);
-  const usedToday = new Set<string>();
   const none = new Set<string>();
 
   // Für jede Slot-Art die beste Übung bestimmen und nach Erholung ordnen. Die Reihenfolge der
@@ -53,21 +62,27 @@ export function buildRecoveryDay(
   }).sort((a, b) => band(b.ready) - band(a.ready) || a.order - b.order);
 
   const budgetSeconds = profile.sessionMinutes * 60 - WARMUP_SECONDS;
-  const exercises: PlannedExercise[] = [];
-  const chosen: Exercise[] = [];
-  let usedSeconds = 0;
-  for (const option of options) {
-    if (exercises.length >= MAX_EXERCISES) break;
-    if (usedToday.has(option.exercise.id)) continue;
-    if (option.ready < READY_PERCENT && exercises.length >= MIN_EXERCISES) break;
-    const entry = prescribe(option.exercise, option.slot.kind, profile.goal, profile.experience);
-    const seconds = estimateExerciseSeconds(entry);
-    if (usedSeconds + seconds > budgetSeconds && exercises.length >= MIN_EXERCISES) continue;
-    exercises.push(entry);
-    chosen.push(option.exercise);
-    usedToday.add(option.exercise.id);
-    usedSeconds += seconds;
-  }
+  // Bereite Muskelgruppen zuerst; noch nicht bereite nur, um auf die Mindestzahl an Übungen zu kommen.
+  const fill = (reduceBy: number) => {
+    const usedToday = new Set<string>();
+    const picked: { entry: PlannedExercise; exercise: Exercise }[] = [];
+    let usedSeconds = 0;
+    for (const option of options) {
+      if (picked.length >= MAX_EXERCISES) break;
+      if (usedToday.has(option.exercise.id)) continue;
+      if (option.ready < READY_PERCENT && picked.length >= MIN_EXERCISES_PER_DAY) continue;
+      const entry = reduceSets(prescribe(option.exercise, option.slot.kind, profile.goal, profile.experience), reduceBy);
+      const seconds = estimateExerciseSeconds(entry);
+      if (usedSeconds + seconds > budgetSeconds) continue;
+      picked.push({ entry, exercise: option.exercise });
+      usedToday.add(option.exercise.id);
+      usedSeconds += seconds;
+    }
+    return picked;
+  };
+  const picked = fillWithinBudget(fill);
+  const exercises = picked.map((item) => item.entry);
+  const chosen = picked.map((item) => item.exercise);
 
   // Grundübungen an den Anfang: Sie brauchen die meiste Frische.
   const order = new Map(chosen.map((exercise, index) => [exercise.id, { exercise, index }]));
@@ -85,6 +100,7 @@ export function buildRecoveryDay(
   const focus = MUSCLES.filter((muscle) => trained.has(muscle))
     .sort((a, b) => recovery[b] - recovery[a])
     .slice(0, FOCUS_MUSCLES);
-  const bestReady = options[0]?.ready ?? 0;
+  // Pause nur, wenn wirklich keine Übung eine bereite Muskelgruppe trifft.
+  const bestReady = Math.max(0, ...options.map((option) => option.ready));
   return { exercises, focus, restRecommended: bestReady < READY_PERCENT };
 }

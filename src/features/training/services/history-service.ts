@@ -4,10 +4,11 @@
 import { and, desc, eq, gte, inArray, isNotNull, lte, ne } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
 import { workoutExercise, workoutSession, workoutSet } from "@/db/schema";
-import { sessionTotals, type LoggedSet } from "@/domain/training/records";
+import { isAssisted, sessionTotals, type LoggedSet } from "@/domain/training/records";
 import { trainingStreak } from "@/domain/training/schedule";
 import { DAY_FOCUSES, SET_TYPES, isOneOf, type DayFocus, type Weekday } from "@/domain/training/types";
 import { addDays, startOfWeek, type LocalDate } from "@/lib/dates";
+import { getUserCatalog } from "./exercise-service";
 
 export interface SessionSummary {
   id: string;
@@ -26,6 +27,7 @@ const SESSION_CHUNK = 90;
 interface SummaryRow {
   sessionId: string;
   workoutExerciseId: string;
+  exerciseId: string;
   type: string;
   weightKg: number | null;
   reps: number | null;
@@ -45,6 +47,7 @@ async function summarize(
         .select({
           sessionId: workoutExercise.sessionId,
           workoutExerciseId: workoutExercise.id,
+          exerciseId: workoutExercise.exerciseId,
           type: workoutSet.type,
           weightKg: workoutSet.weightKg,
           reps: workoutSet.reps,
@@ -60,6 +63,8 @@ async function summarize(
     );
   }
 
+  // Unterstützte Übungen tragen die Unterstützung als Gewicht ein: kein Volumen.
+  const catalog = await getUserCatalog(db, sessions[0].userId);
   return sessions.map((session) => {
     const own = rows.filter((row) => row.sessionId === session.id);
     const sets: LoggedSet[] = own.map((row) => ({
@@ -67,6 +72,7 @@ async function summarize(
       weightKg: row.weightKg,
       reps: row.reps,
       completed: true,
+      assisted: isAssisted(catalog.find(row.exerciseId)?.type),
     }));
     const totals = sessionTotals(sets);
     const durationMs = session.finishedAt ? session.finishedAt.getTime() - session.startedAt.getTime() : null;

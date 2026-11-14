@@ -116,7 +116,7 @@ export function ExerciseCard({
             number={workSetNumber(exercise.sets, set.id)}
             showWeight={showWeight}
             repsPlaceholder={`${exercise.repMin}–${exercise.repMax}`}
-            isRecord={detectRecords([toLoggedSet(exercise, set)], exercise.bests).length > 0}
+            isRecord={detectRecords([toLoggedSet(exercise, set)], exercise.bests, exercise.type).length > 0}
             invalid={invalid?.setId === set.id ? invalid.field : null}
             onEdit={(patch) => onEdit(set.id, patch)}
             onToggle={() => onToggle(set.id)}

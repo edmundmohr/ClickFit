@@ -10,6 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { warmupSets } from "@/domain/training/progression";
+import { isAssisted } from "@/domain/training/records";
 import { afterSetCompleted, groupConsecutive, groupKind, groupRestSeconds } from "@/domain/training/supersets";
 import { estimateRemainingSeconds, isWorkoutForgotten, suggestFinishTime } from "@/domain/training/schedule";
 import { formatDayLong, formatDuration, formatTime } from "@/lib/format";
@@ -30,6 +31,7 @@ import {
   newSetFrom,
   parseReps,
   parseWeightKg,
+  setsToPrefill,
   toDrafts,
   toGroupMember,
   toInputText,
@@ -76,10 +78,10 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
   const [pending, startTransition] = useTransition();
 
   const startedAt = new Date(view.startedAt);
-  const allSets = exercises.flatMap((exercise) =>
-    exercise.sets.map((set) => ({ completed: set.completed, restSeconds: exercise.restSeconds })),
+  const openSets = exercises.reduce(
+    (total, exercise) => total + exercise.sets.filter((set) => !set.completed).length,
+    0,
   );
-  const openSets = allSets.filter((set) => !set.completed).length;
   const elapsedSeconds = now === null ? null : (now - startedAt.getTime()) / 1000;
   const finishedAt = view.finishedAt ?? localFinish;
   const durationMinutes = finishedAt
@@ -158,9 +160,8 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
     sync.schedule(setId, true);
     setInvalid(null);
     if (set.completed) return;
-    // Noch leere Folgesätze übernehmen die Werte: So genügt danach ein Tipp pro Satz.
-    for (const later of exercise.sets.slice(exercise.sets.indexOf(set) + 1)) {
-      if (later.completed || later.weightText !== "" || later.repsText !== "") continue;
+    // Noch leere Folgesätze gleicher Art übernehmen die Werte: So genügt danach ein Tipp pro Satz.
+    for (const later of setsToPrefill(exercise.sets, set)) {
       dispatch({
         type: "edit",
         exerciseId,
@@ -207,6 +208,11 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
   function addWarmup(exerciseId: string) {
     const exercise = exercises.find((item) => item.id === exerciseId);
     if (!exercise) return;
+    // Bei Unterstützung (z. B. Klimmzug-Maschine) wären 40–80 % des Werts weniger Hilfe, also schwerer.
+    if (isAssisted(exercise.type)) {
+      toast.info(t("workout.warmupAssisted"));
+      return;
+    }
     const firstWork = exercise.sets.find((set) => set.type !== "warmup");
     const workWeightKg = firstWork ? parseWeightKg(firstWork, exercise.unit) : null;
     if (workWeightKg === null || workWeightKg <= 0) {
@@ -214,7 +220,7 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
       return;
     }
     const hasWarmup = exercise.sets.some((set) => set.type === "warmup");
-    const suggested = hasWarmup ? [] : warmupSets(workWeightKg, exercise.incrementKg);
+    const suggested = hasWarmup ? [] : warmupSets(workWeightKg, exercise.incrementKg, exercise.minWeightKg);
     if (suggested.length === 0) {
       toast.info(t("workout.warmupNotNeeded"));
       return;
@@ -319,7 +325,7 @@ export function WorkoutScreen({ view, unitSystem, userId }: WorkoutScreenProps) 
               {inProgress
                 ? t("workout.status", {
                     elapsed: elapsedSeconds === null ? "–" : formatDuration(elapsedSeconds),
-                    minutes: Math.ceil(estimateRemainingSeconds(allSets) / 60),
+                    minutes: Math.ceil(estimateRemainingSeconds(exercises) / 60),
                   })
                 : formatDayLong(view.date)}
             </p>

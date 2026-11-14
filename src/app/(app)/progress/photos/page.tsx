@@ -31,16 +31,19 @@ export default async function ProgressPhotosPage({ searchParams }: PageProps<"/p
     getAiStatus(db, getLlmProvider(getEnv()), user.id, today),
   ]);
   const sessionDates = Object.fromEntries(sessions.map((session) => [session.id, session.date]));
-  // Nur ein eigenes, abgeschlossenes Training lässt sich verknüpfen.
+  // Nur ein eigenes, abgeschlossenes Training lässt sich verknüpfen. Die Map prüft nur echte
+  // Kennungen (`in` fände auch geerbte Eigenschaften wie `toString`).
+  const sessionDateById = new Map(sessions.map((session) => [session.id, session.date]));
   const requested = typeof params.session === "string" ? params.session : "";
-  const sessionId = requested in sessionDates ? requested : null;
+  const requestedDate = sessionDateById.get(requested);
+  const sessionId = requestedDate === undefined ? null : requested;
 
   return (
     <div className="grid gap-4">
       <Card>
         <CardContent className="grid gap-3">
           <p className="text-muted-foreground text-sm">
-            {sessionId ? t("forSession", { date: formatDayLong(sessionDates[sessionId]) }) : t("hint")}
+            {requestedDate !== undefined ? t("forSession", { date: formatDayLong(requestedDate) }) : t("hint")}
           </p>
           <PhotoUpload today={today} sessionId={sessionId} />
         </CardContent>

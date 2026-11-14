@@ -43,13 +43,15 @@ export default async function ProgressReportsPage({ searchParams }: PageProps<"/
     `/progress/reports?type=${isYear ? "year" : "month"}&p=${target.year}${isYear ? "" : `-${pad(target.month)}`}`;
 
   const db = getDb();
-  const [sessions, sets, weights, intake] = await Promise.all([
+  const [sessions, sets, weights, intake, catalog] = await Promise.all([
     getPeriodSessions(db, user.id, from, to),
     getTrainedSets(db, user.id, { to }),
     getWeights(db, user.id, addDays(from, -WEIGHT_LOOKBACK_DAYS), to),
     getDailyTotals(db, user.id, from, to),
+    getUserCatalog(db, user.id),
   ]);
-  const report = periodReport(sessions, sets, from, to);
+  // Mit dem Katalog zählt Unterstützung (z. B. Klimmzug-Maschine) nicht als Volumen.
+  const report = periodReport(sessions, sets, from, to, catalog.find);
   const trend = weightTrend(weights);
   const startTrend = trend.filter((point) => point.date <= from).at(-1) ?? trend.find((point) => point.date >= from);
   const endTrend = trend.at(-1);
@@ -58,7 +60,6 @@ export default async function ProgressReportsPage({ searchParams }: PageProps<"/
 
   const unit = t(`training.units.${weightUnitKey(user.unitSystem)}`);
   const display = (kg: number) => toDisplayWeight(kg, user.unitSystem);
-  const catalog = await getUserCatalog(db, user.id);
   const name = (exerciseId: string) => catalog.find(exerciseId)?.name ?? exerciseId;
   const stats = [
     { label: t("progress.reports.workouts"), value: String(report.workouts) },

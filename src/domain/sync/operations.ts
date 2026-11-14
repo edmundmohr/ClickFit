@@ -71,18 +71,42 @@ export function queueKey(operation: SyncOperation): string {
   }
 }
 
-/** So lange zurück darf der Zeitpunkt eines Offline-Vorgangs höchstens liegen. */
-export const MAX_OPERATION_AGE_MS = 14 * 24 * 60 * 60 * 1000;
+/**
+ * So lange zurück darf ein Vorgang höchstens liegen, damit der Server ihn noch annimmt. Ältere
+ * Vorgänge lehnt er ab (siehe `isExpiredOperation`), weil er sich nur begrenzt merkt, welche
+ * Vorgänge er schon ausgeführt hat.
+ */
+export const MAX_OPERATION_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+/**
+ * So lange merkt sich der Server ausgeführte Vorgänge. Deutlich länger als `MAX_OPERATION_AGE_MS`:
+ * Ein Vorgang wird frühestens zu seinem Zeitpunkt ausgeführt (bis auf die Uhrtoleranz). Kommt er
+ * später noch einmal, ist er entweder noch gemerkt oder schon zu alt und wird abgelehnt –
+ * er wird also nie ein zweites Mal angewendet.
+ */
+export const PROCESSED_RETENTION_MS = 2 * MAX_OPERATION_AGE_MS;
 const CLOCK_TOLERANCE_MS = 5 * 60 * 1000;
 
 /**
  * Zeitpunkt, zu dem der Vorgang auf dem Gerät passiert ist. Liegt die Geräteuhr in der Zukunft
- * oder ist der Vorgang sehr alt, gilt die Serverzeit.
+ * oder ist der Zeitpunkt ungültig, gilt die Serverzeit. Alte Zeitpunkte bleiben erhalten (z. B.
+ * das nachträglich bestätigte Ende eines vergessenen Trainings); dass ein Ende nicht vor dem
+ * Start liegt, stellt das Beenden des Trainings sicher.
  */
 export function operationTime(at: string, now: Date): Date {
   const time = new Date(at).getTime();
   if (!Number.isFinite(time)) return now;
   if (time > now.getTime() + CLOCK_TOLERANCE_MS) return now;
-  if (time < now.getTime() - MAX_OPERATION_AGE_MS) return now;
   return new Date(Math.min(time, now.getTime()));
+}
+
+/**
+ * Zu alte Vorgänge darf der Server nicht mehr anwenden: Er hat vergessen, ob er sie schon
+ * ausgeführt hat, und ein erneut gesendeter alter Satz würde spätere Korrekturen überschreiben.
+ * Ausgenommen ist das Beenden eines Trainings: Es wirkt nur auf ein laufendes Training und
+ * trägt bewusst einen frei gewählten, auch weit zurückliegenden Zeitpunkt.
+ */
+export function isExpiredOperation(operation: SyncOperation, now: Date): boolean {
+  if (operation.type === "workout.finish") return false;
+  const time = new Date(operation.at).getTime();
+  return Number.isFinite(time) && time < now.getTime() - MAX_OPERATION_AGE_MS;
 }

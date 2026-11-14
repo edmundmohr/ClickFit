@@ -8,7 +8,7 @@ import type { Moment } from "./timestamps";
 import { HealthImportError, LIMITS, type EntryIssue, type HealthImport, type ImportedWorkout } from "./types";
 
 export interface WorkoutCandidate {
-  /** Kennung der Quelle; fehlt sie, wird sie aus Art und Startzeit abgeleitet. */
+  /** Kennung der Quelle; fehlt sie, wird sie aus Art und Startzeit (ohne Uhrzeit: Tag, Dauer, Distanz) abgeleitet. */
   id: string | null;
   type: ActivityType;
   start: Moment;
@@ -36,9 +36,30 @@ interface Latest {
 const inRange = (value: number, [min, max]: readonly [number, number]) => Number.isFinite(value) && value >= min && value <= max;
 const round = (value: number, decimals: number) => Math.round(value * 10 ** decimals) / 10 ** decimals;
 
-/** Stabile Kennung für Einheiten, deren Quelle keine liefert. */
+/** Stabile Kennung für Einheiten mit Startzeit, deren Quelle keine Kennung liefert. */
 export function deriveExternalId(type: ActivityType, start: Date): string {
   return `auto:${type}:${start.toISOString()}`;
+}
+
+/**
+ * Kennung für Einheiten, von denen nur der Tag bekannt ist (z. B. die Aktivitäten-CSV der App).
+ * Art und Tag allein reichen nicht: Zwei Läufe am selben Tag würden sonst verschmelzen. Dauer
+ * und Distanz unterscheiden sie; völlig gleiche Einheiten zählt `occurrence` (1, 2, …) in der
+ * Reihenfolge der Datei. Dieselbe Datei ergibt so immer dieselben Kennungen.
+ */
+export function deriveDateOnlyExternalId(
+  type: ActivityType,
+  date: LocalDate,
+  durationSeconds: number,
+  distanceMeters: number | null,
+  occurrence: number,
+): string {
+  const base = `auto:${type}:${date}:${durationSeconds}s:${distanceMeters ?? "-"}m`;
+  return occurrence > 1 ? `${base}:${occurrence}` : base;
+}
+
+function cleanDistance(meters: number | null): number | null {
+  return meters !== null && Number.isFinite(meters) && meters > 0 && meters <= LIMITS.maxDistanceMeters ? round(meters, 1) : null;
 }
 
 function cleanExternalId(id: string | null): string | null {
@@ -61,6 +82,8 @@ export function createCollector(now: Date): HealthImportCollector {
   const steps = new Map<LocalDate, number>();
   const restingHeartRates = new Map<LocalDate, Latest>();
   const workouts = new Map<string, ImportedWorkout>();
+  /** Wie oft eine Einheit ohne Uhrzeit mit gleichen Merkmalen schon vorkam. */
+  const dateOnlyOccurrences = new Map<string, number>();
   const counts = { weight: 0, steps: 0, restingHeartRate: 0, workouts: 0 };
   let skipped = 0;
 
@@ -73,6 +96,20 @@ export function createCollector(now: Date): HealthImportCollector {
   function plausible(when: Moment): boolean {
     if (when.date < oldestDate || when.date > latestDate) return false;
     return !when.hasTime || when.instant.getTime() <= latestInstant;
+  }
+
+  /** Kennung aus der Quelle oder abgeleitet; bei reinen Datumsangaben auch die frühere Kennung. */
+  function identify(candidate: WorkoutCandidate, durationSeconds: number, distanceMeters: number | null) {
+    const own = cleanExternalId(candidate.id);
+    if (own !== null) return { externalId: own };
+    const { type, start } = candidate;
+    if (start.hasTime) return { externalId: deriveExternalId(type, start.instant) };
+    const base = deriveDateOnlyExternalId(type, start.date, durationSeconds, distanceMeters, 1);
+    const occurrence = (dateOnlyOccurrences.get(base) ?? 0) + 1;
+    dateOnlyOccurrences.set(base, occurrence);
+    const externalId = deriveDateOnlyExternalId(type, start.date, durationSeconds, distanceMeters, occurrence);
+    // Frühere Importe nutzten nur Art und Tag; ein so gespeicherter Eintrag wird übernommen.
+    return occurrence === 1 ? { externalId, legacyExternalId: deriveExternalId(type, start.instant) } : { externalId };
   }
 
   function reject(issue: EntryIssue): EntryIssue {
@@ -114,19 +151,16 @@ export function createCollector(now: Date): HealthImportCollector {
       if (!plausible(candidate.start)) return reject("date");
       const durationSeconds = Math.round(candidate.durationSeconds);
       if (!inRange(durationSeconds, LIMITS.durationSeconds)) return reject("range");
-      const { distanceMeters, avgHeartRate, type } = candidate;
-      const start = candidate.start.instant;
-      const externalId = cleanExternalId(candidate.id) ?? deriveExternalId(type, start);
+      const { avgHeartRate, type } = candidate;
       // Unbrauchbare Zusatzwerte verwerfen wir, die Einheit selbst bleibt erhalten.
-      workouts.set(externalId, {
-        externalId,
+      const distanceMeters = cleanDistance(candidate.distanceMeters);
+      const ids = identify(candidate, durationSeconds, distanceMeters);
+      workouts.set(ids.externalId, {
+        ...ids,
         type,
-        start,
+        start: candidate.start.instant,
         durationSeconds,
-        distanceMeters:
-          distanceMeters !== null && Number.isFinite(distanceMeters) && distanceMeters > 0 && distanceMeters <= LIMITS.maxDistanceMeters
-            ? round(distanceMeters, 1)
-            : null,
+        distanceMeters,
         avgHeartRate: avgHeartRate !== null && inRange(avgHeartRate, LIMITS.avgHeartRate) ? Math.round(avgHeartRate) : null,
       });
       return null;

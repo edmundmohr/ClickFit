@@ -1,9 +1,10 @@
 /**
  * Lesende Abfragen rund um Workouts: letzte Leistung, bisherige Bestwerte, Besitzprüfung.
  */
-import { and, asc, desc, eq, inArray, isNotNull, ne } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull, lt, ne, or, type SQL } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
 import { workoutExercise, workoutSession, workoutSet } from "@/db/schema";
+import type { ExerciseType } from "@/domain/exercises/types";
 import type { PerformedSet } from "@/domain/training/progression";
 import { bestsOf, type ExerciseBests, type LoggedSet } from "@/domain/training/records";
 import { SET_TYPES, isOneOf } from "@/domain/training/types";
@@ -15,15 +16,44 @@ export interface PreviousPerformance {
   sets: PerformedSet[];
 }
 
+/** Eine Einheit als Bezugspunkt: Es zählen nur Einheiten, die vor ihr stattfanden. */
+export interface SessionAnchor {
+  id: string;
+  date: LocalDate;
+  startedAt: Date;
+}
+
+/** Einheiten vor dem Bezugspunkt (früheres Datum oder am selben Tag früher gestartet), ohne ihn selbst. */
+function before(anchor: SessionAnchor | undefined): SQL | undefined {
+  if (!anchor) return undefined;
+  return and(
+    ne(workoutSession.id, anchor.id),
+    or(
+      lt(workoutSession.date, anchor.date),
+      and(eq(workoutSession.date, anchor.date), lt(workoutSession.startedAt, anchor.startedAt)),
+    ),
+  );
+}
+
+export interface PreviousOptions {
+  /** Nur Einheiten vor dieser (Verlaufsansicht eines älteren Trainings). */
+  before?: SessionAnchor;
+  /**
+   * Deload-Einheiten mitzählen. Für die Anzeige „Letztes Mal“ ja (es war die letzte Einheit),
+   * als Basis der Progression nicht – sonst ginge es nach jeder Deload-Woche leichter weiter.
+   */
+  includeDeload?: boolean;
+}
+
 /**
- * Arbeitssätze der letzten abgeschlossenen regulären Einheit je Übung
- * (ohne Deload-Wochen, ohne Aufwärmsätze). Basis für Vorwerte und Progression.
+ * Arbeitssätze der letzten abgeschlossenen Einheit je Übung (ohne Aufwärmsätze).
+ * Standard ist die Basis der Progression: ohne Deload-Wochen.
  */
 export async function getPreviousPerformances(
   db: AppDatabase,
   userId: string,
   exerciseIds: string[],
-  excludeSessionId?: string,
+  options: PreviousOptions = {},
 ): Promise<Map<string, PreviousPerformance>> {
   const result = new Map<string, PreviousPerformance>();
   if (exerciseIds.length === 0) return result;
@@ -47,10 +77,10 @@ export async function getPreviousPerformances(
         eq(workoutExercise.userId, userId),
         inArray(workoutExercise.exerciseId, exerciseIds),
         eq(workoutSession.status, "completed"),
-        eq(workoutSession.isDeload, false),
+        options.includeDeload ? undefined : eq(workoutSession.isDeload, false),
         isNotNull(workoutSet.completedAt),
         ne(workoutSet.type, "warmup"),
-        excludeSessionId ? ne(workoutSession.id, excludeSessionId) : undefined,
+        before(options.before),
       ),
     )
     .orderBy(desc(workoutSession.date), desc(workoutSession.startedAt), asc(workoutSet.position));
@@ -70,12 +100,16 @@ export async function getPreviousPerformances(
   return result;
 }
 
-/** Bestwerte je Übung aus allen früheren abgeschlossenen Einheiten. Fehlt eine Übung, gibt es keine Historie. */
+/**
+ * Bestwerte je Übung aus allen abgeschlossenen Einheiten vor `anchor`. Fehlt eine Übung, gibt es
+ * keine Historie. `typeOf` liefert die Übungsart (unterstützte Übungen werden umgekehrt gewertet).
+ */
 export async function getExerciseBests(
   db: AppDatabase,
   userId: string,
   exerciseIds: string[],
-  excludeSessionId: string,
+  anchor: SessionAnchor,
+  typeOf: (exerciseId: string) => ExerciseType | undefined,
 ): Promise<Map<string, ExerciseBests>> {
   const result = new Map<string, ExerciseBests>();
   if (exerciseIds.length === 0) return result;
@@ -94,7 +128,7 @@ export async function getExerciseBests(
         eq(workoutExercise.userId, userId),
         inArray(workoutExercise.exerciseId, exerciseIds),
         eq(workoutSession.status, "completed"),
-        ne(workoutSession.id, excludeSessionId),
+        before(anchor),
         isNotNull(workoutSet.completedAt),
       ),
     );
@@ -110,7 +144,7 @@ export async function getExerciseBests(
     });
     grouped.set(row.exerciseId, sets);
   }
-  for (const [exerciseId, sets] of grouped) result.set(exerciseId, bestsOf(sets));
+  for (const [exerciseId, sets] of grouped) result.set(exerciseId, bestsOf(sets, typeOf(exerciseId)));
   return result;
 }
 

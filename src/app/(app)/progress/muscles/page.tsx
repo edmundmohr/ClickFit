@@ -3,13 +3,12 @@ import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireUser } from "@/features/auth/session";
 import { MusclePanel, type MuscleInfo } from "@/features/progress/components/muscle-panel";
-import { getRecoveryOverrides, getTrainedSets } from "@/features/progress/services/progress-service";
+import { getLastTrainedDates, getRecoveryOverrides, getTrainedSets } from "@/features/progress/services/progress-service";
 import { getRecoverySnapshot } from "@/features/progress/services/recovery-service";
 import { getUserCatalog } from "@/features/training/services/exercise-service";
 import { MUSCLES, type Muscle } from "@/domain/exercises/types";
 import {
   areaDistribution,
-  isCountingSet,
   setsPerMuscle,
   trainingDaysPerMuscle,
   weeklySetsForMuscle,
@@ -33,10 +32,11 @@ export default async function ProgressMusclesPage() {
   const today = toLocalDate(now);
   const db = getDb();
   const from = addDays(startOfWeek(today), -7 * (WEEKS - 1));
-  const [sets, overrides, catalog] = await Promise.all([
+  const [sets, overrides, catalog, lastByExercise] = await Promise.all([
     getTrainedSets(db, user.id, { from }),
     getRecoveryOverrides(db, user.id),
     getUserCatalog(db, user.id),
+    getLastTrainedDates(db, user.id),
   ]);
   const findExercise = catalog.find;
 
@@ -45,11 +45,11 @@ export default async function ProgressMusclesPage() {
   const thisWeek = setsPerMuscle(sets, findExercise, startOfWeek(today), today);
   const fourWeeksFrom = addDays(today, -FOUR_WEEKS_DAYS);
   const days = trainingDaysPerMuscle(sets, findExercise, fourWeeksFrom, today);
+  // Das letzte Training zählt unabhängig vom 8-Wochen-Fenster der übrigen Auswertungen.
   const lastTrained = new Map<Muscle, string>();
-  for (const set of sets) {
-    if (!isCountingSet(set)) continue;
-    for (const muscle of findExercise(set.exerciseId)?.primary ?? []) {
-      if ((lastTrained.get(muscle) ?? "") < set.date) lastTrained.set(muscle, set.date);
+  for (const [exerciseId, date] of lastByExercise) {
+    for (const muscle of findExercise(exerciseId)?.primary ?? []) {
+      if ((lastTrained.get(muscle) ?? "") < date) lastTrained.set(muscle, date);
     }
   }
 

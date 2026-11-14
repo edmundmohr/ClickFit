@@ -42,6 +42,8 @@ export interface WorkoutExerciseView {
   /** Einheit, in der diese Übung am Trainingsort geloggt wird (kg und lbs können gemischt sein). */
   unit: WeightUnit;
   incrementKg: number;
+  /** Kleinstes einstellbares Gewicht (z. B. leere Stange); Untergrenze der Aufwärmsätze. Fehlt es, gilt 0. */
+  minWeightKg?: number;
   /** Stange und Scheiben für den Scheiben-Rechner; `null` bei Übungen ohne Scheiben. */
   bar: BarSetup | null;
   note: string;
@@ -77,8 +79,10 @@ export async function getWorkoutView(
     orderBy: asc(workoutExercise.position),
   });
   const exerciseIds = [...new Set(exerciseRows.map((row) => row.exerciseId))];
+  const anchor = { id: session.id, date: session.date, startedAt: session.startedAt };
+  const catalogRequest = getUserCatalog(db, userId);
   const [catalog, gyms, setRows, previous, bests, notes] = await Promise.all([
-    getUserCatalog(db, userId),
+    catalogRequest,
     listGyms(db, userId),
     exerciseRows.length === 0
       ? Promise.resolve([])
@@ -89,8 +93,11 @@ export async function getWorkoutView(
           ),
           orderBy: asc(workoutSet.position),
         }),
-    getPreviousPerformances(db, userId, exerciseIds, sessionId),
-    getExerciseBests(db, userId, exerciseIds, sessionId),
+    // Vorwerte und Rekorde beziehen sich nur auf Einheiten vor dieser – auch im Verlauf.
+    getPreviousPerformances(db, userId, exerciseIds, { before: anchor, includeDeload: true }),
+    catalogRequest.then((userCatalog) =>
+      getExerciseBests(db, userId, exerciseIds, anchor, (exerciseId) => userCatalog.find(exerciseId)?.type),
+    ),
     getExerciseNotes(db, userId, exerciseIds),
   ]);
 
@@ -126,6 +133,7 @@ export async function getWorkoutView(
           groupId: row.groupId,
           unit: ladder.unit,
           incrementKg: ladder.incrementKg,
+          minWeightKg: ladder.minWeightKg,
           bar: usesPlates(exercise.equipment) ? barSetupOf(gym, ladder.unit) : null,
           note: notes.get(row.exerciseId) ?? "",
           previous: previous.get(row.exerciseId) ?? null,

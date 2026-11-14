@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Loader2Icon } from "lucide-react";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/forms/field";
 import { FormError } from "@/components/forms/form-error";
 import { authClient } from "@/lib/auth/client";
+import { tellServiceWorker } from "@/lib/offline/client";
 import type { ErrorCode } from "@/lib/errors";
 
 const HTTP_TOO_MANY_REQUESTS = 429;
@@ -17,6 +18,10 @@ export function LoginForm() {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<ErrorCode | null>(null);
+
+  // Wer die Anmeldung sieht, ist nicht angemeldet (z. B. Sitzung abgelaufen): Gemerkte Seiten
+  // des vorigen Nutzers dürfen offline nicht mehr erscheinen.
+  useEffect(() => tellServiceWorker({ type: "clear-pages" }), []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,6 +40,8 @@ export function LoginForm() {
         );
         return;
       }
+      // Neuer Nutzer am Gerät: nichts aus einer früheren Sitzung offline zeigen.
+      tellServiceWorker({ type: "clear-pages" });
       router.replace("/");
       router.refresh();
     } catch {

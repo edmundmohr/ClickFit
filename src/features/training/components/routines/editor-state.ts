@@ -16,6 +16,8 @@ export interface EditorItem {
   targetRir: number;
   restSeconds: number;
   groupId: string | null;
+  /** Gelöschte eigene Übung: wird angezeigt, beim Speichern aber entfernt und nicht trainiert. */
+  archived?: boolean;
 }
 
 export interface PickerExercise {

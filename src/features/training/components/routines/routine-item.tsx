@@ -102,6 +102,7 @@ export function RoutineItem({
           >
             <span className="min-w-0 flex-1">
               <span className="block truncate font-medium">{item.name}</span>
+              {item.archived ? <span className="text-destructive block text-sm">{t("archived")}</span> : null}
               <span className="text-muted-foreground block truncate text-sm tabular-nums">
                 {t(isTimed ? "summarySeconds" : "summary", { sets: item.sets, min: item.repMin, max: item.repMax })}
                 {" · "}

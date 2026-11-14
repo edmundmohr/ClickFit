@@ -10,7 +10,7 @@ import { WEEKDAYS, type Weekday } from "@/domain/training/types";
 import { WeightCard } from "@/features/nutrition/components/weight-card";
 import { getWeightStatus } from "@/features/nutrition/services/tracking-service";
 import { getRecoverySnapshot } from "@/features/progress/services/recovery-service";
-import { startWorkoutAction } from "@/features/training/actions";
+import { StartWorkoutForm } from "@/features/training/components/start-workout-form";
 import { getUserCatalog } from "@/features/training/services/exercise-service";
 import { routineTitle } from "@/features/training/titles";
 import type { SessionSummary, TrainingStats } from "@/features/training/services/history-service";
@@ -85,13 +85,12 @@ export async function TrainingWidget({ training }: { training: TrainingToday }) 
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={startWorkoutAction}>
-            <input type="hidden" name="planDayId" value={todayDay.id} />
+          <StartWorkoutForm planDayId={todayDay.id}>
             <Button type="submit" size="lg" className="w-full">
               <PlayIcon aria-hidden />
               {t("training.plan.start")}
             </Button>
-          </form>
+          </StartWorkoutForm>
         </CardContent>
       </Card>
     );
@@ -192,7 +191,8 @@ const WEIGHT_LOOKBACK_DAYS = 90;
 
 export async function WeightWidget({ userId, today, unitSystem }: { userId: string; today: LocalDate; unitSystem: UnitSystem }) {
   const status = await getWeightStatus(getDb(), userId, addDays(today, -WEIGHT_LOOKBACK_DAYS), today);
-  return <WeightCard key={`${today}-${status.today}`} date={today} status={status} unitSystem={unitSystem} />;
+  // Ohne Datum speichert der Server für „heute“ zum Zeitpunkt des Klicks.
+  return <WeightCard key={`${today}-${status.today}`} date={null} status={status} unitSystem={unitSystem} />;
 }
 
 const MUSCLES_SHOWN = 3;

@@ -6,7 +6,12 @@ import { parseCsv } from "@/domain/health-import/csv";
 import { emptyHealthImport, type HealthImport } from "@/domain/health-import/types";
 import { createUserWithPassword } from "@/features/auth/services/user-factory";
 import { getActivityLoads, listActivities } from "@/features/cardio/services/activity-service";
-import { MAX_TOKENS_PER_USER } from "@/features/integrations/constants";
+import {
+  CSV_MAX_FILE_BYTES,
+  CSV_MAX_REQUEST_BYTES,
+  MAX_TOKENS_PER_USER,
+  csvRequestBytes,
+} from "@/features/integrations/constants";
 import { applyHealthImport, getHealthMetrics } from "@/features/integrations/services/import-service";
 import {
   authenticateToken,
@@ -283,6 +288,31 @@ describe("applyHealthImport", () => {
     expect(await db.select().from(activity)).toHaveLength(2);
   });
 
+  it("keeps two runs of one day from the activities CSV apart and imports the file only once", async () => {
+    const { db } = testDb;
+    const text = "Datum;Art;Dauer (min);Distanz (km)\r\n13.11.2026;Laufen;30;5\r\n13.11.2026;Laufen;45;7,5\r\n";
+    await applyHealthImport(db, annaId, parseCsv(text, "activities", NOW).data, "csv", NOW);
+    await applyHealthImport(db, annaId, parseCsv(text, "activities", NOW).data, "csv", NOW);
+    const rows = await db.select().from(activity).where(eq(activity.userId, annaId));
+    expect(rows.map((row) => row.durationSeconds).sort()).toEqual([1800, 2700]);
+  });
+
+  it("takes over an activity stored by an earlier version under the old identifier", async () => {
+    const { db } = testDb;
+    const text = "Datum;Art;Dauer (min);Distanz (km)\r\n13.11.2026;Laufen;30;5\r\n13.11.2026;Laufen;45;7,5\r\n";
+    const parsed = parseCsv(text, "activities", NOW).data;
+    // Frühere Version: beide Läufe unter einer Kennung verschmolzen, der letzte blieb übrig.
+    const legacy = { ...parsed.workouts[1], externalId: parsed.workouts[1].legacyExternalId ?? "", legacyExternalId: undefined };
+    await applyHealthImport(db, annaId, data({ workouts: [legacy] }), "csv", NOW);
+    const [old] = await db.select().from(activity);
+    await db.update(activity).set({ note: "eigene Notiz" }).where(eq(activity.id, old.id));
+
+    await applyHealthImport(db, annaId, parsed, "csv", NOW);
+    const rows = await db.select().from(activity).where(eq(activity.userId, annaId));
+    expect(rows).toHaveLength(2);
+    expect(rows.find((row) => row.id === old.id)).toMatchObject({ durationSeconds: 2700, note: "eigene Notiz", externalId: parsed.workouts[1].externalId });
+  });
+
   it("replaces daily values on repeated import and records the source", async () => {
     const { db } = testDb;
     await applyHealthImport(db, annaId, data({ steps: [{ date: TODAY, count: 4000 }] }), "api", NOW);
@@ -332,6 +362,24 @@ describe("applyHealthImport", () => {
       { date: YESTERDAY, weightKg: 81.4 },
       { date: TODAY, weightKg: 81.2 },
     ]);
+  });
+});
+
+describe("CSV upload limit", () => {
+  it("measures the text as it is sent, so a file below the file limit can still be too large", () => {
+    // Kurze Zeilen mit CRLF: Jeder Zeilenumbruch wird beim Senden maskiert und zählt doppelt.
+    const line = "13.11.2026;81,4\r\n";
+    const text = line.repeat(Math.floor(CSV_MAX_FILE_BYTES / line.length));
+    expect(new TextEncoder().encode(text).length).toBeLessThanOrEqual(CSV_MAX_FILE_BYTES);
+    expect(csvRequestBytes(text)).toBeGreaterThan(text.length);
+    const quoted = '"13.11.2026";"81,4"\r\n'.repeat(42_000);
+    expect(quoted.length).toBeLessThanOrEqual(CSV_MAX_FILE_BYTES);
+    expect(csvRequestBytes(quoted)).toBeGreaterThan(CSV_MAX_REQUEST_BYTES);
+  });
+
+  it("counts umlauts in UTF-8 and stays below the 1 MB limit of server actions", () => {
+    expect(csvRequestBytes("Größe")).toBe(9);
+    expect(CSV_MAX_REQUEST_BYTES).toBeLessThan(1024 * 1024);
   });
 });
 

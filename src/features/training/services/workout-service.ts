@@ -107,7 +107,8 @@ async function createSession(
   const setRows: (typeof workoutSet.$inferInsert)[] = [];
   for (const entry of seed.entries) {
     const exercise = context.catalog.find(entry.exerciseId);
-    if (!exercise) continue;
+    // Gelöschte eigene Übungen bleiben im Verlauf, werden aber nicht mehr neu trainiert.
+    if (!exercise || exercise.archived) continue;
     const workoutExerciseId = newId();
     const targetRir = Math.min(entry.targetRir + (cycle?.rirOffset ?? 0), MAX_TARGET_RIR);
     exerciseRows.push({
@@ -146,27 +147,45 @@ async function createSession(
   }
   if (exerciseRows.length === 0) throw new AppError("PLAN_EMPTY");
 
-  await db.batch([
-    db.insert(workoutSession).values({
-      id: sessionId,
-      userId,
-      planId: seed.planId,
-      planDayId: seed.planDayId,
-      focus: seed.focus,
-      name: seed.name,
-      gymProfileId: context.gym?.id ?? null,
-      isShort: seed.isShort,
-      date: today,
-      status: "in_progress",
-      isDeload: seed.isDeload,
-      startedAt: now,
-      createdAt: now,
-      updatedAt: now,
-    }),
-    ...chunk(exerciseRows, EXERCISE_INSERT_CHUNK).map((rows) => db.insert(workoutExercise).values(rows)),
-    ...chunk(setRows, SET_INSERT_CHUNK).map((rows) => db.insert(workoutSet).values(rows)),
-  ]);
+  try {
+    await db.batch([
+      db.insert(workoutSession).values({
+        id: sessionId,
+        userId,
+        planId: seed.planId,
+        planDayId: seed.planDayId,
+        focus: seed.focus,
+        name: seed.name,
+        gymProfileId: context.gym?.id ?? null,
+        isShort: seed.isShort,
+        date: today,
+        status: "in_progress",
+        isDeload: seed.isDeload,
+        startedAt: now,
+        createdAt: now,
+        updatedAt: now,
+      }),
+      ...chunk(exerciseRows, EXERCISE_INSERT_CHUNK).map((rows) => db.insert(workoutExercise).values(rows)),
+      ...chunk(setRows, SET_INSERT_CHUNK).map((rows) => db.insert(workoutSet).values(rows)),
+    ]);
+  } catch (error) {
+    // Zwei Starts gleichzeitig (z. B. Doppeltipp, zwei Geräte): Der Unique-Index lässt nur ein
+    // offenes Workout zu. Der zweite Start setzt das bereits angelegte fort.
+    if (!isOpenWorkoutConflict(error)) throw error;
+    const running = await getInProgressSession(db, userId);
+    if (!running) throw error;
+    return running.id;
+  }
   return sessionId;
+}
+
+/** Erkennt den Verstoß gegen den Index „höchstens ein offenes Workout pro Nutzer“ (auch verschachtelt). */
+export function isOpenWorkoutConflict(error: unknown): boolean {
+  for (let current: unknown = error, depth = 0; current instanceof Error && depth < 5; depth++) {
+    if (/UNIQUE constraint failed: workout_session\.user_id/.test(current.message)) return true;
+    current = current.cause;
+  }
+  return false;
 }
 
 /**
@@ -194,9 +213,11 @@ export async function startWorkout(
     getTrainingContext(db, userId, today),
   ]);
 
+  // Gelöschte eigene Übungen werden übersprungen (die Routine kann sie noch enthalten).
+  const available = planned.filter((entry) => !context.catalog.find(entry.exerciseId)?.archived);
   const adapted = context.candidateProfile
-    ? adaptDay(planned, context.catalog.find, context.catalog.all, context.candidateProfile).items
-    : planned.flatMap((entry) => {
+    ? adaptDay(available, context.catalog.find, context.catalog.all, context.candidateProfile).items
+    : available.flatMap((entry) => {
         const exercise = context.catalog.find(entry.exerciseId);
         return exercise ? [{ entry, exercise }] : [];
       });

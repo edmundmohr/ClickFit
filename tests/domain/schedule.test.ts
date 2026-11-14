@@ -54,14 +54,41 @@ describe("training streak", () => {
 });
 
 describe("time estimates and forgotten workouts", () => {
-  it("sums open sets with their rest", () => {
-    expect(
-      estimateRemainingSeconds([
-        { completed: true, restSeconds: 150 },
-        { completed: false, restSeconds: 150 },
-        { completed: false, restSeconds: 60 },
-      ]),
-    ).toBe(40 + 150 + 40 + 60);
+  const exercise = (restSeconds: number, sets: { completed: boolean; type?: "warmup" | "work" | "drop" }[], groupId: string | null = null) => ({
+    groupId,
+    restSeconds,
+    sets,
+  });
+  const open = (count: number) => Array.from({ length: count }, () => ({ completed: false }));
+
+  it("counts rest only between open sets, not after the last one", () => {
+    // Regression: 3 offene Sätze à 150 s Pause ergaben 570 s statt 420 s.
+    expect(estimateRemainingSeconds([exercise(150, open(3))])).toBe(3 * 40 + 2 * 150);
+    expect(estimateRemainingSeconds([exercise(150, [{ completed: true }, ...open(2)])])).toBe(2 * 40 + 150);
+    expect(estimateRemainingSeconds([exercise(150, [{ completed: true }])])).toBe(0);
+    expect(estimateRemainingSeconds([])).toBe(0);
+  });
+
+  it("rests once per round in a superset", () => {
+    // Supersatz A/B mit je 3 Sätzen und 90 s Pause: 6 × 40 s Arbeit + 2 × 90 s Pause = 7 min.
+    const seconds = estimateRemainingSeconds([exercise(90, open(3), "g"), exercise(60, open(3), "g")]);
+    expect(seconds).toBe(7 * 60);
+  });
+
+  it("adds no full rest after warm-up and drop sets", () => {
+    const sets = [
+      { completed: false, type: "warmup" as const },
+      { completed: false, type: "warmup" as const },
+      { completed: false, type: "work" as const },
+      { completed: false, type: "drop" as const },
+      { completed: false, type: "work" as const },
+    ];
+    expect(estimateRemainingSeconds([exercise(120, sets)])).toBe(5 * 40 + 120);
+  });
+
+  it("adds the change-over time between open exercises like the plan estimate", () => {
+    const seconds = estimateRemainingSeconds([exercise(150, [{ completed: true }]), exercise(150, open(2)), exercise(60, open(2))]);
+    expect(seconds).toBe(2 * 40 + 150 + 60 + 2 * 40 + 60);
   });
 
   it("flags workouts running longer than three hours", () => {

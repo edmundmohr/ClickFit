@@ -3,6 +3,7 @@ import type { AppDatabase } from "@/db/client";
 import { account, session, user } from "@/db/schema";
 import { AppError } from "@/lib/errors";
 import { hashPassword, isPasswordLengthValid, verifyPassword } from "@/lib/auth/password";
+import { PASSWORD_CHECK_LIMIT, consumeAttempt, passwordCheckKey, resetAttempts } from "@/lib/auth/attempt-limit";
 import { canSetPasswordFor, type Actor } from "@/domain/permissions/user-management";
 import { CREDENTIAL_PROVIDER_ID } from "./user-factory";
 
@@ -31,14 +32,22 @@ export async function verifyUserPassword(
   return verifyPassword({ hash: credential.password, password });
 }
 
-/** Ändert das eigene Passwort nach Prüfung des aktuellen; andere Sitzungen werden abgemeldet. */
+/**
+ * Ändert das eigene Passwort nach Prüfung des aktuellen; andere Sitzungen werden abgemeldet.
+ * Die Prüfung ist wie die Anmeldung begrenzt, sonst ließe sich das Passwort einer offenen
+ * Sitzung beliebig oft raten.
+ */
 export async function changeOwnPassword(
   db: AppDatabase,
   input: { userId: string; currentPassword: string; newPassword: string; keepSessionToken: string },
+  now = new Date(),
 ): Promise<void> {
+  const key = passwordCheckKey(input.userId);
+  if (!(await consumeAttempt(db, key, PASSWORD_CHECK_LIMIT, now))) throw new AppError("TOO_MANY_REQUESTS");
   if (!(await verifyUserPassword(db, input.userId, input.currentPassword))) {
     throw new AppError("WRONG_PASSWORD");
   }
+  await resetAttempts(db, key);
   await setPasswordHash(db, input.userId, input.newPassword);
   await db
     .delete(session)

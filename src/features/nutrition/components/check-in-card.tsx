@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CHECK_IN_WINDOW_DAYS } from "@/domain/nutrition/adaptive";
+import { CHECK_IN_WINDOW_DAYS, MIN_PLAUSIBLE_DAY_KCAL } from "@/domain/nutrition/adaptive";
 import { useActionRunner } from "@/hooks/use-action-runner";
 import { formatNumber } from "@/lib/format";
 import { toDisplayWeight, weightUnitKey, type UnitSystem } from "@/lib/units";
@@ -44,7 +44,11 @@ export function CheckInCard({ checkIn, unitSystem, compact }: CheckInCardProps) 
         {compact ? null : (
           <ul className="grid gap-1">
             <li>
-              {t("nutrition.targets.checkIn.loggedDays", { count: analysis.loggedDays, total: CHECK_IN_WINDOW_DAYS })}
+              {t("nutrition.targets.checkIn.loggedDays", {
+                count: analysis.loggedDays,
+                total: CHECK_IN_WINDOW_DAYS,
+                min: MIN_PLAUSIBLE_DAY_KCAL,
+              })}
             </li>
             {analysis.avgIntakeKcal !== null ? (
               <li>{t("nutrition.targets.checkIn.avgIntake", { value: formatNumber(analysis.avgIntakeKcal, 0) })}</li>

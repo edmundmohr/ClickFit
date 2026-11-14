@@ -13,7 +13,7 @@ import { CSV_KINDS, LIMITS, type CsvKind } from "@/domain/health-import/types";
 import { useActionRunner } from "@/hooks/use-action-runner";
 import { formatNumber } from "@/lib/format";
 import { importCsvAction, type CsvImportResult } from "../actions";
-import { CSV_MAX_FILE_BYTES } from "../constants";
+import { CSV_MAX_FILE_BYTES, CSV_MAX_REQUEST_BYTES, csvRequestBytes } from "../constants";
 
 interface SelectedFile {
   name: string;
@@ -35,6 +35,8 @@ export function CsvImportCard() {
   const [pasted, setPasted] = useState("");
   const [result, setResult] = useState<CsvImportResult | null>(null);
   const text = file?.text ?? pasted;
+  // Eingefügter Text: Die Grenze gilt für die Größe, mit der er übertragen wird.
+  const pastedTooLarge = file === null && csvRequestBytes(pasted) > CSV_MAX_REQUEST_BYTES;
 
   function clearFile() {
     setFile(null);
@@ -53,6 +55,11 @@ export function CsvImportCard() {
     try {
       // Die Datei bleibt im Browser, bis „Importieren“ gedrückt wird.
       const content = await selected.text();
+      // Maskierte Zeilenumbrüche und Anführungszeichen machen den Text beim Senden größer.
+      if (csvRequestBytes(content) > CSV_MAX_REQUEST_BYTES) {
+        clearFile();
+        return setFileError("fileTooLarge");
+      }
       setFile({ name: selected.name, size: selected.size, text: content });
       setFileError(null);
     } catch {
@@ -63,6 +70,7 @@ export function CsvImportCard() {
 
   function submit() {
     setResult(null);
+    if (csvRequestBytes(text) > CSV_MAX_REQUEST_BYTES) return;
     run(
       () => importCsvAction(kind, text),
       (data) => {
@@ -147,10 +155,15 @@ export function CsvImportCard() {
               }}
               className="border-input bg-background w-full rounded-md border px-3 py-2 font-mono text-base"
             />
+            {pastedTooLarge ? (
+              <p role="alert" className="text-destructive text-sm">
+                {t("textTooLarge")}
+              </p>
+            ) : null}
           </div>
         )}
 
-        <Button type="button" size="lg" className="w-full" disabled={pending || text.trim() === ""} onClick={submit}>
+        <Button type="button" size="lg" className="w-full" disabled={pending || text.trim() === "" || pastedTooLarge} onClick={submit}>
           {pending ? t("submitting") : t("submit")}
         </Button>
 

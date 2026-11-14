@@ -13,10 +13,17 @@ import type {
   Weekday,
 } from "../types";
 import { MAX_TRAINING_DAYS, MIN_TRAINING_DAYS } from "../types";
-import { DELOAD_EVERY_WEEKS, WARMUP_SECONDS, estimateExerciseSeconds, prescribe } from "./prescription";
-import { DAY_TEMPLATES, GRIP_DAY_ORDER, GRIP_DAYS_PER_WEEK, GRIP_SLOT, SPLIT_BY_DAYS, type Slot } from "./templates";
+import {
+  DELOAD_EVERY_WEEKS,
+  MIN_SETS_PER_EXERCISE,
+  WARMUP_SECONDS,
+  estimateExerciseSeconds,
+  fillWithinBudget,
+  prescribe,
+  reduceSets,
+} from "./prescription";
+import { DAY_TEMPLATES, GRIP_DAY_ORDER, GRIP_DAYS_PER_WEEK, GRIP_SLOT, chooseSplit, type Slot } from "./templates";
 
-const MIN_EXERCISES_PER_DAY = 3;
 const DIFFICULTY_RANK: Record<Difficulty, number> = { beginner: 0, intermediate: 1, advanced: 2 };
 const EXPERIENCE_RANK: Record<ExperienceLevel, number> = { beginner: 0, intermediate: 1, advanced: 2 };
 
@@ -125,6 +132,10 @@ export function pickForSlot(slot: Slot, context: SelectionContext): Exercise | n
   return null;
 }
 
+/**
+ * Stellt einen Tag aus den Slots zusammen und hält das Zeitbudget immer ein. Passen mit den
+ * vollen Sätzen weniger als drei Übungen hinein, wird pro Übung gekürzt (siehe `fillWithinBudget`).
+ */
 export function buildDay(
   slots: readonly Slot[],
   profile: Pick<TrainingProfile, "goal" | "experience" | "sessionMinutes">,
@@ -133,22 +144,29 @@ export function buildDay(
   preferences?: PreferenceMap,
 ): PlannedExercise[] {
   const budgetSeconds = profile.sessionMinutes * 60 - WARMUP_SECONDS;
-  const usedToday = new Set<string>();
-  const planned: PlannedExercise[] = [];
-  let usedSeconds = 0;
 
-  for (const slot of slots) {
-    const exercise = pickForSlot(slot, { candidates, usedInWeek, usedToday, preferences });
-    if (!exercise) continue;
-    const entry = prescribe(exercise, slot.kind, profile.goal, profile.experience);
-    const seconds = estimateExerciseSeconds(entry);
-    const fits = usedSeconds + seconds <= budgetSeconds;
-    if (!fits && planned.length >= MIN_EXERCISES_PER_DAY) continue;
-    planned.push(entry);
-    usedToday.add(exercise.id);
-    usedInWeek.add(exercise.id);
-    usedSeconds += seconds;
-  }
+  const fill = (reduceBy: number): PlannedExercise[] => {
+    const usedToday = new Set<string>();
+    // Eigene Kopie: Erst die gewählte Variante zählt für die Abwechslung in der Woche.
+    const usedThisWeek = new Set(usedInWeek);
+    const planned: PlannedExercise[] = [];
+    let usedSeconds = 0;
+    for (const slot of slots) {
+      const exercise = pickForSlot(slot, { candidates, usedInWeek: usedThisWeek, usedToday, preferences });
+      if (!exercise) continue;
+      const entry = reduceSets(prescribe(exercise, slot.kind, profile.goal, profile.experience), reduceBy);
+      const seconds = estimateExerciseSeconds(entry);
+      if (usedSeconds + seconds > budgetSeconds) continue;
+      planned.push(entry);
+      usedToday.add(exercise.id);
+      usedThisWeek.add(exercise.id);
+      usedSeconds += seconds;
+    }
+    return planned;
+  };
+
+  const planned = fillWithinBudget(fill);
+  for (const entry of planned) usedInWeek.add(entry.exerciseId);
   return planned;
 }
 
@@ -199,7 +217,6 @@ export interface GeneratorOptions {
 
 /** Ab so vielen beinlastigen Einheiten pro Woche gibt es bei Bein-Isolationsübungen einen Satz weniger. */
 export const LEG_SPORT_THRESHOLD = 3;
-const MIN_SETS = 2;
 const LEG_MUSCLES: readonly Muscle[] = ["quads", "hamstrings", "glutes", "calves", "adductors", "abductors"];
 
 export function generatePlan(
@@ -211,7 +228,7 @@ export function generatePlan(
   if (weekdays.length < MIN_TRAINING_DAYS || weekdays.length > MAX_TRAINING_DAYS) {
     throw new RangeError(`Training days must be between ${MIN_TRAINING_DAYS} and ${MAX_TRAINING_DAYS}.`);
   }
-  const { split, days } = SPLIT_BY_DAYS[weekdays.length];
+  const { split, days } = chooseSplit(weekdays.length, profile);
   const candidates = filterCandidates(profile, catalog);
 
   const usedInWeek = new Set<string>();
@@ -242,7 +259,7 @@ export function generatePlan(
         const exercise = byId.get(entry.exerciseId);
         const isLegIsolation =
           exercise?.mechanic === "isolation" && exercise.primary.every((muscle) => LEG_MUSCLES.includes(muscle));
-        return isLegIsolation ? { ...entry, sets: Math.max(MIN_SETS, entry.sets - 1) } : entry;
+        return isLegIsolation ? { ...entry, sets: Math.max(MIN_SETS_PER_EXERCISE, entry.sets - 1) } : entry;
       });
     }
   }

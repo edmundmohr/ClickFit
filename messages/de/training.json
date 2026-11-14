@@ -107,6 +107,7 @@
   },
   "prescription": "{sets} × {repMin}–{repMax}",
   "prescriptionSeconds": "{sets} × {repMin}–{repMax} s",
+  "assistedHint": "Bei dieser Übung trägst du die Unterstützung ein: Weniger Unterstützung ist besser.",
   "plan": {
     "title": "Dein Trainingsplan",
     "noProfileTitle": "Noch kein Trainingsplan",

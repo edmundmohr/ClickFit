@@ -6,7 +6,8 @@ import { and, eq, lt } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
 import { syncOperation } from "@/db/schema";
 import {
-  MAX_OPERATION_AGE_MS,
+  PROCESSED_RETENTION_MS,
+  isExpiredOperation,
   operationTime,
   syncOperationSchema,
   type SyncOperation,
@@ -57,6 +58,11 @@ export async function processOperations(
       results.push({ id: operation.id, status: "duplicate" });
       continue;
     }
+    if (isExpiredOperation(operation, now)) {
+      // Zu alt: ob er schon angewendet wurde, ist nicht mehr bekannt. Das Gerät verwirft ihn.
+      results.push({ id: operation.id, status: "rejected" });
+      continue;
+    }
     try {
       await apply(db, userId, operation, now);
       await db.insert(syncOperation).values({ userId, id: operation.id, processedAt: now }).onConflictDoNothing();
@@ -74,7 +80,10 @@ export async function processOperations(
   return results;
 }
 
-/** Entfernt Merker für Vorgänge, die so alt sind, dass kein Gerät sie mehr erneut schickt. */
+/**
+ * Entfernt Merker für Vorgänge, die so alt sind, dass der Server sie ohnehin als zu alt ablehnt
+ * (siehe `isExpiredOperation`).
+ */
 export async function pruneProcessedOperations(db: AppDatabase, now = new Date()): Promise<void> {
-  await db.delete(syncOperation).where(lt(syncOperation.processedAt, new Date(now.getTime() - 2 * MAX_OPERATION_AGE_MS)));
+  await db.delete(syncOperation).where(lt(syncOperation.processedAt, new Date(now.getTime() - PROCESSED_RETENTION_MS)));
 }

@@ -22,7 +22,7 @@ import type { TargetInput } from "../schemas";
 import { getDailyTotals } from "./diary-service";
 import { getWeights } from "./tracking-service";
 
-/** Messungen vor dem Zeitraum stabilisieren den Gewichtstrend. */
+/** Zeitraum, in dem die jüngste Gewichtsmessung als aktuelles Gewicht gilt. */
 const WEIGHT_LOOKBACK_DAYS = 90;
 
 export const TARGET_SOURCES = ["formula", "adaptive", "manual"] as const;
@@ -141,7 +141,7 @@ export async function getCheckIn(db: AppDatabase, userId: string, today: LocalDa
   const from = addDays(to, -(CHECK_IN_WINDOW_DAYS - 1));
   const [intake, weights] = await Promise.all([
     getDailyTotals(db, userId, from, to),
-    getWeights(db, userId, addDays(from, -WEIGHT_LOOKBACK_DAYS), to),
+    getWeights(db, userId, from, to),
   ]);
   const analysis = adaptiveTdee({ intake, weights, from, to, formulaTdeeKcal: formulaTdee(profile) });
   return {

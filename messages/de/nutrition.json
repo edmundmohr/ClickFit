@@ -233,7 +233,7 @@
       "title": "Wöchentlicher Check-in",
       "due": "Zeit für deinen Check-in",
       "text": "Die App vergleicht, was du gegessen hast, mit deinem Gewichtstrend und schätzt daraus deinen tatsächlichen Verbrauch.",
-      "loggedDays": "Tage mit Einträgen: {count} von {total}",
+      "loggedDays": "Auswertbare Tage (ab {min} kcal): {count} von {total}",
       "avgIntake": "Durchschnittliche Zufuhr: {value} kcal",
       "trend": "Gewichtstrend: {value} {unit}",
       "noTrend": "Gewichtstrend: zu wenige Messungen",

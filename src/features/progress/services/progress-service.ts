@@ -1,7 +1,7 @@
 /**
  * Daten für die Auswertungen: Satzverlauf, Umfänge und manuelle Erholungswerte.
  */
-import { and, asc, desc, eq, gte, isNotNull, lte } from "drizzle-orm";
+import { and, asc, desc, eq, gt, gte, isNotNull, lte, max, ne } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
 import { bodyMeasurement, recoveryOverride, workoutExercise, workoutSession, workoutSet } from "@/db/schema";
 import { isMuscle, type Muscle } from "@/domain/exercises/types";
@@ -49,6 +49,29 @@ export async function getTrainedSets(db: AppDatabase, userId: string, filter: Se
       ? [{ ...row, completedAt: row.completedAt, type: isOneOf(SET_TYPES, row.type) ? row.type : "work" }]
       : [],
   );
+}
+
+/**
+ * Letztes Trainingsdatum je Übung über die gesamte Historie. Es zählen dieselben Sätze wie bei
+ * der Muskelbelastung (`isCountingSet`): abgehakt, kein Aufwärmsatz, mindestens eine Wiederholung.
+ */
+export async function getLastTrainedDates(db: AppDatabase, userId: string): Promise<Map<string, LocalDate>> {
+  const rows = await db
+    .select({ exerciseId: workoutExercise.exerciseId, date: max(workoutSession.date) })
+    .from(workoutSet)
+    .innerJoin(workoutExercise, eq(workoutSet.workoutExerciseId, workoutExercise.id))
+    .innerJoin(workoutSession, eq(workoutExercise.sessionId, workoutSession.id))
+    .where(
+      and(
+        eq(workoutExercise.userId, userId),
+        eq(workoutSession.status, "completed"),
+        isNotNull(workoutSet.completedAt),
+        ne(workoutSet.type, "warmup"),
+        gt(workoutSet.reps, 0),
+      ),
+    )
+    .groupBy(workoutExercise.exerciseId);
+  return new Map(rows.flatMap((row) => (row.date ? [[row.exerciseId, row.date] as const] : [])));
 }
 
 export async function getPeriodSessions(db: AppDatabase, userId: string, from: LocalDate, to: LocalDate): Promise<PeriodSession[]> {

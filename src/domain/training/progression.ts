@@ -24,6 +24,8 @@ export interface Prescription {
 }
 
 export const DELOAD_WEIGHT_FACTOR = 0.9;
+/** Zeitübungen in der Deload-Woche: etwa 20 % kürzer halten (die Dauer ist dort die Belastung). */
+export const DELOAD_DURATION_FACTOR = 0.8;
 const DURATION_STEP_SECONDS = 5;
 /** Ab so vielen Wiederholungen „Luft“ über dem Ziel-RIR gilt ein Satz als zu leicht. */
 const EASY_RIR_MARGIN = 2;
@@ -125,9 +127,30 @@ function nextUnweightedTarget(
   return { weightKg: null, reps: tooHard ? base : base + step };
 }
 
-function deloadTarget(previous: PerformedSet, prescription: Prescription, steps: WeightSteps): SetTarget {
+/**
+ * Zielwerte in der Deload-Woche:
+ * - Gewicht etwa 10 % leichter. Bei unterstützten Übungen (Gewicht = Unterstützung) heißt
+ *   leichter: mehr Unterstützung, mindestens eine Stufe.
+ * - Wiederholungen zwei weniger, nicht unter dem Zielbereich.
+ * - Zeitübungen etwa 20 % kürzer, auf 5 Sekunden gerundet.
+ */
+function deloadTarget(
+  previous: PerformedSet,
+  prescription: Prescription,
+  steps: WeightSteps,
+  type: ExerciseType,
+): SetTarget {
+  if (type === "duration") {
+    const seconds = previous.reps ?? prescription.repMin;
+    const shorter = roundToIncrement(seconds * DELOAD_DURATION_FACTOR, DURATION_STEP_SECONDS);
+    return { weightKg: null, reps: Math.max(DURATION_STEP_SECONDS, Math.min(shorter, seconds)) };
+  }
   const reps = Math.max(prescription.repMin, Math.min(previous.reps ?? prescription.repMin, prescription.repMax) - 2);
   if (previous.weightKg === null) return { weightKg: null, reps };
+  if (type === "assisted_bodyweight") {
+    const moreSupport = Math.max(steps.nearest(previous.weightKg / DELOAD_WEIGHT_FACTOR), steps.up(previous.weightKg));
+    return { weightKg: moreSupport, reps };
+  }
   return { weightKg: steps.nearest(previous.weightKg * DELOAD_WEIGHT_FACTOR), reps };
 }
 
@@ -164,7 +187,7 @@ export function nextSetTargets(input: NextTargetsInput): SetTarget[] {
     // Gibt es weniger Vorwerte als Sätze, gilt der letzte bekannte Satz als Maßstab.
     const reference = done[Math.min(index, done.length - 1)];
     if (!reference) return { weightKg: null, reps: null };
-    if (isDeload) return deloadTarget(reference, prescription, steps);
+    if (isDeload) return deloadTarget(reference, prescription, steps, exerciseType);
     if (factor < 1) {
       // Wiedereinstieg: leichter beginnen und mit den unteren Wiederholungen des Bereichs starten.
       const eased = holdTarget(reference, prescription);
@@ -192,12 +215,16 @@ const WARMUP_STEPS = [
 
 /**
  * Aufwärm-Rechner: steigende Sätze bis zum Arbeitsgewicht. Stufen unterhalb des
- * Mindestgewichts (z. B. leere Stange) oder doppelte Gewichte entfallen.
+ * Mindestgewichts (z. B. leere Stange) werden auf das Mindestgewicht angehoben, doppelte
+ * Gewichte entfallen. Gerundet wird auf `minWeightKg + n × incrementKg`, damit die Stufen
+ * auch mit einer 7-kg-SZ-Stange oder einer lbs-Stange aufgehen.
  */
 export function warmupSets(workWeightKg: number, incrementKg: number, minWeightKg = 0): WarmupSet[] {
   const result: WarmupSet[] = [];
+  const min = Math.max(minWeightKg, 0);
   for (const step of WARMUP_STEPS) {
-    const weightKg = Math.max(roundToIncrement(workWeightKg * step.factor, incrementKg), minWeightKg);
+    const raw = min + roundToIncrement(workWeightKg * step.factor - min, incrementKg);
+    const weightKg = Math.round(Math.max(raw, min) * 1000) / 1000;
     const isDuplicate = result.some((set) => set.weightKg === weightKg);
     if (weightKg <= 0 || weightKg >= workWeightKg || isDuplicate) continue;
     result.push({ weightKg, reps: step.reps });

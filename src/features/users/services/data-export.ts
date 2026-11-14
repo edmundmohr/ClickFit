@@ -1,7 +1,8 @@
 /**
  * Vollständiger Export der eigenen Daten als JSON. Enthält alles, was die App über den Nutzer
- * speichert – außer Zugangsdaten (Passwort-Hash, Sitzungen, Token-Hashes, Push-Schlüssel) und
- * den Bilddateien der Fotos (zu jedem Foto stehen die Angaben im Export).
+ * speichert – außer Zugangsdaten (Passwort-Hash, Sitzungen, Token-Hashes, Push-Schlüssel),
+ * rein technischen Merkern (übertragene Offline-Vorgänge, laufender Pausen-Timer) und den
+ * Bilddateien der Fotos (zu jedem Foto stehen die Angaben im Export).
  */
 import { eq, inArray } from "drizzle-orm";
 import type { SQLiteColumn, SQLiteTable } from "drizzle-orm/sqlite-core";
@@ -9,6 +10,7 @@ import type { AppDatabase } from "@/db/client";
 import {
   activity,
   aiConsent,
+  aiUsage,
   apiToken,
   bodyFatEstimate,
   bodyMeasurement,
@@ -117,6 +119,7 @@ export async function collectUserData(db: AppDatabase, userId: string) {
     health,
     bodyFat,
     consent,
+    usage,
     tokens,
   ] = await Promise.all([
     own(userProfile),
@@ -145,6 +148,7 @@ export async function collectUserData(db: AppDatabase, userId: string) {
     own(healthMetric),
     own(bodyFatEstimate),
     own(aiConsent),
+    own(aiUsage),
     own(apiToken),
   ]);
 
@@ -187,6 +191,8 @@ export async function collectUserData(db: AppDatabase, userId: string) {
     app: {
       dashboard,
       aiConsent: consent,
+      // Zahl der KI-Anfragen je Tag.
+      aiUsage: usage,
       // Von API-Tokens nur die Angaben zum Wiedererkennen, nie der Hash.
       apiTokens: tokens.map((token) => omit(token, "tokenHash")),
     },

@@ -3,7 +3,7 @@
  * beim Tippen nicht verloren gehen; erst beim Speichern wird nach kg umgerechnet.
  */
 import type { ExerciseType } from "@/domain/exercises/types";
-import type { LoggedSet } from "@/domain/training/records";
+import { isAssisted, type LoggedSet } from "@/domain/training/records";
 import type { SetType } from "@/domain/training/types";
 import type { WeightUnit } from "@/domain/training/weights";
 import { fromDisplayWeight, parseDecimal, toDisplayWeight, unitSystemOf } from "@/lib/units";
@@ -85,6 +85,7 @@ export function toLoggedSet(exercise: ExerciseDraft, set: SetDraft): LoggedSet {
     weightKg: usesWeight(exercise.type) ? parseWeightKg(set, exercise.unit) : null,
     reps: parseReps(set),
     completed: set.completed,
+    assisted: isAssisted(exercise.type),
   };
 }
 
@@ -171,6 +172,20 @@ export function newSetFrom(last: SetDraft | undefined, id: string): SetDraft {
     note: "",
     completed: false,
   };
+}
+
+/**
+ * Folgesätze, die nach dem Abhaken von `completed` dessen Werte übernehmen: noch offen, ganz leer
+ * und von derselben Satzart. Ein Aufwärmsatz gibt sein leichtes Gewicht so nicht an Arbeitssätze weiter.
+ */
+export function setsToPrefill(sets: readonly SetDraft[], completed: SetDraft): SetDraft[] {
+  const index = sets.findIndex((set) => set.id === completed.id);
+  if (index < 0) return [];
+  return sets
+    .slice(index + 1)
+    .filter(
+      (later) => !later.completed && later.type === completed.type && later.weightText === "" && later.repsText === "",
+    );
 }
 
 /** Laufende Nummer eines Satzes unter den Nicht-Aufwärmsätzen (1-basiert). */
