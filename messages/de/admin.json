@@ -1,0 +1,17 @@
+{
+  "title": "Benutzer",
+  "description": "Als Admin kannst du für andere Benutzer ein neues Passwort setzen, z. B. wenn es vergessen wurde.",
+  "username": "Benutzername",
+  "roles": {
+    "admin": "Admin",
+    "user": "Benutzer"
+  },
+  "you": "Du",
+  "setPassword": "Passwort setzen",
+  "dialogTitle": "Neues Passwort für {name}",
+  "dialogDescription": "{name} wird danach auf allen Geräten abgemeldet.",
+  "newPassword": "Neues Passwort",
+  "confirmPassword": "Neues Passwort wiederholen",
+  "submit": "Passwort setzen",
+  "success": "Das Passwort für {name} wurde gesetzt."
+}

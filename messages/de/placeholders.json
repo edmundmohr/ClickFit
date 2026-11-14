@@ -1,0 +1,14 @@
+{
+  "training": {
+    "title": "Training",
+    "description": "Trainingsplan, Workout-Modus mit Pausentimer, Übungsbibliothek und Kalender."
+  },
+  "nutrition": {
+    "title": "Ernährung",
+    "description": "Kalorienziel, Mahlzeiten-Tracking, Barcode-Scan, Rezepte, Wasser und Supplements."
+  },
+  "progress": {
+    "title": "Fortschritt",
+    "description": "Körpergewicht, Umfänge, Kraftentwicklung, Muskelkarte und Fortschrittsfotos."
+  }
+}

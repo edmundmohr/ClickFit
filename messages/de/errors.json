@@ -1,0 +1,13 @@
+{
+  "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es noch einmal.",
+  "VALIDATION": "Bitte prüfe deine Eingaben.",
+  "INVALID_CREDENTIALS": "Benutzername oder Passwort ist falsch.",
+  "TOO_MANY_REQUESTS": "Zu viele Versuche. Bitte warte ein paar Minuten.",
+  "USERNAME_TAKEN": "Dieser Benutzername ist schon vergeben.",
+  "PASSWORD_TOO_SHORT": "Das Passwort ist zu kurz.",
+  "PASSWORD_MISMATCH": "Die Passwörter stimmen nicht überein.",
+  "WRONG_PASSWORD": "Das aktuelle Passwort ist falsch.",
+  "NOT_FOUND": "Nicht gefunden.",
+  "NOT_ADMIN": "Dafür brauchst du Admin-Rechte.",
+  "SELF_NOT_ALLOWED": "Für dein eigenes Konto nutze bitte „Passwort ändern“ in den Einstellungen."
+}

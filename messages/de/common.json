@@ -1,0 +1,10 @@
+{
+  "appName": "ClickFit",
+  "save": "Speichern",
+  "saving": "Wird gespeichert …",
+  "saved": "Gespeichert",
+  "cancel": "Abbrechen",
+  "close": "Schließen",
+  "loading": "Lädt …",
+  "comingSoon": "Kommt in Phase {phase}"
+}

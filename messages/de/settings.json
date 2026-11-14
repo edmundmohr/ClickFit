@@ -1,0 +1,39 @@
+{
+  "title": "Einstellungen",
+  "profile": {
+    "title": "Profil",
+    "description": "So wirst du in der App angezeigt.",
+    "name": "Anzeigename",
+    "username": "Benutzername",
+    "usernameHint": "Der Benutzername zum Anmelden bleibt fest."
+  },
+  "preferences": {
+    "title": "Design & Einheiten",
+    "theme": "Design",
+    "themes": {
+      "system": "Wie System",
+      "light": "Hell",
+      "dark": "Dunkel"
+    },
+    "units": "Einheiten",
+    "unitSystems": {
+      "metric": "Metrisch (kg, cm)",
+      "imperial": "Imperial (lbs, in)"
+    }
+  },
+  "password": {
+    "title": "Passwort ändern",
+    "description": "Deine anderen Geräte werden danach abgemeldet.",
+    "current": "Aktuelles Passwort",
+    "new": "Neues Passwort",
+    "confirm": "Neues Passwort wiederholen",
+    "hint": "Mindestens {min} Zeichen.",
+    "submit": "Passwort ändern",
+    "success": "Dein Passwort wurde geändert."
+  },
+  "data": {
+    "title": "Meine Daten",
+    "description": "Lade alle über dich gespeicherten Daten als JSON-Datei herunter.",
+    "exportJson": "Daten exportieren (JSON)"
+  }
+}
