@@ -1,19 +1,20 @@
 /**
- * Pläne lesen und erzeugen. Ein Plan ist zugleich ein Ordner für Routinen (Plantage);
- * der aktive Plan ist der Wochenplan. Bearbeiten: siehe routine-service.
+ * Pläne lesen und erzeugen. Ein Plan enthält Routinen (Plantage); der Hauptplan und die
+ * Zusatzpläne bestimmen den Wochenablauf. Bearbeiten: siehe routine-service.
  */
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
 import { planDay, planExercise, trainingPlan } from "@/db/schema";
 import { LEG_DOMINANT_ACTIVITIES } from "@/domain/cardio/types";
 import type { Exercise } from "@/domain/exercises/types";
 import { adaptDay, estimateDaySeconds, type SubstitutionReason } from "@/domain/training/adaptation";
 import { findAlternatives, generatePlan } from "@/domain/training/plan-generator";
+import { PLAN_STATUSES, SCHEDULED_STATUSES, type PlanStatus } from "@/domain/training/plan-roles";
 import { DAY_FOCUSES, SPLITS, isOneOf, type DayFocus, type Split, type Weekday } from "@/domain/training/types";
 import { AppError } from "@/lib/errors";
 import { toLocalDate, type LocalDate } from "@/lib/dates";
 import { newId } from "@/lib/tokens";
-import { getTrainingContext, type TrainingContext } from "./context-service";
+import { getTrainingContext, withPlanGym, type TrainingContext } from "./context-service";
 import { getUserCatalog } from "./exercise-service";
 import { getProfile, toTrainingProfile } from "./profile-service";
 import { getPreferences, getTrainingSettings, recordRejection } from "./settings-service";
@@ -48,7 +49,7 @@ export interface PlanDayView {
 
 export const PLAN_SOURCES = ["generated", "custom"] as const;
 export type PlanSource = (typeof PLAN_SOURCES)[number];
-export type PlanStatus = "active" | "saved";
+export type { PlanStatus };
 
 export interface PlanView {
   id: string;
@@ -57,6 +58,8 @@ export interface PlanView {
   split: Split | null;
   source: PlanSource;
   status: PlanStatus;
+  /** Fester Trainingsort; `null` = Ort des Tages. */
+  gymProfileId: string | null;
   startDate: LocalDate;
   deloadEveryWeeks: number;
   days: PlanDayView[];
@@ -105,7 +108,16 @@ function toDayView(day: DayRow, rows: ExerciseRow[], context: Adaptation, adapt:
   };
 }
 
-async function loadPlanViews(db: AppDatabase, plans: PlanRow[], context: Adaptation, adapt: boolean): Promise<PlanView[]> {
+/**
+ * Lädt Pläne mit Routinen. Mit `adapt` werden die Übungen an die heutige Lage angepasst, jeweils
+ * am festen Ort des Plans (sonst am Ort des Tages).
+ */
+async function loadPlanViews(
+  db: AppDatabase,
+  plans: PlanRow[],
+  context: TrainingContext | Adaptation,
+  adapt: boolean,
+): Promise<PlanView[]> {
   if (plans.length === 0) return [];
   const days = await db.query.planDay.findMany({
     where: inArray(
@@ -127,25 +139,29 @@ async function loadPlanViews(db: AppDatabase, plans: PlanRow[], context: Adaptat
       })),
     );
   }
-  return plans.map((plan) => ({
-    id: plan.id,
-    name: plan.name,
-    split: isOneOf(SPLITS, plan.split) ? plan.split : null,
-    source: isOneOf(PLAN_SOURCES, plan.source) ? plan.source : "generated",
-    status: plan.status === "active" ? "active" : "saved",
-    startDate: plan.startDate,
-    deloadEveryWeeks: plan.deloadEveryWeeks,
-    days: days
-      .filter((day) => day.planId === plan.id)
-      .map((day) =>
-        toDayView(
-          day,
-          exercises.filter((row) => row.planDayId === day.id),
-          context,
-          adapt,
+  return plans.map((plan) => {
+    const planContext = "gyms" in context ? withPlanGym(context, plan.gymProfileId) : context;
+    return {
+      id: plan.id,
+      name: plan.name,
+      split: isOneOf(SPLITS, plan.split) ? plan.split : null,
+      source: isOneOf(PLAN_SOURCES, plan.source) ? plan.source : "generated",
+      status: isOneOf(PLAN_STATUSES, plan.status) ? plan.status : "saved",
+      gymProfileId: plan.gymProfileId,
+      startDate: plan.startDate,
+      deloadEveryWeeks: plan.deloadEveryWeeks,
+      days: days
+        .filter((day) => day.planId === plan.id)
+        .map((day) =>
+          toDayView(
+            day,
+            exercises.filter((row) => row.planDayId === day.id),
+            planContext,
+            adapt,
+          ),
         ),
-      ),
-  }));
+    };
+  });
 }
 
 export function chunk<T>(items: T[], size: number): T[][] {
@@ -155,8 +171,9 @@ export function chunk<T>(items: T[], size: number): T[][] {
 }
 
 /**
- * Erzeugt aus dem Profil einen neuen Plan und macht ihn zum Wochenplan. Ein bisher aktiver
- * erzeugter Plan wird archiviert; ein selbst gebauter bleibt als Ordner erhalten.
+ * Erzeugt aus dem Profil einen neuen Plan und macht ihn zum Hauptplan. Ein bisher aktiver
+ * erzeugter Plan kommt ins Archiv; ein selbst gebauter bleibt als inaktiver Plan erhalten.
+ * Der erzeugte Plan hat keinen festen Ort: Er folgt dem Ort des Tages.
  */
 export async function createPlanFromProfile(
   db: AppDatabase,
@@ -207,7 +224,7 @@ export async function createPlanFromProfile(
       split: generated.split,
       source: "generated",
       status: "active",
-      gymProfileId: stored.gymProfileId,
+      gymProfileId: null,
       startDate: today,
       deloadEveryWeeks: generated.deloadEveryWeeks,
       createdAt: now,
@@ -229,7 +246,7 @@ export async function createPlanFromProfile(
 }
 
 /**
- * Der Wochenplan, angepasst an die heutige Lage: Übungen, die am aktuellen Ort, wegen
+ * Der Hauptplan, angepasst an die heutige Lage: Übungen, die am aktuellen Ort, wegen
  * Beschwerden oder Ausschlüssen nicht passen, sind durch Alternativen ersetzt.
  */
 export async function getActivePlan(
@@ -248,17 +265,50 @@ export async function getActivePlan(
   return view ?? null;
 }
 
-/** Alle Ordner mit ihren Routinen, der Wochenplan zuerst. Ohne Anpassung: so, wie sie gespeichert sind. */
-export async function listFolders(db: AppDatabase, userId: string): Promise<PlanView[]> {
+/**
+ * Hauptplan und Zusatzpläne (Hauptplan zuerst), angepasst an die heutige Lage – für die
+ * Heute-Seite, den Kalender und die Serie.
+ */
+export async function getScheduledPlans(
+  db: AppDatabase,
+  userId: string,
+  today: LocalDate = toLocalDate(new Date()),
+  loaded?: TrainingContext,
+): Promise<PlanView[]> {
+  const plans = await db.query.trainingPlan.findMany({
+    where: and(eq(trainingPlan.userId, userId), inArray(trainingPlan.status, [...SCHEDULED_STATUSES])),
+    orderBy: asc(trainingPlan.createdAt),
+  });
+  if (plans.length === 0) return [];
+  const context = loaded ?? (await getTrainingContext(db, userId, today));
+  return sortByStatus(await loadPlanViews(db, plans, context, true));
+}
+
+const STATUS_ORDER: Record<PlanStatus, number> = { active: 0, extra: 1, saved: 2, archived: 3 };
+
+function sortByStatus(views: PlanView[]): PlanView[] {
+  return views.sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
+}
+
+/**
+ * Alle Pläne mit ihren Routinen: Hauptplan, Zusatzpläne, inaktive – mit `archived` die Pläne im
+ * Archiv. Ohne Anpassung: so, wie sie gespeichert sind.
+ */
+export async function listFolders(
+  db: AppDatabase,
+  userId: string,
+  options: { archived?: boolean } = {},
+): Promise<PlanView[]> {
+  const statuses: PlanStatus[] = options.archived ? ["archived"] : ["active", "extra", "saved"];
   const [plans, catalog] = await Promise.all([
     db.query.trainingPlan.findMany({
-      where: and(eq(trainingPlan.userId, userId), inArray(trainingPlan.status, ["active", "saved"])),
-      orderBy: asc(trainingPlan.createdAt),
+      where: and(eq(trainingPlan.userId, userId), inArray(trainingPlan.status, statuses)),
+      orderBy: options.archived ? desc(trainingPlan.updatedAt) : asc(trainingPlan.createdAt),
     }),
     getUserCatalog(db, userId),
   ]);
   const views = await loadPlanViews(db, plans, { catalog, candidateProfile: null }, false);
-  return views.sort((a, b) => Number(b.status === "active") - Number(a.status === "active"));
+  return options.archived ? views : sortByStatus(views);
 }
 
 /** Lädt einen Plantag und stellt sicher, dass er zu einem Plan des Nutzers gehört. */
@@ -289,7 +339,7 @@ export async function getRoutine(
 /** Lädt eine Plan-Übung und stellt sicher, dass sie zu einem Plan des Nutzers gehört. */
 async function getOwnedPlanExercise(db: AppDatabase, userId: string, planExerciseId: string) {
   const [row] = await db
-    .select({ planExercise, planDayId: planDay.id, source: trainingPlan.source })
+    .select({ planExercise, planDayId: planDay.id, source: trainingPlan.source, gymProfileId: trainingPlan.gymProfileId })
     .from(planExercise)
     .innerJoin(planDay, eq(planExercise.planDayId, planDay.id))
     .innerJoin(trainingPlan, eq(planDay.planId, trainingPlan.id))
@@ -306,13 +356,15 @@ export async function getSwapOptions(
   today: LocalDate = toLocalDate(new Date()),
 ): Promise<Exercise[]> {
   const row = await getOwnedPlanExercise(db, userId, planExerciseId);
-  const [context, sameDay] = await Promise.all([
+  const [dayContext, sameDay] = await Promise.all([
     getTrainingContext(db, userId, today),
     db.query.planExercise.findMany({
       columns: { exerciseId: true },
       where: eq(planExercise.planDayId, row.planDayId),
     }),
   ]);
+  // Alternativen passend zum Ort, an dem die Routine trainiert wird.
+  const context = withPlanGym(dayContext, row.gymProfileId);
   const current = context.catalog.find(row.planExercise.exerciseId);
   if (!current) return [];
   return findAlternatives(current, context.catalog.all, {

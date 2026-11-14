@@ -16,7 +16,7 @@ import { createGym, deleteGym, getGym, listGyms, setActiveGym, updateGym } from 
 import { createPlanFromProfile, getActivePlan, getRoutine, listFolders } from "@/features/training/services/plan-service";
 import { listCompletedSessions } from "@/features/training/services/history-service";
 import { saveOnboarding } from "@/features/training/services/profile-service";
-import { activateFolder, createFolder, createRoutine, deleteFolder, deleteRoutine, duplicateRoutine, renameFolder, saveRoutine } from "@/features/training/services/routine-service";
+import { createFolder, createRoutine, deleteFolder, deleteRoutine, duplicateRoutine, renameFolder, saveRoutine, setPlanStatus } from "@/features/training/services/routine-service";
 import { saveInjuries, saveTrainingSettings, setExerciseExcluded } from "@/features/training/services/settings-service";
 import { finishWorkout, saveSet, startWorkout } from "@/features/training/services/workout-service";
 import { getWorkoutView } from "@/features/training/services/workout-view";
@@ -412,7 +412,7 @@ describe("plan builder", () => {
     const folder = await createFolder(testDb.db, annaId, "Mein Plan", created);
     const routine = await createRoutine(testDb.db, annaId, folder, "Push");
     await saveRoutine(testDb.db, annaId, routine, input(folder));
-    await activateFolder(testDb.db, annaId, folder, NOW);
+    await setPlanStatus(testDb.db, annaId, folder, "active", NOW);
 
     const plan = await getActivePlan(testDb.db, annaId, TODAY);
     expect(plan).toMatchObject({ id: folder, startDate: TODAY });
@@ -421,7 +421,7 @@ describe("plan builder", () => {
     expect(dayStatus("2026-10-06", new Set(), schedule, TODAY)).toBe("rest");
     expect(dayStatus(addDays(TODAY, 1), new Set(), schedule, TODAY)).toBe("planned");
     // Erneutes Aktivieren des schon aktiven Plans verschiebt den Start nicht.
-    await activateFolder(testDb.db, annaId, folder, new Date(NOW.getTime() + 7 * 86_400_000));
+    await setPlanStatus(testDb.db, annaId, folder, "active", new Date(NOW.getTime() + 7 * 86_400_000));
     expect((await getActivePlan(testDb.db, annaId, TODAY))?.startDate).toBe(TODAY);
   });
 
@@ -431,7 +431,7 @@ describe("plan builder", () => {
     await saveRoutine(testDb.db, annaId, routine, input(folder));
     const generated = (await listFolders(testDb.db, annaId))[0].id;
 
-    await activateFolder(testDb.db, annaId, folder);
+    await setPlanStatus(testDb.db, annaId, folder, "active");
     const plan = await getActivePlan(testDb.db, annaId, TODAY);
     expect(plan).toMatchObject({ id: folder, name: "Mein Plan" });
     expect(plannedWeekdays(plan!.days)).toEqual([2]);
@@ -471,7 +471,7 @@ describe("plan builder", () => {
     await expectAppError(saveRoutine(testDb.db, eddiId, routine, input(own)), "NOT_FOUND");
     await expectAppError(deleteRoutine(testDb.db, eddiId, routine), "NOT_FOUND");
     await expectAppError(createRoutine(testDb.db, eddiId, folder, "Fremd"), "NOT_FOUND");
-    await expectAppError(activateFolder(testDb.db, eddiId, folder), "NOT_FOUND");
+    await expectAppError(setPlanStatus(testDb.db, eddiId, folder, "active"), "NOT_FOUND");
     await expectAppError(startWorkout(testDb.db, eddiId, routine, NOW), "NOT_FOUND");
     // Eine eigene Routine darf nicht in einen fremden Ordner verschoben werden.
     const eddiRoutine = await createRoutine(testDb.db, eddiId, own, "Meine");

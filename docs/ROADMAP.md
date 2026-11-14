@@ -153,3 +153,8 @@ Grenzen:
   (20–90 Minuten), unabhängig vom Wochenplan; zeigt die Erholung je Region an.
 - Abfrage nach jeder Übung: Anstrengung und RIR nach dem letzten Satz, freiwillig und
   abschaltbar; fließt in die Progression und in „Plan verfeinern“ ein.
+- Mehrere Trainingspläne: beliebig viele benannte Pläne (z. B. Sommer, Winter, Draußen) mit
+  Hauptplan, Zusatzplänen, inaktiven Plänen und Archiv. Zusatzpläne erscheinen zusätzlich an
+  ihren Wochentagen, sodass auch zwei Einheiten am Tag geplant sind (z. B. morgens draußen,
+  abends zu Hause). Optional fester Ort pro Plan. Migration 0009 (nur Daten: bestehende Pläne
+  ohne festen Ort).

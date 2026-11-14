@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ClipboardListIcon, CrosshairIcon, MapPinIcon, PlayIcon, SlidersHorizontalIcon } from "lucide-react";
+import { ClipboardListIcon, CrosshairIcon, FolderOpenIcon, MapPinIcon, PlayIcon, SlidersHorizontalIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +14,7 @@ import { PlanDayCard } from "@/features/training/components/plan-day-card";
 import { RecoveryDayCard } from "@/features/training/components/recovery-day-card";
 import { RegeneratePlanButton } from "@/features/training/components/regenerate-plan-button";
 import { getTrainingContext } from "@/features/training/services/context-service";
-import { getActivePlan } from "@/features/training/services/plan-service";
+import { getScheduledPlans } from "@/features/training/services/plan-service";
 import { getRecoveryDay } from "@/features/training/services/recovery-day-service";
 import { folderTitle } from "@/features/training/titles";
 import { cycleStatus } from "@/domain/training/cycle";
@@ -39,10 +39,12 @@ export default async function TrainingPage() {
   const db = getDb();
   const today = toLocalDate(new Date());
   const context = await getTrainingContext(db, user.id, today);
-  const [plan, running] = await Promise.all([
-    getActivePlan(db, user.id, today, context),
+  const [plans, running] = await Promise.all([
+    getScheduledPlans(db, user.id, today, context),
     getInProgressSession(db, user.id),
   ]);
+  const plan = plans.find((item) => item.status === "active") ?? null;
+  const extraPlans = plans.filter((item) => item.status === "extra");
 
   if (!plan) {
     return (
@@ -60,6 +62,16 @@ export default async function TrainingPage() {
   const gymName = gym ? (gym.name ?? tTraining(`locations.${gym.type}`)) : null;
   const injuries = profile?.injuries ?? [];
   const gymLabel = gymName ? t("location", { name: gymName }) : tAll("gyms.title");
+  /** Hinweis auf den festen Ort eines Plans, wenn er vom Ort des Tages abweicht. */
+  const fixedLocation = (gymId: string | null) => {
+    const fixed = gymId === null || gymId === gym?.id ? null : context.gyms.find((item) => item.id === gymId);
+    return fixed ? (
+      <p className="text-muted-foreground flex items-center gap-1.5 text-sm">
+        <MapPinIcon className="size-4 shrink-0" aria-hidden />
+        {t("fixedLocation", { name: fixed.name ?? tTraining(`locations.${fixed.type}`) })}
+      </p>
+    ) : null;
+  };
 
   return (
     <>
@@ -79,6 +91,12 @@ export default async function TrainingPage() {
             <Link href="/training/adjustments">
               <SlidersHorizontalIcon aria-hidden />
               {t("adjustments")}
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/training/routines">
+              <FolderOpenIcon aria-hidden />
+              {t("managePlans")}
             </Link>
           </Button>
           <Button asChild variant="outline" size="sm">
@@ -137,8 +155,20 @@ export default async function TrainingPage() {
           </Alert>
         ) : null}
         {recoveryDay ? <RecoveryDayCard day={recoveryDay} canStart={!running} /> : null}
+        {fixedLocation(plan.gymProfileId)}
         {plan.days.map((day) => (
           <PlanDayCard key={day.id} day={day} isToday={day.weekday === todayWeekday} canStart={!running} />
+        ))}
+        {extraPlans.map((extra) => (
+          <section key={extra.id} className="grid gap-4 pt-2">
+            <h2 className="text-lg font-semibold">
+              {t("extraTitle", { name: folderTitle(extra, (split) => tTraining(`splits.${split}`)) })}
+            </h2>
+            {fixedLocation(extra.gymProfileId)}
+            {extra.days.map((day) => (
+              <PlanDayCard key={day.id} day={day} isToday={day.weekday === todayWeekday} canStart={!running} />
+            ))}
+          </section>
         ))}
         <div className="flex flex-wrap gap-3 pt-2">
           <RegeneratePlanButton />

@@ -13,5 +13,7 @@
   "streakValue": "{count, plural, one {# Training} other {# Trainings}} in Folge",
   "streakHint": "Ruhetage unterbrechen den Streak nicht.",
   "weekTitle": "Diese Woche",
-  "weekValue": "{done} von {planned} erledigt"
+  "weekValue": "{done} von {planned} erledigt",
+  "unitsProgress": "{done} von {total} erledigt",
+  "unitDone": "Erledigt · {sets, plural, one {# Satz} other {# Sätze}} in {minutes} min"
 }

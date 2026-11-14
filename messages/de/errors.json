@@ -14,7 +14,7 @@
   "PLAN_EMPTY": "Mit diesen Angaben lässt sich kein Plan erstellen. Bitte prüfe Equipment und Ausschlüsse.",
   "LAST_GYM": "Mindestens ein Trainingsort muss bleiben.",
   "GYM_ACTIVE": "Der aktive Trainingsort kann nicht gelöscht werden. Wähle zuerst einen anderen aus.",
-  "PLAN_ACTIVE": "Der Wochenplan kann nicht gelöscht werden. Mach zuerst einen anderen Ordner zum Wochenplan.",
+  "PLAN_ACTIVE": "Der Hauptplan lässt sich nicht löschen, archivieren oder zurückstufen. Mach zuerst einen anderen Plan zum Hauptplan.",
   "WORKOUT_RUNNING": "Es läuft bereits ein Training. Schließe es zuerst ab.",
   "TOKEN_LIMIT": "Du hast die Höchstzahl an API-Tokens erreicht. Lösche zuerst einen, den du nicht mehr brauchst.",
   "IMPORT_INVALID": "Die Datei oder die Daten konnten nicht gelesen werden. Bitte prüfe das Format.",

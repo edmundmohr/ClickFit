@@ -3,7 +3,19 @@
 import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { FolderPlusIcon, MoreVerticalIcon, PencilIcon, PlusIcon, StarIcon, Trash2Icon } from "lucide-react";
+import {
+  ArchiveIcon,
+  ArchiveRestoreIcon,
+  CalendarMinusIcon,
+  CalendarPlusIcon,
+  FolderPlusIcon,
+  MapPinIcon,
+  MoreVerticalIcon,
+  PencilIcon,
+  PlusIcon,
+  StarIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -25,13 +37,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Field } from "@/components/forms/field";
 import { useActionRunner } from "@/hooks/use-action-runner";
+import type { PlanStatus } from "@/domain/training/plan-roles";
 import {
-  activateFolderAction,
   createFolderAction,
   createRoutineAction,
   deleteFolderAction,
   renameFolderAction,
+  setPlanStatusAction,
 } from "../../flex-actions";
+import { PlanLocationDialog, type LocationOption } from "./plan-location-dialog";
 
 interface NameDialogProps {
   open: boolean;
@@ -141,19 +155,30 @@ export function NewFolderButton() {
 interface FolderActionsProps {
   folderId: string;
   title: string;
-  /** Eigener Name des Ordners; leer bei erzeugten Plänen. */
+  /** Eigener Name des Plans; leer bei erzeugten Plänen. */
   name: string;
-  isActive: boolean;
+  status: PlanStatus;
+  /** Fester Ort des Plans; `null` = Ort des Tages. */
+  gymId: string | null;
+  locations: LocationOption[];
 }
 
-type FolderDialog = "routine" | "rename" | "delete" | null;
+type FolderDialog = "routine" | "rename" | "location" | null;
 
-/** „Routine hinzufügen“ und das Menü eines Ordners (Umbenennen, Wochenplan, Löschen). */
-export function FolderActions({ folderId, title, name, isActive }: FolderActionsProps) {
+/**
+ * „Routine hinzufügen“ und das Menü eines Plans: umbenennen, Ort festlegen, Rolle wechseln
+ * (Haupt-, Zusatzplan, inaktiv) und archivieren. Der Hauptplan bleibt, bis ein anderer ihn ablöst.
+ */
+export function FolderActions({ folderId, title, name, status, gymId, locations }: FolderActionsProps) {
   const t = useTranslations();
   const router = useRouter();
   const { run, pending } = useActionRunner();
   const [dialog, setDialog] = useState<FolderDialog>(null);
+  const changeStatus = (target: PlanStatus, message: "madeMain" | "madeExtra" | "unscheduled" | "archivedToast") =>
+    run(
+      () => setPlanStatusAction(folderId, target),
+      () => toast.success(t(`routines.${message}`, { name: title })),
+    );
 
   return (
     <div className="flex shrink-0 items-center gap-1">
@@ -173,24 +198,37 @@ export function FolderActions({ folderId, title, name, isActive }: FolderActions
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          {status === "active" ? null : (
+            <DropdownMenuItem className="min-h-11" onSelect={() => changeStatus("active", "madeMain")}>
+              <StarIcon aria-hidden />
+              {t("routines.makeMain")}
+            </DropdownMenuItem>
+          )}
+          {status === "saved" ? (
+            <DropdownMenuItem className="min-h-11" onSelect={() => changeStatus("extra", "madeExtra")}>
+              <CalendarPlusIcon aria-hidden />
+              {t("routines.makeExtra")}
+            </DropdownMenuItem>
+          ) : null}
+          {status === "extra" ? (
+            <DropdownMenuItem className="min-h-11" onSelect={() => changeStatus("saved", "unscheduled")}>
+              <CalendarMinusIcon aria-hidden />
+              {t("routines.unschedule")}
+            </DropdownMenuItem>
+          ) : null}
+          <DropdownMenuItem className="min-h-11" onSelect={() => setDialog("location")}>
+            <MapPinIcon aria-hidden />
+            {t("routines.location")}
+          </DropdownMenuItem>
           <DropdownMenuItem className="min-h-11" onSelect={() => setDialog("rename")}>
             <PencilIcon aria-hidden />
             {t("routines.rename")}
           </DropdownMenuItem>
-          {isActive ? null : (
-            <>
-              <DropdownMenuItem
-                className="min-h-11"
-                onSelect={() => run(() => activateFolderAction(folderId), () => toast.success(t("routines.activated")))}
-              >
-                <StarIcon aria-hidden />
-                {t("routines.activate")}
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive min-h-11" onSelect={() => setDialog("delete")}>
-                <Trash2Icon aria-hidden />
-                {t("routines.deleteFolder")}
-              </DropdownMenuItem>
-            </>
+          {status === "active" ? null : (
+            <DropdownMenuItem className="min-h-11" onSelect={() => changeStatus("archived", "archivedToast")}>
+              <ArchiveIcon aria-hidden />
+              {t("routines.archive")}
+            </DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -220,7 +258,51 @@ export function FolderActions({ folderId, title, name, isActive }: FolderActions
         onSubmit={(value) => run(() => renameFolderAction(folderId, value), () => setDialog(null))}
         onClose={() => setDialog(null)}
       />
-      <AlertDialog open={dialog === "delete"} onOpenChange={(open) => !open && setDialog(null)}>
+      <PlanLocationDialog
+        open={dialog === "location"}
+        folderId={folderId}
+        title={title}
+        gymId={gymId}
+        locations={locations}
+        onClose={() => setDialog(null)}
+      />
+    </div>
+  );
+}
+
+/** Aktionen eines Plans im Archiv: wiederherstellen oder endgültig löschen. */
+export function ArchivedPlanActions({ folderId, title }: { folderId: string; title: string }) {
+  const t = useTranslations();
+  const { run, pending } = useActionRunner();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  return (
+    <div className="flex shrink-0 items-center gap-1">
+      <Button
+        variant="outline"
+        className="min-h-11"
+        disabled={pending}
+        onClick={() =>
+          run(
+            () => setPlanStatusAction(folderId, "saved"),
+            () => toast.success(t("routines.restored", { name: title })),
+          )
+        }
+      >
+        <ArchiveRestoreIcon aria-hidden />
+        {t("routines.restore")}
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="text-destructive size-11"
+        aria-label={`${t("routines.deleteFolder")}: ${title}`}
+        disabled={pending}
+        onClick={() => setConfirmDelete(true)}
+      >
+        <Trash2Icon aria-hidden />
+      </Button>
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("routines.deleteFolderTitle")}</AlertDialogTitle>

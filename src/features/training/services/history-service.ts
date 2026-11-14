@@ -16,6 +16,8 @@ export interface SessionSummary {
   focus: DayFocus | null;
   /** Name der Routine, falls sie einen eigenen hat. */
   name: string | null;
+  /** Routine, aus der die Einheit gestartet wurde; `null` = freies Training. */
+  planDayId: string | null;
   durationMinutes: number | null;
   completedSets: number;
   volumeKg: number;
@@ -81,6 +83,7 @@ async function summarize(
       date: session.date,
       focus: isOneOf(DAY_FOCUSES, session.focus) ? session.focus : null,
       name: session.name,
+      planDayId: session.planDayId,
       durationMinutes: durationMs === null ? null : Math.max(1, Math.round(durationMs / 60000)),
       completedSets: totals.completedSets,
       volumeKg: totals.volumeKg,
