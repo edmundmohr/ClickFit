@@ -153,7 +153,18 @@ geändertes Schema und neue Textdateien nicht zuverlässig im laufenden Betrieb.
 
 ## Deployment auf Cloudflare
 
-Einmalig einzurichten (im Cloudflare-Account, in dem die Zone `clickfit.online` liegt):
+**Produktion läuft** unter https://clickfit.online (erstes Deployment am 14.11.2026).
+Datenbank `clickfit`, Bucket `clickfit-uploads` und das Secret `BETTER_AUTH_SECRET` sind
+angelegt. Eine neue Version geht so live:
+
+1. Neue Migrationen einspielen: `npm run db:migrate:prod`
+2. Deployen: `npm run deploy`
+
+Die Staging-Umgebung ist vorbereitet, aber noch nicht angelegt.
+
+### Ersteinrichtung (zum Nachschlagen, für Produktion erledigt)
+
+Im Cloudflare-Account, in dem die Zone `clickfit.online` liegt:
 
 1. Workers Paid Plan aktivieren.
 2. Anmelden: `npx wrangler login`

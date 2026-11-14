@@ -24,8 +24,7 @@
     {
       "binding": "DB",
       "database_name": "clickfit",
-      // Durch die ID ersetzen, die `wrangler d1 create clickfit --location weur` ausgibt
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "9d873abe-e148-461f-b8bf-076c5337d30a",
       "migrations_dir": "drizzle/migrations"
     }
   ],
