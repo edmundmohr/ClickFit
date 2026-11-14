@@ -4,3 +4,4 @@ export * from "./nutrition";
 export * from "./progress";
 export * from "./flexibility";
 export * from "./sync";
+export * from "./integrations";

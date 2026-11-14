@@ -22,6 +22,8 @@ import cardio from "./cardio.json";
 import mobility from "./mobility.json";
 import dataExport from "./export.json";
 import sync from "./offline-sync.json";
+import integrations from "./integrations.json";
+import ai from "./ai.json";
 
 const messages = {
   common,
@@ -48,6 +50,8 @@ const messages = {
   mobility,
   export: dataExport,
   sync,
+  integrations,
+  ai,
 };
 
 export default messages;

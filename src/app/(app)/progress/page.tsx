@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SeriesChart } from "@/components/charts/series-chart";
 import { requireUser } from "@/features/auth/session";
+import { HealthCard } from "@/features/integrations/components/health-card";
 import { WeightCard } from "@/features/nutrition/components/weight-card";
 import { getWeights } from "@/features/nutrition/services/tracking-service";
 import { MeasurementPanel } from "@/features/progress/components/measurement-panel";
@@ -86,6 +87,7 @@ export default async function ProgressBodyPage() {
           <MeasurementPanel today={today} measurements={measurements} />
         </CardContent>
       </Card>
+      <HealthCard userId={user.id} today={today} />
     </div>
   );
 }

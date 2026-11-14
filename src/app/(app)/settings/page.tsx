@@ -5,9 +5,13 @@ import { DownloadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/layout/page-header";
+import { AiConsentCard } from "@/features/ai/components/ai-consent-card";
+import { getAiStatus } from "@/features/ai/services/ai-service";
 import { requireUser } from "@/features/auth/session";
 import { PushCard } from "@/features/notifications/components/push-card";
-import { getEnv } from "@/lib/server/context";
+import { toLocalDate } from "@/lib/dates";
+import { getLlmProvider } from "@/lib/llm";
+import { getDb, getEnv } from "@/lib/server/context";
 import { ChangePasswordForm } from "@/features/users/components/change-password-form";
 import { PreferencesForm } from "@/features/users/components/preferences-form";
 import { ProfileForm } from "@/features/users/components/profile-form";
@@ -21,7 +25,12 @@ export default async function SettingsPage() {
   const user = await requireUser();
   const t = await getTranslations("settings");
   // Ohne Schlüssel ist Web Push nicht eingerichtet: Dann entfällt die Karte.
-  const vapidPublicKey: string | undefined = getEnv().VAPID_PUBLIC_KEY;
+  const env = getEnv();
+  const vapidPublicKey: string | undefined = env.VAPID_PUBLIC_KEY;
+  const tAi = await getTranslations("ai.settings");
+  const ai = await getAiStatus(getDb(), getLlmProvider(env), user.id, toLocalDate(new Date()));
+  const aiTitle = tAi("title");
+  const aiDescription = tAi("description");
   return (
     <>
       <PageHeader title={t("title")} />
@@ -71,6 +80,17 @@ export default async function SettingsPage() {
             </Button>
           </CardContent>
         </Card>
+        {ai.available ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>{aiTitle}</CardTitle>
+              <CardDescription>{aiDescription}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AiConsentCard status={ai} />
+            </CardContent>
+          </Card>
+        ) : null}
         {vapidPublicKey ? (
           <Card>
             <CardHeader>

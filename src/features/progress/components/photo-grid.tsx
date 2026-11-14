@@ -6,6 +6,8 @@ import { Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { BodyFatSection, type BodyFatAi } from "@/features/ai/components/body-fat-section";
+import type { BodyFatEstimateView } from "@/features/ai/services/body-fat-service";
 import { useActionRunner } from "@/hooks/use-action-runner";
 import { formatDayLong } from "@/lib/format";
 import { deletePhotoAction } from "../actions";
@@ -15,10 +17,14 @@ interface PhotoGridProps {
   photos: PhotoView[];
   /** Datum des zugeordneten Trainings je Foto (Kennung des Trainings → Datum). */
   sessionDates: Record<string, string>;
+  /** Vorhandene Körperfett-Schätzungen je Foto. */
+  estimates: Record<string, BodyFatEstimateView>;
+  /** `null`, wenn auf dem Server keine KI eingerichtet ist: Dann entfällt der Abschnitt. */
+  ai: BodyFatAi | null;
 }
 
 /** Raster der eigenen Fotos; ein Tipp vergrößert, dort lässt sich das Foto löschen. */
-export function PhotoGrid({ photos, sessionDates }: PhotoGridProps) {
+export function PhotoGrid({ photos, sessionDates, estimates, ai }: PhotoGridProps) {
   const t = useTranslations("progress.photos");
   const { run, pending } = useActionRunner();
   const [open, setOpen] = useState<PhotoView | null>(null);
@@ -65,6 +71,7 @@ export function PhotoGrid({ photos, sessionDates }: PhotoGridProps) {
                 alt={t("photoAlt", { date: formatDayLong(open.date) })}
                 className="w-full rounded-lg"
               />
+              {ai ? <BodyFatSection key={open.id} photoId={open.id} estimate={estimates[open.id] ?? null} ai={ai} /> : null}
               <DialogFooter>
                 <Button
                   variant="ghost"

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
-import { session } from "@/db/schema";
+import { apiToken, bodyWeightEntry, session } from "@/db/schema";
 import { AppError } from "@/lib/errors";
 import type { Actor } from "@/domain/permissions/user-management";
 import { createUserWithPassword } from "@/features/auth/services/user-factory";
@@ -189,6 +189,31 @@ describe("user list, profile and export", () => {
     });
     const adminExport = await exportOwnData(testDb.db, admin.id);
     expect(adminExport.profile).toMatchObject({ name: "Admin", theme: "system", unitSystem: "metric" });
+  });
+
+  it("exports the stored data of the user and nothing of others", async () => {
+    const now = new Date();
+    await testDb.db.insert(bodyWeightEntry).values([
+      { id: newId(), userId: anna.id, date: "2026-11-10", weightKg: 64.5, source: "manual", createdAt: now },
+      { id: newId(), userId: admin.id, date: "2026-11-10", weightKg: 90, source: "manual", createdAt: now },
+    ]);
+    await testDb.db.insert(apiToken).values({
+      id: newId(),
+      userId: anna.id,
+      name: "Waage",
+      tokenHash: "geheimer-hash",
+      prefix: "cf_abc",
+      createdAt: now,
+    });
+    const exported = await exportOwnData(testDb.db, anna.id);
+    expect(exported.version).toBe(2);
+    expect(exported.data.body.weights).toHaveLength(1);
+    expect(exported.data.body.weights[0]).toMatchObject({ weightKg: 64.5 });
+    expect(exported.data.app.apiTokens).toEqual([expect.objectContaining({ name: "Waage", prefix: "cf_abc" })]);
+    const serialized = JSON.stringify(exported);
+    expect(serialized).not.toContain("geheimer-hash");
+    expect(serialized).not.toContain(admin.id);
+    expect((await exportOwnData(testDb.db, admin.id)).data.body.weights[0]).toMatchObject({ weightKg: 90 });
   });
 
   it("never includes password hashes in the export", async () => {

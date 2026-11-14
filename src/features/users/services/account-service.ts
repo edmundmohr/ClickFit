@@ -1,3 +1,4 @@
+import { collectUserData, type UserData } from "./data-export";
 import { asc, eq } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
 import { user } from "@/db/schema";
@@ -48,7 +49,7 @@ export async function listUsers(db: AppDatabase, actor: Actor): Promise<UserList
 
 export interface UserDataExport {
   format: "clickfit-export";
-  version: 1;
+  version: 2;
   exportedAt: string;
   profile: {
     username: string;
@@ -57,15 +58,17 @@ export interface UserDataExport {
     unitSystem: string;
     createdAt: string;
   };
+  /** Alle gespeicherten Daten, nach Bereichen gegliedert. */
+  data: UserData;
 }
 
-/** Sammelt alle Daten des Nutzers. Spätere Phasen hängen hier ihre Bereiche an. */
+/** Sammelt alle Daten des Nutzers; Zugangsdaten und Bilddateien sind nicht enthalten. */
 export async function exportOwnData(db: AppDatabase, userId: string): Promise<UserDataExport> {
   const self = await db.query.user.findFirst({ where: eq(user.id, userId) });
   if (!self) throw new AppError("NOT_FOUND");
   return {
     format: "clickfit-export",
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     profile: {
       username: self.displayUsername,
@@ -74,5 +77,6 @@ export async function exportOwnData(db: AppDatabase, userId: string): Promise<Us
       unitSystem: self.unitSystem,
       createdAt: self.createdAt.toISOString(),
     },
+    data: await collectUserData(db, userId),
   };
 }

@@ -22,7 +22,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/training", labelKey: "training", icon: DumbbellIcon },
   { href: "/nutrition", labelKey: "nutrition", icon: AppleIcon },
   { href: "/progress", labelKey: "progress", icon: LineChartIcon },
-  { href: "/more", labelKey: "more", icon: MenuIcon, matches: ["/settings", "/admin", "/export"] },
+  { href: "/more", labelKey: "more", icon: MenuIcon, matches: ["/settings", "/admin", "/export", "/integrations"] },
 ];
 
 export function isNavItemActive(item: NavItem, pathname: string): boolean {

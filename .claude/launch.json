@@ -35,6 +35,23 @@
         "APP_URL:http://localhost:3100"
       ],
       "port": 3100
+    },
+    {
+      "name": "clickfit-worker-preview-ki",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "wrangler",
+        "dev",
+        "--port",
+        "3100",
+        "--local-upstream",
+        "localhost:3100",
+        "--var",
+        "APP_URL:http://localhost:3100",
+        "--var",
+        "ANTHROPIC_API_KEY:nur-fuer-die-oberflaeche-ungueltig"
+      ],
+      "port": 3100
     }
   ]
 }

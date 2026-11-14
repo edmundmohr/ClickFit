@@ -10,3 +10,7 @@ APP_URL=http://localhost:3000
 # Privater Schlüssel für Web Push (Pausen-Benachrichtigung). Erzeugen mit
 # `npx tsx scripts/generate-vapid-keys.ts`; das Skript trägt ihn selbst in `.dev.vars` ein.
 VAPID_PRIVATE_KEY=
+
+# Optional: Schlüssel für die KI-Funktionen (Anthropic). Ohne ihn sind sie ausgeblendet.
+# In Produktion als Secret setzen: `npx wrangler secret put ANTHROPIC_API_KEY`
+ANTHROPIC_API_KEY=

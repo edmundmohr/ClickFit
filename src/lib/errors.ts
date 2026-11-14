@@ -21,6 +21,13 @@ export const ERROR_CODES = [
   "GYM_ACTIVE",
   "PLAN_ACTIVE",
   "WORKOUT_RUNNING",
+  "TOKEN_LIMIT",
+  "IMPORT_INVALID",
+  "AI_DISABLED",
+  "AI_UNAVAILABLE",
+  "AI_LIMIT",
+  "AI_REFUSED",
+  "AI_FAILED",
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];

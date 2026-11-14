@@ -135,7 +135,9 @@ export async function saveWeight(db: AppDatabase, userId: string, date: LocalDat
   await db
     .insert(bodyWeightEntry)
     .values({ id: newId(), userId, date, weightKg, source: "manual", createdAt: new Date() })
-    .onConflictDoUpdate({ target: [bodyWeightEntry.userId, bodyWeightEntry.date], set: { weightKg } });
+    // Ein von Hand eingetragener Wert gilt als manuell – auch wenn er einen importierten ersetzt.
+    // So überschreibt der nächste Import die Korrektur nicht wieder.
+    .onConflictDoUpdate({ target: [bodyWeightEntry.userId, bodyWeightEntry.date], set: { weightKg, source: "manual" } });
 }
 
 export async function getWeights(db: AppDatabase, userId: string, from: LocalDate, to: LocalDate): Promise<WeightPoint[]> {

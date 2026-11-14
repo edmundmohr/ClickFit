@@ -32,6 +32,8 @@ interface SeriesChartProps {
   rawLabel?: string;
   unit: string;
   height?: number;
+  /** Breite der y-Achse; größer wählen, wenn die Werte fünf Stellen haben (z. B. Schritte). */
+  axisWidth?: number;
 }
 
 const AXIS_TICK = { fontSize: 11, fill: "var(--muted-foreground)" };
@@ -77,7 +79,16 @@ function ChartTooltip({
  * Linien- oder Balkendiagramm mit einer Achse, Tooltip und einer Tabelle für Screenreader.
  * Farben kommen aus den geprüften Diagramm-Tokens; Texte tragen Textfarben, nie die Serienfarbe.
  */
-export function SeriesChart({ data, kind, ariaLabel, valueLabel, rawLabel, unit, height = 220 }: SeriesChartProps) {
+export function SeriesChart({
+  data,
+  kind,
+  ariaLabel,
+  valueLabel,
+  rawLabel,
+  unit,
+  height = 220,
+  axisWidth = 40,
+}: SeriesChartProps) {
   const hasRaw = rawLabel !== undefined;
   const names: Record<string, string> = { value: valueLabel, raw: rawLabel ?? "" };
   const axes = (
@@ -85,7 +96,7 @@ export function SeriesChart({ data, kind, ariaLabel, valueLabel, rawLabel, unit,
       <CartesianGrid vertical={false} stroke="var(--border)" />
       <XAxis dataKey="label" tickLine={false} axisLine={false} tick={AXIS_TICK} minTickGap={28} />
       <YAxis
-        width={40}
+        width={axisWidth}
         tickLine={false}
         axisLine={false}
         tick={AXIS_TICK}

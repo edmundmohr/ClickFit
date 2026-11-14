@@ -11,7 +11,7 @@ einschließlich der Ergänzungen aus Abschnitt 8.
 | 4 | Fortschritt & Dashboard | fertig |
 | 5 | Flexibilität | fertig |
 | 6 | Offline & Export | fertig |
-| 7 | Integrationen & optionale KI | offen |
+| 7 | Integrationen & optionale KI | fertig |
 
 ## Phase 1 – Fundament (fertig)
 
@@ -125,8 +125,24 @@ Grenzen:
   Hintergrund geht; ohne Verbindung in diesem Moment bleibt sie aus.
 - Vibration gibt es am iPhone im Browser weiterhin nicht.
 
-## Phase 7 – Integrationen & optionale KI
+## Phase 7 – Integrationen & optionale KI (fertig)
 
-- Health-Import-API mit API-Token pro Nutzer, CSV-Import
-- Home-Assistant-Anbindung (z. B. smarte Waage)
-- LLM-Provider-Schnittstelle: Feinjustierung der Pläne, Körperfett-Schätzung aus Fotos
+- Health-Import-API mit API-Token pro Nutzer: Gewicht, Schritte, Ruhepuls und Workouts, im
+  Format von „Health Auto Export“ oder als einfaches JSON
+- Home-Assistant-Anbindung über denselben Token (z. B. Gewicht von einer smarten Waage)
+- CSV-Import für Gewicht, Schritte, Ruhepuls und Aktivitäten
+- Importierte Workouts fließen in die Erholung ein; Schritte und Ruhepuls erscheinen unter
+  Fortschritt
+- Austauschbare KI-Schnittstelle mit Anthropic als Anbieter; alles funktioniert auch ohne KI
+- Plan-Feinschliff per KI: Vorschläge werden geprüft und nur nach Auswahl übernommen
+- Körperfett-Schätzung aus Fotos, klar als grobe Schätzung gekennzeichnet
+- Zustimmung pro Konto und Tageslimit für KI-Anfragen
+- JSON-Export enthält jetzt alle gespeicherten Daten
+
+Grenzen:
+
+- Das Format von „Health Auto Export“ ist nach dessen Dokumentation umgesetzt und nicht gegen
+  die echte App geprüft.
+- Die Körperfett-Schätzung ist eine Einschätzung nach Augenschein und kann deutlich
+  danebenliegen. Das Modell kann eine Schätzung auch ablehnen.
+- Schritte und Ruhepuls werden angezeigt, fließen aber nicht in Kalorienziel oder Erholung ein.

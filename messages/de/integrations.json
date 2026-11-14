@@ -1,0 +1,134 @@
+{
+  "title": "Integrationen",
+  "description": "Verbinde Health-Apps und Home Assistant mit ClickFit oder importiere Daten aus einer CSV-Datei.",
+  "copy": {
+    "done": "Kopiert.",
+    "failed": "Kopieren nicht möglich. Bitte markiere den Text von Hand."
+  },
+  "tokens": {
+    "title": "API-Token",
+    "description": "Mit einem Token dürfen andere Apps Daten in dein Konto schreiben, aber nichts lesen. Lege für jede App einen eigenen an (höchstens {max}).",
+    "empty": "Noch kein Token angelegt.",
+    "name": "Name des Tokens",
+    "namePlaceholder": "z. B. iPhone",
+    "create": "Token anlegen",
+    "created": "Token angelegt.",
+    "limitReached": "Du hast die Höchstzahl an Tokens erreicht. Lösche zuerst einen, den du nicht mehr brauchst.",
+    "newTitle": "Dein neuer Token",
+    "newHint": "Kopiere den Token jetzt und bewahre ihn sicher auf. Er wird nur dieses eine Mal angezeigt und ist später nicht mehr sichtbar.",
+    "copy": "Kopieren",
+    "dismiss": "Ich habe ihn gespeichert",
+    "startsWith": "Beginnt mit {prefix}…",
+    "createdAt": "Angelegt am {date}",
+    "lastUsed": "Zuletzt benutzt am {date}",
+    "neverUsed": "Noch nie benutzt",
+    "delete": "Token „{name}“ löschen",
+    "deleteTitle": "Token löschen?",
+    "deleteText": "Apps, die den Token „{name}“ verwenden, können danach keine Daten mehr senden.",
+    "deleted": "Token gelöscht."
+  },
+  "endpoint": {
+    "url": "Adresse (URL)",
+    "copyUrl": "Adresse kopieren",
+    "method": "Methode",
+    "header": "Header",
+    "tokenPlaceholder": "DEIN_TOKEN"
+  },
+  "healthAutoExport": {
+    "title": "Health Auto Export (iPhone)",
+    "description": "Die App „Health Auto Export“ schickt Werte aus Apple Health automatisch an ClickFit: Gewicht, Schritte, Ruhepuls und Workouts.",
+    "steps": {
+      "token": "Lege oben einen API-Token an und kopiere ihn.",
+      "automation": "Öffne in Health Auto Export den Bereich „Automations“ und lege eine neue Automation vom Typ „REST API“ an.",
+      "url": "Trage als URL die Adresse unten ein.",
+      "header": "Füge einen Header mit dem Namen „Authorization“ und dem Wert „Bearer“ gefolgt von einem Leerzeichen und deinem Token hinzu.",
+      "format": "Wähle als Exportformat „JSON“.",
+      "metrics": "Wähle als Datentyp die Gesundheitswerte (Health Metrics) und dort Gewicht (Weight & Body Mass), Schritte (Step Count) und Ruhepuls (Resting Heart Rate).",
+      "period": "Fasse die Werte nach Tagen zusammen und wähle einen kurzen Zeitraum, zum Beispiel „seit der letzten Synchronisierung“.",
+      "workouts": "Für Workouts legst du – je nach Version der App – eine zweite Automation mit dem Datentyp „Workouts“ und denselben Angaben an."
+    },
+    "notes": {
+      "strength": "Krafttraining wird nicht übernommen, weil du es in ClickFit selbst loggst.",
+      "manual": "Ein von Hand eingetragenes Gewicht bleibt bestehen und wird nicht überschrieben.",
+      "limit": "Pro Anfrage höchstens {count} Einträge je Art und 2 MB."
+    }
+  },
+  "homeAssistant": {
+    "title": "Home Assistant",
+    "description": "Home Assistant kann Werte über denselben Token schicken, zum Beispiel das Gewicht einer smarten Waage.",
+    "exampleLabel": "Beispiel für configuration.yaml, secrets.yaml und eine Automation",
+    "copy": "Beispiel kopieren",
+    "secretsHint": "Ersetze {placeholder} durch deinen Token. Er gehört in die Datei secrets.yaml und nicht in die configuration.yaml, damit er nicht in Sicherungen oder geteilten Konfigurationen landet.",
+    "entityHint": "Passe den Namen des Sensors an deine Waage an. Meldet sie das Gewicht in Pfund, sende statt „kg“ das Feld „lbs“.",
+    "formatHint": "Dasselbe Format nimmt auch Schritte („steps“) und Ruhepuls („restingHeartRate“) an. Ohne Datum gilt der heutige Tag."
+  },
+  "csv": {
+    "title": "CSV-Import",
+    "description": "Lies Werte aus einer CSV-Datei ein, zum Beispiel aus einer anderen App oder aus dem Export von ClickFit.",
+    "kind": "Art der Daten",
+    "kinds": {
+      "weight": "Gewicht",
+      "steps": "Schritte",
+      "resting_heart_rate": "Ruhepuls",
+      "activities": "Aktivitäten"
+    },
+    "columns": {
+      "weight": "Erwartete Spalten: Datum und Gewicht (kg). Steht in der Überschrift „lbs“, wird umgerechnet.",
+      "steps": "Erwartete Spalten: Datum und Schritte. Mehrere Zeilen eines Tages werden addiert.",
+      "resting_heart_rate": "Erwartete Spalten: Datum und Ruhepuls (Schläge pro Minute).",
+      "activities": "Erwartete Spalten: Datum, Art, Dauer (Minuten); optional Distanz (km) und Puls. Krafttraining wird nicht übernommen."
+    },
+    "formatHint": "Datum als TT.MM.JJJJ oder JJJJ-MM-TT, auch mit Uhrzeit. Trennzeichen (Semikolon, Komma oder Tab) und Dezimalkomma werden erkannt.",
+    "file": "CSV-Datei",
+    "fileSelected": "{name} ({size} kB)",
+    "removeFile": "Datei entfernen",
+    "fileTooLarge": "Die Datei ist zu groß (höchstens {size} kB). Teile sie in mehrere Dateien auf.",
+    "fileUnreadable": "Die Datei konnte nicht gelesen werden.",
+    "paste": "Oder Text einfügen",
+    "pastePlaceholder": "Datum;Gewicht\n14.11.2026;81,2",
+    "submit": "Importieren",
+    "submitting": "Wird importiert …",
+    "result": {
+      "title": "Ergebnis",
+      "rows": "{count, plural, one {# Zeile gelesen} other {# Zeilen gelesen}}",
+      "weight": "{count, plural, one {# Gewichtswert übernommen} other {# Gewichtswerte übernommen}}",
+      "steps": "{count, plural, one {# Tag mit Schritten übernommen} other {# Tage mit Schritten übernommen}}",
+      "restingHeartRate": "{count, plural, one {# Tag mit Ruhepuls übernommen} other {# Tage mit Ruhepuls übernommen}}",
+      "workouts": "{count, plural, one {# Aktivität übernommen} other {# Aktivitäten übernommen}}",
+      "skipped": "{count, plural, one {# Eintrag übersprungen} other {# Einträge übersprungen}}",
+      "errorsTitle": "Nicht übernommene Zeilen",
+      "error": "Zeile {line}: {reason}",
+      "moreErrors": "{count, plural, one {und # weitere Zeile} other {und # weitere Zeilen}}",
+      "done": "Import abgeschlossen."
+    },
+    "issues": {
+      "date": "Datum fehlt, ist ungültig, liegt in der Zukunft oder ist älter als zehn Jahre",
+      "value": "Wert fehlt oder ist keine Zahl",
+      "range": "Wert liegt außerhalb des plausiblen Bereichs",
+      "type": "Art der Aktivität fehlt",
+      "strength": "Krafttraining wird nicht importiert"
+    },
+    "fatal": {
+      "empty": "Die Datei enthält keine Datenzeilen.",
+      "columns": "Die nötigen Spalten wurden nicht gefunden. Prüfe die Überschriften und die gewählte Art.",
+      "too_many_rows": "Die Datei hat zu viele Zeilen (höchstens {max}). Teile sie in mehrere Dateien auf."
+    }
+  },
+  "health": {
+    "title": "Schritte & Ruhepuls",
+    "empty": "Noch keine importierten Werte. Verbinde eine Health-App oder importiere eine CSV-Datei.",
+    "toIntegrations": "Zu den Integrationen",
+    "stepsTitle": "Schritte",
+    "stepsAverage": "Durchschnitt der letzten 7 Tage: {value} Schritte",
+    "stepsNoRecent": "In den letzten 7 Tagen keine Schritte importiert.",
+    "stepsChartLabel": "Schritte pro Tag in den letzten 30 Tagen",
+    "stepsLabel": "Schritte",
+    "stepsUnit": "Schritte",
+    "restingTitle": "Ruhepuls",
+    "restingLatest": "Letzter Wert: {value} Schläge/min ({date})",
+    "restingNone": "Noch kein Ruhepuls importiert.",
+    "restingChartLabel": "Ruhepuls in den letzten 30 Tagen",
+    "restingLabel": "Ruhepuls",
+    "restingUnit": "Schläge/min"
+  }
+}

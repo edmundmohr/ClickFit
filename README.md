@@ -6,8 +6,8 @@ Läuft komplett auf Cloudflare (Workers, D1, R2) unter `clickfit.online`.
 - Anforderungen: [docs/SPEC.md](docs/SPEC.md)
 - Umsetzungsplan und Stand: [docs/ROADMAP.md](docs/ROADMAP.md)
 
-**Stand:** Die Phasen 1 bis 6 sind fertig (Fundament, Training-Kern, Ernährung, Fortschritt,
-Flexibilität, Offline & Export). Als Nächstes folgt Phase 7 (Integrationen & optionale KI).
+**Stand:** Alle sieben Phasen sind fertig (Fundament, Training-Kern, Ernährung, Fortschritt,
+Flexibilität, Offline & Export, Integrationen & optionale KI).
 
 ## Technik
 
@@ -23,6 +23,7 @@ Flexibilität, Offline & Export). Als Nächstes folgt Phase 7 (Integrationen & o
 | Offline | Service Worker (Seiten-Cache) und Warteschlange in IndexedDB, Übertragung über `/api/sync` |
 | Web Push | VAPID mit Web Crypto, zeitversetzte Zustellung über Cloudflare Queues |
 | Export | CSV, Excel (`fflate`) und PDF (`pdf-lib`) |
+| KI (optional) | Anthropic über `@anthropic-ai/sdk`, hinter einer austauschbaren Schnittstelle (`src/lib/llm`) |
 | Tests | Vitest gegen eine echte lokale D1 (Miniflare) |
 
 ## Projektregeln
@@ -250,6 +251,39 @@ Typprüfung nicht an ihnen scheitert.
   wie eine Formel beginnen, werden entschärft. Der JSON-Vollexport bleibt unter
   `/api/me/export`.
 
+## Integrationen & KI (Phase 7)
+
+- **Health-Import:** `POST /api/import/health` mit `Authorization: Bearer <Token>`. Tokens legt
+  jeder Nutzer unter **Mehr → Integrationen** an; gespeichert wird nur ihr SHA-256-Hash, der
+  Token selbst ist nur beim Anlegen sichtbar. Angenommen werden das Format der iOS-App
+  „Health Auto Export“ und ein einfaches eigenes JSON-Format (Gewicht, Schritte, Ruhepuls,
+  Workouts). Krafttraining aus der Health-App wird nicht übernommen, weil es in ClickFit selbst
+  geloggt wird. Ein von Hand eingetragenes Gewicht wird vom Import nicht überschrieben.
+- **Home Assistant:** nutzt denselben Endpunkt und Token, z. B. `{ "weight": 81.2 }` von einer
+  smarten Waage. Ein Beispiel für `rest_command` und Automation steht auf der Seite
+  Integrationen.
+- **CSV-Import:** auf derselben Seite für Gewicht, Schritte, Ruhepuls und Aktivitäten. Die von
+  ClickFit exportierte Gewichts-CSV lässt sich wieder einlesen.
+- **KI ist freiwillig:** Ohne das Secret `ANTHROPIC_API_KEY` sind alle KI-Funktionen
+  ausgeblendet, die App funktioniert vollständig ohne. Jeder Nutzer muss sie zusätzlich unter
+  **Mehr → Einstellungen** für sein Konto einschalten; dort steht, was gesendet wird. Pro Nutzer
+  sind 20 Anfragen am Tag möglich.
+- **Plan verfeinern:** Auf der Plan-Seite beschreibt man einen Wunsch. Das Modell schlägt
+  Änderungen vor (tauschen, hinzufügen, entfernen, Sätze und Wiederholungen anpassen). Die App
+  prüft jeden Vorschlag (`src/domain/ai/plan-changes.ts`): nur Übungen aus dem Katalog, die zu
+  Equipment, Beschwerden und Ausschlüssen passen; übernommen wird nur, was man auswählt.
+  Gesendet werden Ziel, Erfahrung, Trainingstage, Equipment, Beschwerden, der Plan und der
+  Wunsch – kein Name, kein Verlauf.
+- **Körperfett-Schätzung:** im Foto-Dialog unter Fortschritt → Fotos, nach einer Rückfrage vor
+  jedem Foto. Gespeichert wird eine Spanne von mindestens drei Prozentpunkten, überall als grobe
+  Schätzung gekennzeichnet. Reicht das Foto nicht aus, gibt es keine Schätzung.
+- **Modell:** Standard ist `claude-opus-5-5` mit strukturierter Ausgabe. Lehnt das Modell eine
+  Anfrage ab, darf der Anbieter sie auf einem Ausweich-Modell wiederholen. Über die Variable
+  `LLM_MODEL` lässt sich ein anderes Modell wählen. Ein anderer Anbieter braucht nur eine neue
+  Umsetzung von `LlmProvider`.
+- **JSON-Export:** `/api/me/export` enthält seit dieser Phase alle gespeicherten Daten des
+  Nutzers, ohne Zugangsdaten und ohne die Bilddateien der Fotos.
+
 ## Datenbank
 
 Das Schema steht in `src/db/schema`. Nach einer Änderung:
@@ -278,6 +312,10 @@ Seit Phase 6 braucht der Worker zusätzlich die Queue `clickfit-rest-timer`
 (`npx wrangler queues create clickfit-rest-timer`) und das Secret `VAPID_PRIVATE_KEY`
 (`npx wrangler secret put VAPID_PRIVATE_KEY`, Wert aus `.dev.vars`). Beides muss vor dem
 ersten Deployment mit Phase 6 vorhanden sein.
+
+Für die KI-Funktionen kommt optional das Secret `ANTHROPIC_API_KEY` dazu
+(`npx wrangler secret put ANTHROPIC_API_KEY`). Wichtig: als **Secret** anlegen, nicht als
+Text-Variable – Text-Variablen, die nicht in `wrangler.jsonc` stehen, löscht jedes Deployment.
 
 Die Staging-Umgebung ist vorbereitet, aber noch nicht angelegt.
 

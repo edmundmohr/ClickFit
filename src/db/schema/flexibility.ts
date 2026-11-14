@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real, index, primaryKey } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real, index, primaryKey, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { user } from "./auth";
 
 /**
@@ -102,13 +102,18 @@ export const activity = sqliteTable(
     intensity: text().notNull().default("moderate"),
     intervals: text({ mode: "json" }).$type<StoredInterval>(),
     note: text(),
-    /** `manual` oder später `import` (Phase 7). */
+    /** `manual` oder `import` (Health-Import). */
     source: text().notNull().default("manual"),
+    /** Kennung der Einheit in der Quelle; verhindert doppelte Importe. */
+    externalId: text(),
     /** Ende der Einheit; ab hier klingt die Ermüdung ab. */
     endedAt: timestamp().notNull(),
     createdAt: timestamp().notNull(),
   },
-  (table) => [index("activity_user_date_idx").on(table.userId, table.date)],
+  (table) => [
+    index("activity_user_date_idx").on(table.userId, table.date),
+    uniqueIndex("activity_user_external_idx").on(table.userId, table.externalId),
+  ],
 );
 
 /** Geplante Cardio-Einheit pro Wochentag. */

@@ -6,6 +6,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/layout/page-header";
+import { PlanRefineDialog } from "@/features/ai/components/plan-refine-dialog";
+import { getAiStatus } from "@/features/ai/services/ai-service";
 import { requireUser } from "@/features/auth/session";
 import { OnboardingPrompt } from "@/features/training/components/onboarding-prompt";
 import { PlanDayCard } from "@/features/training/components/plan-day-card";
@@ -21,7 +23,8 @@ import { getInProgressSession } from "@/features/training/services/workout-servi
 import { isDeloadWeek } from "@/domain/training/progression";
 import { diffDays, toLocalDate, weekdayOf } from "@/lib/dates";
 import { formatDayShort, formatTime } from "@/lib/format";
-import { getDb } from "@/lib/server/context";
+import { getLlmProvider } from "@/lib/llm";
+import { getDb, getEnv } from "@/lib/server/context";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("training.plan");
@@ -53,6 +56,7 @@ export default async function TrainingPage() {
   const vacation = isVacationActive(settings.vacation, today) ? settings.vacation : null;
   const cycle = settings.cycle?.enabled ? cycleStatus(settings.cycle.lastStart, settings.cycle.lengthDays, today) : null;
   const recoveryDay = settings.recoveryMode && !running ? await getRecoveryDay(db, user.id) : null;
+  const ai = await getAiStatus(db, getLlmProvider(getEnv()), user.id, today);
   const gymName = gym ? (gym.name ?? tTraining(`locations.${gym.type}`)) : null;
   const injuries = profile?.injuries ?? [];
   const gymLabel = gymName ? t("location", { name: gymName }) : tAll("gyms.title");
@@ -132,6 +136,7 @@ export default async function TrainingPage() {
         ))}
         <div className="flex flex-wrap gap-3 pt-2">
           <RegeneratePlanButton />
+          {ai.available ? <PlanRefineDialog enabled={ai.enabled} /> : null}
           <Button asChild variant="outline">
             <Link href="/onboarding">
               <ClipboardListIcon aria-hidden />

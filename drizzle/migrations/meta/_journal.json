@@ -43,6 +43,13 @@
       "when": 1794662383543,
       "tag": "0005_offline_push",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1794676534385,
+      "tag": "0006_integrations_ai",
+      "breakpoints": true
     }
   ]
 }
