@@ -1,0 +1,177 @@
+{
+  "tabs": {
+    "plan": "Plan",
+    "exercises": "Übungen",
+    "history": "Verlauf",
+    "calendar": "Kalender",
+    "label": "Bereiche im Training"
+  },
+  "goals": {
+    "muscle_gain": "Muskelaufbau",
+    "fat_loss": "Fettabbau",
+    "recomposition": "Rekomposition",
+    "maintain": "Fitness halten"
+  },
+  "goalHints": {
+    "muscle_gain": "Mehr Muskelmasse und Kraft aufbauen.",
+    "fat_loss": "Körperfett reduzieren und Muskeln erhalten.",
+    "recomposition": "Gleichzeitig Fett abbauen und Muskeln aufbauen.",
+    "maintain": "Den aktuellen Stand halten und fit bleiben."
+  },
+  "experience": {
+    "beginner": "Anfänger",
+    "intermediate": "Fortgeschritten",
+    "advanced": "Profi"
+  },
+  "experienceHints": {
+    "beginner": "Weniger als ein Jahr regelmäßiges Krafttraining.",
+    "intermediate": "Ein bis drei Jahre regelmäßiges Krafttraining.",
+    "advanced": "Mehr als drei Jahre konsequentes Krafttraining."
+  },
+  "difficulty": {
+    "beginner": "Einsteiger",
+    "intermediate": "Mittel",
+    "advanced": "Anspruchsvoll"
+  },
+  "splits": {
+    "full_body": "Ganzkörper",
+    "upper_lower": "Oberkörper / Unterkörper",
+    "upper_lower_ppl": "Oberkörper / Unterkörper + Push / Pull / Beine",
+    "push_pull_legs": "Push / Pull / Beine"
+  },
+  "focus": {
+    "full_body_a": "Ganzkörper A",
+    "full_body_b": "Ganzkörper B",
+    "full_body_c": "Ganzkörper C",
+    "upper_a": "Oberkörper A",
+    "upper_b": "Oberkörper B",
+    "lower_a": "Unterkörper A",
+    "lower_b": "Unterkörper B",
+    "push_a": "Push A",
+    "push_b": "Push B",
+    "pull_a": "Pull A",
+    "pull_b": "Pull B",
+    "legs_a": "Beine A",
+    "legs_b": "Beine B",
+    "free": "Freies Training"
+  },
+  "weekdays": {
+    "1": "Montag",
+    "2": "Dienstag",
+    "3": "Mittwoch",
+    "4": "Donnerstag",
+    "5": "Freitag",
+    "6": "Samstag",
+    "7": "Sonntag"
+  },
+  "weekdaysShort": {
+    "1": "Mo",
+    "2": "Di",
+    "3": "Mi",
+    "4": "Do",
+    "5": "Fr",
+    "6": "Sa",
+    "7": "So"
+  },
+  "locations": {
+    "gym": "Fitnessstudio",
+    "home": "Zuhause",
+    "travel": "Unterwegs"
+  },
+  "locationHints": {
+    "gym": "Alle üblichen Geräte sind vorhanden.",
+    "home": "Du trainierst mit dem, was du zu Hause hast.",
+    "travel": "Hotelzimmer, Park oder kleines Hotelgym."
+  },
+  "exerciseTypes": {
+    "weight_reps": "Gewicht × Wiederholungen",
+    "bodyweight_reps": "Körpergewicht",
+    "weighted_bodyweight": "Körpergewicht mit Zusatzgewicht",
+    "assisted_bodyweight": "Körpergewicht mit Unterstützung",
+    "duration": "Dauer",
+    "distance_duration": "Distanz und Zeit"
+  },
+  "mechanics": {
+    "compound": "Mehrgelenksübung",
+    "isolation": "Isolationsübung"
+  },
+  "units": {
+    "kg": "kg",
+    "lbs": "lbs",
+    "minutes": "{count} min",
+    "seconds": "{count} s"
+  },
+  "prescription": "{sets} × {repMin}–{repMax}",
+  "prescriptionSeconds": "{sets} × {repMin}–{repMax} s",
+  "plan": {
+    "title": "Dein Trainingsplan",
+    "noProfileTitle": "Noch kein Trainingsplan",
+    "noProfileText": "Beantworte ein paar Fragen zu Ziel, Zeit und Equipment. Daraus entsteht dein persönlicher Plan.",
+    "startOnboarding": "Fragebogen starten",
+    "split": "Split: {split}",
+    "estimated": "ca. {minutes} min",
+    "exercises": "{count, plural, one {# Übung} other {# Übungen}}",
+    "start": "Training starten",
+    "continue": "Training fortsetzen",
+    "runningTitle": "Du hast ein laufendes Training",
+    "runningText": "Begonnen um {time} Uhr.",
+    "today": "Heute",
+    "deloadTitle": "Deload-Woche",
+    "deloadText": "Diese Woche trainierst du bewusst leichter: weniger Sätze und etwa 10 % weniger Gewicht.",
+    "swap": "Übung tauschen",
+    "swapTitle": "{name} tauschen",
+    "swapText": "Alternativen mit denselben Muskelgruppen, passend zu deinem Equipment.",
+    "swapEmpty": "Für dein Equipment gibt es keine passende Alternative.",
+    "swapDone": "Übung getauscht.",
+    "regenerate": "Plan neu erstellen",
+    "regenerateTitle": "Plan neu erstellen?",
+    "regenerateText": "Der aktuelle Plan wird durch einen frisch erzeugten ersetzt. Getauschte Übungen gehen verloren, dein Trainingsverlauf bleibt erhalten.",
+    "regenerateConfirm": "Neu erstellen",
+    "regenerated": "Dein Plan wurde neu erstellt.",
+    "editProfile": "Fragebogen erneut ausfüllen",
+    "rest": "Pause {time}",
+    "rir": "RIR {rir}"
+  },
+  "library": {
+    "title": "Übungen",
+    "search": "Übung suchen",
+    "allMuscles": "Alle Muskelgruppen",
+    "onlyMine": "Nur mit meinem Equipment",
+    "count": "{count, plural, one {# Übung} other {# Übungen}}",
+    "empty": "Keine Übung gefunden.",
+    "primary": "Hauptmuskeln",
+    "secondary": "Unterstützend",
+    "equipment": "Equipment",
+    "instructions": "Ausführung",
+    "alternatives": "Alternativen",
+    "type": "Art",
+    "difficulty": "Schwierigkeit",
+    "unilateral": "Einseitig ausgeführt",
+    "noteTitle": "Meine Notiz",
+    "noteText": "Zum Beispiel Sitzeinstellung oder Griffbreite. Die Notiz erscheint bei jedem Training.",
+    "notePlaceholder": "Notiz zur Übung",
+    "noteSaved": "Notiz gespeichert.",
+    "back": "Zurück zu den Übungen"
+  },
+  "history": {
+    "title": "Verlauf",
+    "empty": "Du hast noch kein Training abgeschlossen.",
+    "sets": "{count, plural, one {# Satz} other {# Sätze}}",
+    "volume": "{volume} {unit} Volumen",
+    "duration": "{minutes} min"
+  },
+  "calendar": {
+    "title": "Kalender",
+    "previous": "Vorheriger Monat",
+    "next": "Nächster Monat",
+    "legendDone": "Erledigt",
+    "legendPlanned": "Geplant",
+    "legendMissed": "Verpasst",
+    "sessions": "Einheiten in diesem Monat",
+    "empty": "In diesem Monat gibt es noch keine Einheit.",
+    "dayDone": "{date}: Training erledigt",
+    "dayPlanned": "{date}: Training geplant",
+    "dayMissed": "{date}: Training verpasst",
+    "dayRest": "{date}: Ruhetag"
+  }
+}

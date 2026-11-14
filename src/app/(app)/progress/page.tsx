@@ -13,7 +13,7 @@ export default async function ProgressPage() {
   return (
     <>
       <PageHeader title={t("title")} />
-      <ComingSoon title={t("title")} description={t("description")} phase={4} />
+      <ComingSoon title={t("title")} description={t("description")} illustration="progress" phase={4} />
     </>
   );
 }

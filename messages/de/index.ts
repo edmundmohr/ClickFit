@@ -9,6 +9,11 @@ import settings from "./settings.json";
 import admin from "./admin.json";
 import errors from "./errors.json";
 import offline from "./offline.json";
+import muscles from "./muscles.json";
+import equipment from "./equipment.json";
+import training from "./training.json";
+import onboarding from "./onboarding.json";
+import workout from "./workout.json";
 
 const messages = {
   common,
@@ -22,6 +27,11 @@ const messages = {
   admin,
   errors,
   offline,
+  muscles,
+  equipment,
+  training,
+  onboarding,
+  workout,
 };
 
 export default messages;

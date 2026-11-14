@@ -1,4 +1,18 @@
 {
   "greeting": "Hallo {name}!",
-  "description": "Hier erscheinen bald dein heutiges Training, Kalorien und Makros, Wasser und deine Streaks."
+  "onboardingTitle": "Richte dein Training ein",
+  "onboardingText": "Beantworte ein paar Fragen, dann erstellt ClickFit deinen persönlichen Trainingsplan.",
+  "onboardingStart": "Los geht's",
+  "todayWorkout": "Heutiges Training",
+  "restDayTitle": "Heute ist Ruhetag",
+  "restDayText": "Nächstes Training: {weekday} ({focus}).",
+  "doneTitle": "Training erledigt",
+  "doneText": "{sets, plural, one {# Satz} other {# Sätze}} in {minutes} min. Stark!",
+  "viewWorkout": "Ansehen",
+  "streakTitle": "Trainings-Streak",
+  "streakValue": "{count, plural, one {# Training} other {# Trainings}} in Folge",
+  "streakHint": "Ruhetage unterbrechen den Streak nicht.",
+  "weekTitle": "Diese Woche",
+  "weekValue": "{done} von {planned} erledigt",
+  "moreSoon": "Kalorien, Wasser und Gewicht erscheinen hier, sobald die nächsten Phasen fertig sind."
 }

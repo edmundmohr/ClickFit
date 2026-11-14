@@ -13,6 +13,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Bilder liegen fertig verkleinert in public/: kein Bild-Optimierer auf dem Worker nötig.
+  images: { unoptimized: true },
   // Jede Seite hängt vom angemeldeten Nutzer ab. Deshalb wird pro Request gerendert,
   // ohne Cache Components und ohne Partial Prefetching.
   turbopack: {

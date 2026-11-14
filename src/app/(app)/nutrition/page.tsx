@@ -13,7 +13,7 @@ export default async function NutritionPage() {
   return (
     <>
       <PageHeader title={t("title")} />
-      <ComingSoon title={t("title")} description={t("description")} phase={3} />
+      <ComingSoon title={t("title")} description={t("description")} illustration="nutrition" phase={3} />
     </>
   );
 }

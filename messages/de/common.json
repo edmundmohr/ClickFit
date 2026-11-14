@@ -6,5 +6,9 @@
   "cancel": "Abbrechen",
   "close": "Schließen",
   "loading": "Lädt …",
-  "comingSoon": "Kommt in Phase {phase}"
+  "comingSoon": "Kommt in Phase {phase}",
+  "delete": "Löschen",
+  "confirm": "Bestätigen",
+  "back": "Zurück",
+  "edit": "Bearbeiten"
 }

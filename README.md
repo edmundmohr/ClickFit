@@ -6,8 +6,8 @@ Läuft komplett auf Cloudflare (Workers, D1, R2) unter `clickfit.online`.
 - Anforderungen: [docs/SPEC.md](docs/SPEC.md)
 - Umsetzungsplan und Stand: [docs/ROADMAP.md](docs/ROADMAP.md)
 
-**Stand:** Phase 1 (Fundament) ist fertig. Training, Ernährung und Fortschritt sind noch
-Platzhalter.
+**Stand:** Phase 1 (Fundament) und Phase 2 (Training-Kern) sind fertig. Ernährung und
+Fortschritt sind noch Platzhalter.
 
 ## Technik
 
@@ -95,7 +95,25 @@ Das führt Typprüfung, ESLint, die Zeilenprüfung und die Tests aus. Einzeln:
 | `npm run typecheck` | TypeScript |
 | `npm run lint` | ESLint inklusive i18n-Regel |
 | `npm run check:size` | 600-Zeilen-Regel |
-| `npm run test` | Tests (Rechte, Passwort-Hashing, Nutzer-Dienste, Anmeldung, Textkatalog) |
+| `npm run test` | Tests (Rechte, Anmeldung, Plan-Generator, Progression, Rekorde, Streaks, Trainings-Dienste) |
+
+## Training (Phase 2)
+
+- **Übungsbibliothek:** 232 Übungen liegen als Daten im Code (`src/data/exercises`). Sie brauchen
+  keinen Seed und keine Migration. Trainingsdaten verweisen über die Kennung der Übung darauf.
+- **Fragebogen:** unter `/onboarding`. Daraus entsteht der Plan; „Plan neu erstellen“ erzeugt ihn
+  aus dem gespeicherten Profil erneut.
+- **Plan-Generator:** `src/domain/training/plan-generator`. Gleiche Eingaben ergeben immer
+  denselben Plan.
+- **Progression:** `src/domain/training/progression.ts`. Erreichen die Wiederholungen das obere
+  Ende des Bereichs, steigt das Gewicht um die kleinste Stufe und die Wiederholungen beginnen
+  wieder unten. Jeder Satz wird einzeln bewertet. Die letzte Woche jedes Blocks ist eine
+  Deload-Woche (weniger Sätze, etwa 10 % weniger Gewicht).
+- **Trainingsmodus:** unter `/workout/<id>`, ohne Tab-Leiste. Jede Eingabe wird sofort
+  gespeichert; nach einem Neuladen ist der Stand wieder da. Es gibt höchstens ein laufendes
+  Training pro Nutzer.
+- **Grenzen am iPhone:** Vibration gibt es im Browser nicht. Der Ton am Pausenende braucht eine
+  geöffnete App; Benachrichtigungen im Hintergrund folgen in Phase 6.
 
 ## Datenbank
 
@@ -149,12 +167,13 @@ Anmeldung ausgeliefert.
 ## Projektstruktur
 
 ```
-docs/                Spezifikation und Umsetzungsplan
+docs/                Spezifikation, Umsetzungsplan, Grafiken
 drizzle/migrations/  SQL-Migrationen für D1
 messages/de/         alle Texte der Oberfläche
 scripts/             Seed, Icon-Erzeugung, Zeilenprüfung
 src/app/             Seiten und API-Routen
 src/components/      Layout, Formular-Bausteine, shadcn/ui
+src/data/exercises/  Übungsbibliothek
 src/db/              Drizzle-Schema und Client
 src/domain/          reine Fachlogik ohne Framework (testbar)
 src/features/        Fachbereiche: Dienste, Server Actions, Komponenten

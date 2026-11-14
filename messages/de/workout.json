@@ -1,0 +1,110 @@
+{
+  "title": "Training",
+  "finish": "Beenden",
+  "back": "Zurück",
+  "deload": "Deload",
+  "columns": {
+    "set": "Satz",
+    "weight": "Gewicht",
+    "extraWeight": "Zusatz",
+    "assistance": "Hilfe",
+    "reps": "Wdh.",
+    "seconds": "Sek.",
+    "rir": "RIR",
+    "done": "Fertig"
+  },
+  "setTypes": {
+    "warmup": "Aufwärmsatz",
+    "work": "Arbeitssatz",
+    "failure": "Bis zum Muskelversagen",
+    "drop": "Dropsatz"
+  },
+  "setTypeShort": {
+    "warmup": "A",
+    "failure": "M",
+    "drop": "D"
+  },
+  "target": "Ziel: {target}",
+  "rest": "Pause {time}",
+  "rirTarget": "RIR {rir}",
+  "previous": "Letztes Mal ({date})",
+  "noPrevious": "Erstes Training mit dieser Übung: Wähle ein Gewicht, das du sauber schaffst.",
+  "addSet": "Satz hinzufügen",
+  "addWarmup": "Aufwärmsätze",
+  "warmupAdded": "Aufwärmsätze hinzugefügt.",
+  "warmupNeedsWeight": "Trage zuerst das Gewicht des ersten Arbeitssatzes ein.",
+  "warmupNotNeeded": "Bei diesem Gewicht sind keine Aufwärmsätze nötig.",
+  "complete": "Satz {number} abhaken",
+  "uncomplete": "Satz {number} wieder öffnen",
+  "setOptions": "Optionen für Satz {number}",
+  "weightLabel": "Gewicht Satz {number}",
+  "repsLabel": "Wiederholungen Satz {number}",
+  "rirLabel": "RIR Satz {number}",
+  "rirNone": "–",
+  "needsReps": "Trage die Wiederholungen ein.",
+  "needsWeight": "Trage das Gewicht ein.",
+  "options": {
+    "title": "Satz {number}",
+    "type": "Satz-Typ",
+    "note": "Notiz zum Satz",
+    "notePlaceholder": "z. B. Technik, Tempo, Gefühl",
+    "delete": "Satz löschen",
+    "done": "Fertig"
+  },
+  "exerciseNote": "Notiz",
+  "exerciseNoteTitle": "Notiz zu {name}",
+  "details": "Anleitung ansehen",
+  "record": "Neuer Rekord",
+  "records": {
+    "weight": "Schwerstes Gewicht",
+    "one_rep_max": "Bestes geschätztes 1RM",
+    "reps": "Meiste Wiederholungen",
+    "set_volume": "Höchstes Satz-Volumen"
+  },
+  "timer": {
+    "title": "Pause",
+    "skip": "Überspringen",
+    "add": "+15 s",
+    "subtract": "−15 s",
+    "over": "Pause vorbei – weiter geht's!"
+  },
+  "sync": {
+    "error": "Einige Eingaben sind noch nicht gespeichert.",
+    "retry": "Erneut speichern"
+  },
+  "finishDialog": {
+    "title": "Training beenden?",
+    "allDone": "Alle Sätze sind abgehakt.",
+    "open": "{count, plural, one {# Satz ist} other {# Sätze sind}} noch offen. Offene Sätze zählen nicht.",
+    "confirm": "Training beenden",
+    "cancel": "Weiter trainieren"
+  },
+  "forgotten": {
+    "title": "Läuft dein Training noch?",
+    "text": "Dieses Training läuft seit mehr als drei Stunden. Soll es um {time} Uhr als beendet gelten?",
+    "finish": "Um {time} Uhr beenden",
+    "keep": "Läuft noch"
+  },
+  "summary": {
+    "title": "Training abgeschlossen",
+    "duration": "Dauer",
+    "volume": "Volumen",
+    "sets": "Sätze",
+    "records": "Neue Rekorde",
+    "noRecords": "Diesmal kein neuer Rekord – dranbleiben!",
+    "minutes": "{minutes} min",
+    "toPlan": "Zum Plan",
+    "editHint": "Du kannst Gewichte und Wiederholungen hier nachträglich korrigieren."
+  },
+  "sessionNote": "Notiz zum Training",
+  "sessionNotePlaceholder": "Wie lief es heute?",
+  "noteSaved": "Notiz gespeichert.",
+  "delete": "Training löschen",
+  "discard": "Training verwerfen",
+  "deleteTitle": "Training löschen?",
+  "deleteText": "Alle Sätze dieser Einheit werden gelöscht. Das lässt sich nicht rückgängig machen.",
+  "deleteConfirm": "Löschen",
+  "deleted": "Training gelöscht.",
+  "status": "{elapsed} · noch ca. {minutes} min",
+  "statusLabel": "Dauer und verbleibende Zeit"
+}

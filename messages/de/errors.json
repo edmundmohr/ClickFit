@@ -9,5 +9,7 @@
   "WRONG_PASSWORD": "Das aktuelle Passwort ist falsch.",
   "NOT_FOUND": "Nicht gefunden.",
   "NOT_ADMIN": "Dafür brauchst du Admin-Rechte.",
-  "SELF_NOT_ALLOWED": "Für dein eigenes Konto nutze bitte „Passwort ändern“ in den Einstellungen."
+  "SELF_NOT_ALLOWED": "Für dein eigenes Konto nutze bitte „Passwort ändern“ in den Einstellungen.",
+  "PROFILE_REQUIRED": "Bitte fülle zuerst den Fragebogen aus.",
+  "PLAN_EMPTY": "Mit diesen Angaben lässt sich kein Plan erstellen. Bitte prüfe Equipment und Ausschlüsse."
 }

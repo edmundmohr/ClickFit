@@ -1,0 +1,90 @@
+{
+  "title": "Dein Fragebogen",
+  "step": "Schritt {current} von {total}",
+  "next": "Weiter",
+  "back": "Zurück",
+  "finish": "Plan erstellen",
+  "finishing": "Plan wird erstellt …",
+  "done": "Dein Plan ist fertig.",
+  "goal": {
+    "title": "Was ist dein Ziel?"
+  },
+  "experience": {
+    "title": "Wie viel Trainingserfahrung hast du?"
+  },
+  "schedule": {
+    "title": "Wann trainierst du?",
+    "days": "Trainingstage",
+    "daysHint": "Wähle 1 bis 6 Tage. Gewählt: {count}",
+    "duration": "Dauer einer Einheit"
+  },
+  "location": {
+    "title": "Wo trainierst du hauptsächlich?",
+    "equipment": "Was hast du dort zur Verfügung?",
+    "equipmentHint": "Der Plan nutzt nur Übungen, die damit möglich sind. Übungen ohne Geräte gehen immer.",
+    "selectAll": "Alles auswählen",
+    "selectNone": "Nichts auswählen"
+  },
+  "cardio": {
+    "title": "Möchtest du zusätzlich Cardio machen?",
+    "yes": "Ja",
+    "no": "Nein",
+    "types": "Welche Art?",
+    "frequency": "Wie oft pro Woche?",
+    "hint": "Geplante Cardio-Einheiten kommen in einer späteren Phase dazu. Deine Angaben werden schon jetzt gespeichert."
+  },
+  "cardioTypes": {
+    "running": "Laufen",
+    "cycling": "Radfahren",
+    "rowing": "Rudern",
+    "walking": "Gehen",
+    "swimming": "Schwimmen",
+    "other": "Anderes"
+  },
+  "body": {
+    "title": "Deine Körperdaten",
+    "hint": "Daraus berechnet die App später deinen Kalorienbedarf.",
+    "sex": "Geschlecht",
+    "sexes": {
+      "male": "Männlich",
+      "female": "Weiblich"
+    },
+    "birthYear": "Geburtsjahr",
+    "height": "Größe (cm)",
+    "weight": "Gewicht ({unit})",
+    "activity": "Aktivität im Alltag"
+  },
+  "activity": {
+    "sedentary": "Überwiegend sitzend",
+    "light": "Leicht aktiv",
+    "moderate": "Mäßig aktiv",
+    "active": "Sehr aktiv",
+    "very_active": "Körperlich schwere Arbeit"
+  },
+  "limits": {
+    "title": "Gibt es Einschränkungen?",
+    "hint": "Beide Angaben sind freiwillig.",
+    "injuries": "Beschwerden oder Verletzungen",
+    "injuriesHint": "Übungen, die diese Bereiche stark belasten, lässt der Plan weg.",
+    "note": "Anmerkung (optional)",
+    "excluded": "Übungen ausschließen",
+    "excludedHint": "Diese Übungen kommen in deinem Plan nicht vor.",
+    "excludedSearch": "Übung suchen",
+    "excludedCount": "{count, plural, =0 {Keine Übung ausgeschlossen} one {# Übung ausgeschlossen} other {# Übungen ausgeschlossen}}",
+    "remove": "{name} wieder zulassen"
+  },
+  "regions": {
+    "shoulder": "Schulter",
+    "elbow": "Ellenbogen",
+    "wrist": "Handgelenk",
+    "lower_back": "Unterer Rücken",
+    "hip": "Hüfte",
+    "knee": "Knie",
+    "ankle": "Sprunggelenk",
+    "neck": "Nacken"
+  },
+  "errors": {
+    "days": "Wähle 1 bis 6 Trainingstage.",
+    "body": "Bitte prüfe Geburtsjahr, Größe und Gewicht."
+  }
+}

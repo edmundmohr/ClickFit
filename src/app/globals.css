@@ -137,4 +137,9 @@
   [role="button"] {
     touch-action: manipulation;
   }
+  /* Rasterzellen dürfen schmaler werden als ihr Inhalt. Sonst schieben lange,
+     abgeschnittene Texte die Seite am Handy über den Rand. */
+  .grid > * {
+    min-width: 0;
+  }
 }

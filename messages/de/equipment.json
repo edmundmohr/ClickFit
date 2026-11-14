@@ -1,0 +1,20 @@
+{
+  "barbell": "Langhantel",
+  "ez_bar": "SZ-Stange",
+  "dumbbell": "Kurzhanteln",
+  "kettlebell": "Kettlebell",
+  "bench": "Hantelbank",
+  "rack": "Rack / Kniebeugenständer",
+  "pull_up_bar": "Klimmzugstange",
+  "dip_bars": "Dip-Barren",
+  "cable": "Kabelzug",
+  "machine": "Geräte (Maschinen)",
+  "smith_machine": "Multipresse",
+  "resistance_band": "Widerstandsband",
+  "suspension_trainer": "Schlingentrainer",
+  "ab_wheel": "Bauchroller",
+  "box": "Box / Stufe",
+  "jump_rope": "Springseil",
+  "cardio_machine": "Cardio-Gerät",
+  "none": "Ohne Geräte"
+}
