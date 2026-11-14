@@ -35,6 +35,8 @@ const exercise = (sets: SetDraft[]): ExerciseDraft => ({
   incrementKg: 2.5,
   bar: null,
   note: "",
+  cues: [],
+  mistakes: [],
   previous: null,
   bests: null,
   feedback: null,
