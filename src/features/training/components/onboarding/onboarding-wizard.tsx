@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition, type CSSProperties } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { CheckIcon, ChevronLeftIcon, Loader2Icon } from "lucide-react";
@@ -14,7 +14,6 @@ import type { UnitSystem } from "@/lib/units";
 import { completeOnboardingAction } from "../../actions";
 import {
   SECTIONS,
-  SECTION_TINTS,
   STEPS,
   toOnboardingInput,
   type OnboardingState,
@@ -154,16 +153,10 @@ export function OnboardingWizard({
     else setReminderFailed(true);
   }
 
-  const tint = { "--tint": SECTION_TINTS[section] } as CSSProperties;
-  const background: CSSProperties = {
-    background:
-      "linear-gradient(to bottom, color-mix(in oklab, var(--tint) 18%, var(--background)), var(--background) 60%)",
-  };
-
   if (pending || finished) {
     return (
-      <div style={{ ...tint, ...background }} className="flex h-dvh flex-col justify-center gap-4 px-6">
-        <Loader2Icon className="size-16 animate-spin text-[var(--tint)]" aria-hidden />
+      <div className="bg-background flex h-dvh flex-col justify-center gap-4 px-6">
+        <Loader2Icon className="size-16 animate-spin" aria-hidden />
         <h1 role="status" className="text-2xl font-bold">
           {t("creating.title")}
         </h1>
@@ -178,7 +171,7 @@ export function OnboardingWizard({
   const hintStep = STEPS_WITH_HINT.find((id) => id === step.id);
 
   return (
-    <div style={{ ...tint, ...background }} className="flex h-dvh flex-col">
+    <div className="bg-background flex h-dvh flex-col">
       <header className="mx-auto w-full max-w-lg px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
         <div className="flex h-11 items-center gap-1">
           <Button
@@ -191,10 +184,7 @@ export function OnboardingWizard({
           >
             <ChevronLeftIcon className="size-6" aria-hidden />
           </Button>
-          <span
-            className="rounded-md px-2 py-1 text-xs font-bold tracking-wide text-[var(--tint)] uppercase"
-            style={{ background: "color-mix(in oklab, var(--tint) 18%, transparent)" }}
-          >
+          <span className="bg-foreground/10 rounded-md px-2 py-1 text-xs font-bold tracking-wide uppercase">
             {t(`sections.${section}`)}
           </span>
         </div>
@@ -230,7 +220,7 @@ export function OnboardingWizard({
         <div className="mx-auto flex min-h-full w-full max-w-lg flex-col gap-5 px-4 pt-5 pb-4">
           {intro ? (
             <div className="my-auto grid gap-4">
-              <span aria-hidden className="size-20 animate-pulse rounded-full border-[6px] border-[var(--tint)]" />
+              <span aria-hidden className="size-20 animate-pulse rounded-full border-foreground border-[6px]" />
               <p className="text-lg">{t(`intro.${intro === "profile" ? "goals" : intro}`)}</p>
               <div>
                 <p className="text-muted-foreground">{t("intro.upNext")}</p>

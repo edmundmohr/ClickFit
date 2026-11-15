@@ -71,13 +71,6 @@ export const STEPS = [
 ] as const satisfies readonly { id: string; section: SectionId }[];
 export type StepId = (typeof STEPS)[number]["id"];
 
-/** Akzentfarbe je Abschnitt; sie färbt Hintergrund, Abzeichen und Auswahl. */
-export const SECTION_TINTS: Record<SectionId, string> = {
-  profile: "var(--status-good)",
-  goals: "var(--viz-2)",
-  needs: "var(--status-warning)",
-};
-
 export const MIN_AGE_YEARS = 12;
 export const MAX_AGE_YEARS = 100;
 export const HEIGHT_RANGE_CM = { min: 100, max: 250 } as const;

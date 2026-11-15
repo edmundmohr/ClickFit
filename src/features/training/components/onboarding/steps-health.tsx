@@ -94,8 +94,8 @@ export function PainStep({ state, update }: StepProps) {
                     cx={cx}
                     cy={cy}
                     r={POINT_RADIUS}
-                    fill={selected ? "var(--status-critical)" : "var(--background)"}
-                    stroke={selected ? "var(--status-critical)" : "var(--foreground)"}
+                    fill={selected ? "var(--foreground)" : "var(--background)"}
+                    stroke="var(--foreground)"
                     strokeWidth={3}
                     strokeOpacity={selected ? 0.35 : 0.6}
                   />
