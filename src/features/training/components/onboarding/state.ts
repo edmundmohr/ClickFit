@@ -1,84 +1,122 @@
-import type { Equipment } from "@/domain/exercises/types";
+import type { Equipment, Muscle } from "@/domain/exercises/types";
 import {
-  MAX_TRAINING_DAYS,
-  MIN_TRAINING_DAYS,
-  type ActivityLevel,
-  type BodyRegion,
-  type CardioType,
-  type ExperienceLevel,
-  type Goal,
-  type LocationType,
-  type SessionMinutes,
-  type Sex,
-  type Weekday,
+  estimateBodyFat,
+  experienceFromAssessment,
+  type SelfAssessment,
+  type WorkPosture,
+} from "@/domain/training/onboarding";
+import type {
+  ActivityLevel,
+  BodyRegion,
+  CardioType,
+  Goal,
+  LocationType,
+  SessionMinutes,
+  Sex,
+  Weekday,
 } from "@/domain/training/types";
-import { fromDisplayWeight, parseDecimal, type UnitSystem } from "@/lib/units";
+import { fromDisplayWeight, type UnitSystem } from "@/lib/units";
 import type { OnboardingInput } from "../../schemas";
 
-/** Formularzustand des Fragebogens. Zahlenfelder bleiben Text, bis abgeschickt wird. */
+/** Antworten des Fragebogens, solange er ausgefüllt wird. Das Gewicht steht in der Anzeige-Einheit. */
 export interface OnboardingState {
+  sex: Sex;
+  birthYear: number;
+  heightCm: number;
+  weight: number;
+  /** `null`: Der geschätzte Wert gilt, bis der Nutzer ihn ändert. */
+  bodyFatPercent: number | null;
+  trainingMonths: number;
+  trainedRecently: boolean;
+  selfAssessment: SelfAssessment;
   goal: Goal;
-  experience: ExperienceLevel;
+  focusMuscles: Muscle[];
   weekdays: Weekday[];
   sessionMinutes: SessionMinutes;
   locationType: LocationType;
   equipment: Equipment[];
+  injuries: BodyRegion[];
+  injuryNote: string;
+  activityLevel: ActivityLevel;
+  workPostures: WorkPosture[];
   cardioWanted: boolean;
   cardioTypes: CardioType[];
   cardioSessions: number;
-  sex: Sex;
-  birthYear: string;
-  heightCm: string;
-  weight: string;
-  activityLevel: ActivityLevel;
-  injuries: BodyRegion[];
-  injuryNote: string;
   excludedExerciseIds: string[];
 }
 
-export const STEPS = ["goal", "experience", "schedule", "location", "cardio", "body", "limits"] as const;
-export type StepId = (typeof STEPS)[number];
+export const SECTIONS = ["profile", "goals", "needs"] as const;
+export type SectionId = (typeof SECTIONS)[number];
 
-export type StepError = "days" | "body" | null;
+/** Alle Fragen in ihrer Reihenfolge: eine Frage pro Bildschirm, gegliedert in drei Abschnitte. */
+export const STEPS = [
+  { id: "sex", section: "profile" },
+  { id: "birth", section: "profile" },
+  { id: "height", section: "profile" },
+  { id: "weight", section: "profile" },
+  { id: "bodyFat", section: "profile" },
+  { id: "trainingAge", section: "goals" },
+  { id: "assessment", section: "goals" },
+  { id: "goal", section: "goals" },
+  { id: "focus", section: "goals" },
+  { id: "frequency", section: "needs" },
+  { id: "location", section: "needs" },
+  { id: "week", section: "needs" },
+  { id: "reminder", section: "needs" },
+  { id: "pain", section: "needs" },
+  { id: "activity", section: "needs" },
+  { id: "work", section: "needs" },
+  { id: "cardio", section: "needs" },
+  { id: "excluded", section: "needs" },
+] as const satisfies readonly { id: string; section: SectionId }[];
+export type StepId = (typeof STEPS)[number]["id"];
+
+/** Akzentfarbe je Abschnitt; sie färbt Hintergrund, Abzeichen und Auswahl. */
+export const SECTION_TINTS: Record<SectionId, string> = {
+  profile: "var(--status-good)",
+  goals: "var(--viz-2)",
+  needs: "var(--status-warning)",
+};
+
+export const MIN_AGE_YEARS = 12;
+export const MAX_AGE_YEARS = 100;
+export const HEIGHT_RANGE_CM = { min: 100, max: 250 } as const;
+/** Wählbares Gewicht in der Anzeige-Einheit; beide Bereiche liegen innerhalb von 30 bis 400 kg. */
+export const WEIGHT_RANGE: Record<UnitSystem, { min: number; max: number }> = {
+  metric: { min: 30, max: 250 },
+  imperial: { min: 67, max: 550 },
+};
+
+export function range(min: number, max: number): number[] {
+  return Array.from({ length: max - min + 1 }, (_, index) => min + index);
+}
+
+export function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
 
 export function toggle<T>(list: readonly T[], value: T): T[] {
   return list.includes(value) ? list.filter((item) => item !== value) : [...list, value];
 }
 
-function parseBody(state: OnboardingState, unitSystem: UnitSystem) {
-  const birthYear = parseDecimal(state.birthYear);
-  const heightCm = parseDecimal(state.heightCm);
-  const weight = parseDecimal(state.weight);
-  if (birthYear === null || heightCm === null || weight === null) return null;
-  const year = new Date().getFullYear();
-  const weightKg = fromDisplayWeight(weight, unitSystem);
-  const valid =
-    Number.isInteger(birthYear) &&
-    birthYear >= year - 100 &&
-    birthYear <= year - 12 &&
-    heightCm >= 100 &&
-    heightCm <= 250 &&
-    weightKg >= 30 &&
-    weightKg <= 400;
-  return valid ? { birthYear, heightCm, weightKg } : null;
+/** Körperfett-Schätzung aus den bisherigen Angaben. */
+export function estimatedBodyFat(state: OnboardingState, unitSystem: UnitSystem, currentYear: number): number {
+  return estimateBodyFat({
+    sex: state.sex,
+    ageYears: currentYear - state.birthYear,
+    heightCm: state.heightCm,
+    weightKg: fromDisplayWeight(state.weight, unitSystem),
+  });
 }
 
-/** Prüft den aktuellen Schritt, bevor es weitergeht. */
-export function validateStep(step: StepId, state: OnboardingState, unitSystem: UnitSystem): StepError {
-  if (step === "schedule") {
-    const count = state.weekdays.length;
-    return count >= MIN_TRAINING_DAYS && count <= MAX_TRAINING_DAYS ? null : "days";
-  }
-  if (step === "body") return parseBody(state, unitSystem) ? null : "body";
-  return null;
-}
-
-export function toOnboardingInput(state: OnboardingState, unitSystem: UnitSystem): OnboardingInput | null {
-  const body = parseBody(state, unitSystem);
-  if (!body) return null;
+export function toOnboardingInput(
+  state: OnboardingState,
+  unitSystem: UnitSystem,
+  currentYear: number,
+): OnboardingInput {
   return {
     goal: state.goal,
-    experience: state.experience,
+    experience: experienceFromAssessment(state.selfAssessment),
     weekdays: state.weekdays,
     sessionMinutes: state.sessionMinutes,
     locationType: state.locationType,
@@ -89,10 +127,18 @@ export function toOnboardingInput(state: OnboardingState, unitSystem: UnitSystem
       sessionsPerWeek: state.cardioWanted ? state.cardioSessions : 0,
     },
     sex: state.sex,
-    ...body,
+    birthYear: state.birthYear,
+    heightCm: state.heightCm,
+    weightKg: fromDisplayWeight(state.weight, unitSystem),
     activityLevel: state.activityLevel,
     injuries: state.injuries,
     injuryNote: state.injuryNote,
     excludedExerciseIds: state.excludedExerciseIds,
+    bodyFatPercent: state.bodyFatPercent ?? estimatedBodyFat(state, unitSystem, currentYear),
+    trainingMonths: state.trainingMonths,
+    trainedRecently: state.trainedRecently,
+    selfAssessment: state.selfAssessment,
+    focusMuscles: state.focusMuscles,
+    workPostures: state.workPostures,
   };
 }

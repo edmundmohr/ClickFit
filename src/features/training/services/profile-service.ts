@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
 import { gymProfile, userProfile } from "@/db/schema";
-import { EQUIPMENT, isEquipment, type Equipment } from "@/domain/exercises/types";
+import { EQUIPMENT, isEquipment, isMuscle, type Equipment } from "@/domain/exercises/types";
 import {
   BODY_REGIONS,
   EXPERIENCE_LEVELS,
@@ -65,6 +65,7 @@ export function toTrainingProfile(stored: ProfileWithLocation): TrainingProfile 
     equipment: stored.equipment,
     excludedExerciseIds: profile.excludedExerciseIds,
     injuries: profile.injuries.filter((region): region is BodyRegion => isOneOf(BODY_REGIONS, region)),
+    focusMuscles: profile.focusMuscles.filter(isMuscle),
   };
 }
 
@@ -89,6 +90,12 @@ export async function saveOnboarding(
     injuries: input.injuries,
     injuryNote: input.injuryNote || null,
     excludedExerciseIds: input.excludedExerciseIds,
+    bodyFatPercent: input.bodyFatPercent ?? null,
+    trainingMonths: input.trainingMonths ?? null,
+    trainedRecently: input.trainedRecently ?? null,
+    selfAssessment: input.selfAssessment ?? null,
+    focusMuscles: input.focusMuscles ?? [],
+    workPostures: input.workPostures ?? [],
     updatedAt: now,
   };
   // Der aktive Ort wird angepasst, nicht ersetzt: Stange, Scheiben und Gewichtsstufen bleiben erhalten.

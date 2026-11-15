@@ -1,6 +1,14 @@
 import { z } from "zod";
 import { ACTIVITY_TYPES } from "@/domain/cardio/types";
 import { EQUIPMENT, EXERCISE_TYPES, MECHANICS, MOVEMENT_PATTERNS, MUSCLES } from "@/domain/exercises/types";
+import {
+  MAX_BODY_FAT,
+  MAX_FOCUS_MUSCLES,
+  MAX_TRAINING_MONTHS,
+  MIN_BODY_FAT,
+  SELF_ASSESSMENTS,
+  WORK_POSTURES,
+} from "@/domain/training/onboarding";
 import { MAX_CYCLE_LENGTH, MIN_CYCLE_LENGTH } from "@/domain/training/cycle";
 import { MAX_TARGET_WEIGHT_KG } from "@/domain/training/target-weight";
 import { VACATION_TYPES } from "@/domain/training/vacation";
@@ -72,6 +80,17 @@ export const onboardingSchema = z.object({
   injuries: z.array(z.enum(BODY_REGIONS)),
   injuryNote: z.string().trim().max(500),
   excludedExerciseIds: z.array(z.string().min(1).max(80)).max(200),
+  // Angaben des ausführlichen Fragebogens. Freiwillig, damit ältere Aufrufer gültig bleiben.
+  bodyFatPercent: z.number().min(MIN_BODY_FAT).max(MAX_BODY_FAT).optional(),
+  trainingMonths: z.number().int().min(0).max(MAX_TRAINING_MONTHS).optional(),
+  trainedRecently: z.boolean().optional(),
+  selfAssessment: z.enum(SELF_ASSESSMENTS).optional(),
+  focusMuscles: z
+    .array(z.enum(MUSCLES))
+    .max(MAX_FOCUS_MUSCLES)
+    .refine((muscles) => new Set(muscles).size === muscles.length)
+    .optional(),
+  workPostures: z.array(z.enum(WORK_POSTURES)).max(WORK_POSTURES.length).optional(),
 });
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
 

@@ -85,6 +85,13 @@
       "when": 1794753324869,
       "tag": "0011_target_weight",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1794766921423,
+      "tag": "0012_onboarding_details",
+      "breakpoints": true
     }
   ]
 }
