@@ -174,3 +174,6 @@ Grenzen:
   die Progression wieder automatisch. Jede Änderung steht im Verlauf der Übung unter
   Fortschritt → Kraft und im Export. Migration 0011 (Spalten in `plan_exercise`, Tabelle
   `target_weight_change`).
+- Startgewicht neuer Pläne: Ein erzeugter Plan schätzt für noch nie trainierte Übungen ein
+  vorsichtiges Zielgewicht aus Körpergewicht, Geschlecht, Alter, Erfahrung, Ziel und Beschwerden.
+  Keine Migration.

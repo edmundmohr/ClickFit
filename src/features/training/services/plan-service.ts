@@ -4,13 +4,14 @@
  */
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
-import { planDay, planExercise, trainingPlan } from "@/db/schema";
+import { planDay, planExercise, targetWeightChange, trainingPlan } from "@/db/schema";
 import { LEG_DOMINANT_ACTIVITIES } from "@/domain/cardio/types";
 import type { Exercise } from "@/domain/exercises/types";
 import { adaptDay, estimateDaySeconds, type SubstitutionReason } from "@/domain/training/adaptation";
 import { findAlternatives, generatePlan } from "@/domain/training/plan-generator";
 import { PLAN_STATUSES, SCHEDULED_STATUSES, type PlanStatus } from "@/domain/training/plan-roles";
 import { DAY_FOCUSES, SPLITS, isOneOf, type DayFocus, type Split, type Weekday } from "@/domain/training/types";
+import type { WeightUnit } from "@/domain/training/weights";
 import { AppError } from "@/lib/errors";
 import { toLocalDate, type LocalDate } from "@/lib/dates";
 import { newId } from "@/lib/tokens";
@@ -18,6 +19,7 @@ import { getTrainingContext, withPlanGym, type TrainingContext } from "./context
 import { getUserCatalog } from "./exercise-service";
 import { getProfile, toTrainingProfile } from "./profile-service";
 import { getPreferences, getTrainingSettings, recordRejection } from "./settings-service";
+import { planStartWeights } from "./start-weight-service";
 
 export interface PlanExerciseView {
   id: string;
@@ -178,12 +180,16 @@ export function chunk<T>(items: T[], size: number): T[][] {
  * Erzeugt aus dem Profil einen neuen Plan und macht ihn zum Hauptplan. Ein bisher aktiver
  * erzeugter Plan kommt ins Archiv; ein selbst gebauter bleibt als inaktiver Plan erhalten.
  * Der erzeugte Plan hat keinen festen Ort: Er folgt dem Ort des Tages.
+ *
+ * Übungen, die noch nie trainiert wurden, bekommen ein vorsichtiges Startgewicht (siehe
+ * domain/training/start-weight); es steht im Verlauf der Zielgewichte.
  */
 export async function createPlanFromProfile(
   db: AppDatabase,
   userId: string,
   today: LocalDate,
   now = new Date(),
+  defaultUnit: WeightUnit = "kg",
 ): Promise<string> {
   const stored = await getProfile(db, userId);
   if (!stored) throw new AppError("PROFILE_REQUIRED");
@@ -195,7 +201,8 @@ export async function createPlanFromProfile(
       where: and(eq(trainingPlan.userId, userId), eq(trainingPlan.status, "active")),
     }),
   ]);
-  const generated = generatePlan(toTrainingProfile(stored), catalog.all, {
+  const training = toTrainingProfile(stored);
+  const generated = generatePlan(training, catalog.all, {
     preferences,
     includeGrip: settings.gripModule,
     legSportSessions: settings.extraSports
@@ -212,10 +219,33 @@ export async function createPlanFromProfile(
     weekday: day.weekday,
     exercises: day.exercises,
   }));
-  const exerciseRows = days.flatMap((day) =>
+  const planned = days.flatMap((day) =>
     day.exercises.map((exercise, position) => ({ id: newId(), planDayId: day.id, position, ...exercise })),
   );
-  if (exerciseRows.length === 0) throw new AppError("PLAN_EMPTY");
+  if (planned.length === 0) throw new AppError("PLAN_EMPTY");
+  const startWeights = await planStartWeights(db, userId, stored, training, planned, catalog.find, defaultUnit, now);
+  const exerciseRows = planned.map((row, index) => ({
+    ...row,
+    targetWeightKg: startWeights[index],
+    targetWeightSetAt: startWeights[index] === null ? null : now,
+  }));
+  const startChanges = exerciseRows.flatMap((row) =>
+    row.targetWeightKg === null
+      ? []
+      : [
+          {
+            id: newId(),
+            userId,
+            exerciseId: row.exerciseId,
+            planDayId: row.planDayId,
+            routineName: null,
+            fromKg: null,
+            toKg: row.targetWeightKg,
+            date: today,
+            changedAt: now,
+          },
+        ],
+  );
 
   await db.batch([
     db
@@ -244,7 +274,8 @@ export async function createPlanFromProfile(
       })),
     ),
     // D1 erlaubt höchstens 100 gebundene Parameter pro Anweisung: in kleinen Blöcken einfügen.
-    ...chunk(exerciseRows, 10).map((rows) => db.insert(planExercise).values(rows)),
+    ...chunk(exerciseRows, 8).map((rows) => db.insert(planExercise).values(rows)),
+    ...chunk(startChanges, 9).map((rows) => db.insert(targetWeightChange).values(rows)),
   ]);
   return planId;
 }

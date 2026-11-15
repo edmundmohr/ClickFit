@@ -232,6 +232,17 @@ Typprüfung nicht an ihnen scheitert.
   landet in `target_weight_change` und steht unter Fortschritt → Kraft bei der Übung. Wird eine
   Übung getauscht oder heute ersetzt, gilt ihr Zielgewicht nicht für den Ersatz; „Plan
   verfeinern“ behält vorhandene Zielgewichte. Regeln: `src/domain/training/target-weight.ts`.
+- **Startgewicht neuer Pläne:** Ein neu erzeugter Plan trägt für Übungen, die noch nie trainiert
+  wurden, ein vorsichtiges Zielgewicht ein (`src/domain/training/start-weight.ts`). Grundlage ist
+  ein geschätztes 1RM aus Richtwerten je Übung (Verhältnis zum Körpergewicht, angelehnt an die
+  Kraftstandards der Kraftstufen; Tabelle in `start-weight-table.ts`), angepasst an Geschlecht
+  und Erfahrung. Daraus folgt das Gewicht für „obere Wiederholungszahl + Ziel-RIR“, mit
+  Abschlägen fürs erste Training, ab 40 Jahren, bei Beschwerden in der belasteten Region und in
+  der Diät; gerundet wird auf die Stufen des aktiven Orts, eher nach unten. Wäre schon die leere
+  Stange deutlich zu schwer, bleibt das Feld leer. Unterstützungs-Maschinen bekommen eine
+  großzügige Unterstützung, Übungen mit Körpergewicht plus Zusatzlast starten ohne Zusatz.
+  Gerechnet wird mit dem zuletzt gewogenen Körpergewicht. Die Startwerte stehen im Verlauf der
+  Zielgewichte (ohne Routinenname).
 - **Fester Ort pro Plan:** Optional hat ein Plan einen festen Trainingsort
   (`training_plan.gym_profile_id`). Seine Routinen nutzen dann beim Start, in der Anzeige und
   beim Tauschen das Equipment und die Gewichtsstufen dieses Orts, unabhängig vom aktiven Ort

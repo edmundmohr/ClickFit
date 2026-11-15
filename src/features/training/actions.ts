@@ -35,7 +35,8 @@ export async function completeOnboardingAction(input: unknown): Promise<ActionRe
   try {
     const db = getDb();
     await saveOnboarding(db, user.id, parsed.data);
-    await createPlanFromProfile(db, user.id, toLocalDate(new Date()));
+    const now = new Date();
+    await createPlanFromProfile(db, user.id, toLocalDate(now), now, unitOf(user));
   } catch (error) {
     return fail(error);
   }
@@ -46,7 +47,8 @@ export async function completeOnboardingAction(input: unknown): Promise<ActionRe
 export async function regeneratePlanAction(): Promise<ActionResult> {
   const user = await requireUser();
   try {
-    await createPlanFromProfile(getDb(), user.id, toLocalDate(new Date()));
+    const now = new Date();
+    await createPlanFromProfile(getDb(), user.id, toLocalDate(now), now, unitOf(user));
   } catch (error) {
     return fail(error);
   }

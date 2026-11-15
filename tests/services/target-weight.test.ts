@@ -3,7 +3,12 @@ import { EQUIPMENT } from "@/domain/exercises/types";
 import { toLocalDate } from "@/lib/dates";
 import { createUserWithPassword } from "@/features/auth/services/user-factory";
 import type { OnboardingInput, RoutineInput } from "@/features/training/schemas";
-import { createPlanFromProfile, getRoutine, swapPlanExercise } from "@/features/training/services/plan-service";
+import {
+  createPlanFromProfile,
+  getActivePlan,
+  getRoutine,
+  swapPlanExercise,
+} from "@/features/training/services/plan-service";
 import { saveOnboarding } from "@/features/training/services/profile-service";
 import {
   createFolder,
@@ -76,6 +81,11 @@ async function train(at: Date, weightKg: number, reps: number) {
   await finishWorkout(testDb.db, userId, sessionId, new Date(at.getTime() + 40 * 60_000));
 }
 
+/** Änderungen aus der Routine „Push“ (ohne die Startgewichte des erzeugten Plans). */
+async function routineChanges(exerciseId: string) {
+  return (await listTargetWeightChanges(testDb.db, userId, exerciseId)).filter((change) => change.routineName === "Push");
+}
+
 async function firstTargets(at: Date) {
   const sessionId = await startWorkout(testDb.db, userId, routineId, at);
   const view = await getWorkoutView(testDb.db, userId, sessionId);
@@ -120,10 +130,10 @@ describe("target weight in routines", () => {
 
     // Kein Eintrag für Liegestütze (ohne Zusatzgewicht) und keiner für unverändertes Speichern.
     await saveRoutine(testDb.db, userId, routineId, routine([entry(BENCH, 50)]), changedAt);
-    const changes = await listTargetWeightChanges(testDb.db, userId, BENCH);
+    const changes = await routineChanges(BENCH);
     expect(changes).toHaveLength(1);
     expect(changes[0]).toMatchObject({ fromKg: null, toKg: 50, routineName: "Push", date: toLocalDate(changedAt) });
-    expect(await listTargetWeightChanges(testDb.db, userId, PUSH_UP)).toEqual([]);
+    expect(await routineChanges(PUSH_UP)).toEqual([]);
   });
 
   it("hands back to the progression once the exercise was trained with the new weight", async () => {
@@ -139,7 +149,7 @@ describe("target weight in routines", () => {
     await saveRoutine(testDb.db, userId, routineId, routine([entry(BENCH)]), NOW);
     const kept = await getRoutine(testDb.db, userId, routineId);
     expect(kept.day.exercises[0].targetWeightKg).toBe(70);
-    expect(await listTargetWeightChanges(testDb.db, userId, BENCH)).toHaveLength(1);
+    expect(await routineChanges(BENCH)).toHaveLength(1);
 
     await swapPlanExercise(testDb.db, userId, kept.day.exercises[0].id, "dumbbell-bench-press");
     const swapped = await getRoutine(testDb.db, userId, routineId);
@@ -149,6 +159,40 @@ describe("target weight in routines", () => {
   it("is part of the data export", async () => {
     await saveRoutine(testDb.db, userId, routineId, routine([entry(BENCH, 55)]), NOW);
     const data = await collectUserData(testDb.db, userId);
-    expect(data.training.targetWeightChanges).toEqual([expect.objectContaining({ exerciseId: BENCH, toKg: 55 })]);
+    expect(data.training.targetWeightChanges).toEqual(
+      expect.arrayContaining([expect.objectContaining({ exerciseId: BENCH, toKg: 55, routineName: "Push" })]),
+    );
+  });
+});
+
+describe("start weights of a generated plan", () => {
+  async function planEntries() {
+    const plan = await getActivePlan(testDb.db, userId);
+    return plan!.days.flatMap((day) => day.exercises);
+  }
+
+  it("fills never-trained exercises with weight, logs them and leaves out trained ones", async () => {
+    const entries = await planEntries();
+    const weighted = entries.filter((item) => item.exercise.type === "weight_reps");
+    expect(weighted.length).toBeGreaterThan(0);
+    for (const item of weighted) expect(item.targetWeightKg).toBeGreaterThan(0);
+    for (const item of entries.filter((entry) => entry.exercise.type === "bodyweight_reps")) {
+      expect(item.targetWeightKg).toBeNull();
+    }
+    const first = weighted[0];
+    const logged = await listTargetWeightChanges(testDb.db, userId, first.exercise.id);
+    expect(logged).toContainEqual(
+      expect.objectContaining({ routineName: null, fromKg: null, toKg: first.targetWeightKg, date: TODAY }),
+    );
+
+    // Wer die Übung schon trainiert hat, bekommt beim nächsten Plan kein Startgewicht mehr dafür.
+    await saveRoutine(testDb.db, userId, routineId, routine([entry(first.exercise.id)]), NOW);
+    await train(new Date(NOW.getTime() + DAY_MS), 40, 10);
+    await createPlanFromProfile(testDb.db, userId, TODAY, new Date(NOW.getTime() + 2 * DAY_MS));
+    const next = await planEntries();
+    const trained = next.filter((item) => item.exercise.id === first.exercise.id);
+    expect(trained.length).toBeGreaterThan(0);
+    for (const item of trained) expect(item.targetWeightKg).toBeNull();
+    expect(next.filter((item) => item.targetWeightKg !== null).length).toBeGreaterThan(0);
   });
 });

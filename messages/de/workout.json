@@ -29,7 +29,7 @@
   "rirTarget": "RIR {rir}",
   "previous": "Letztes Mal ({date})",
   "noPrevious": "Erstes Training mit dieser Übung: Wähle ein Gewicht, das du sauber schaffst.",
-  "noPreviousPlanned": "Erstes Training mit dieser Übung: Das Gewicht stammt aus deiner Routine.",
+  "noPreviousPlanned": "Erstes Training mit dieser Übung: Das Gewicht ist der Startwert aus deiner Routine. Fühlt es sich zu leicht oder zu schwer an, passe es einfach an.",
   "addSet": "Satz hinzufügen",
   "addWarmup": "Aufwärmsätze",
   "warmupAdded": "Aufwärmsätze hinzugefügt.",

@@ -134,6 +134,8 @@ Creator-Programm) werden nicht gebraucht.
   betroffene Bewegungsmuster meidet
 - Eigenen Trainingsplan frei erstellen (Plan-Builder mit Drag & Drop)
 - Pro Übung ein eigenes Zielgewicht festlegen; jede Änderung wird im Verlauf der Übung festgehalten
+- Neu erzeugte Pläne tragen für noch nie trainierte Übungen ein vorsichtiges Startgewicht ein
+  (nach Körpergewicht, Geschlecht, Alter, Erfahrung, Ziel und Beschwerden)
 - Flexible Gewichtseingabe: eigene Gewichtsstufen pro Gerät/Hantel, freie Werte ohne Rundung,
   kg/lbs
 - Cardio-Trainingsplan: Cardio im Onboarding wählbar, Einheiten (Dauer, Distanz, Puls-Zone,
