@@ -47,6 +47,10 @@ const eslintConfig = defineConfig([
     "public/sw.js",
     "next-env.d.ts",
     "cloudflare-env.d.ts",
+    // Worktrees anderer Sitzungen und erzeugte Auswertungen: eigene Kopien des Projekts,
+    // die den Linter im Haupt-Checkout sonst bis zum Speichermangel beschäftigen.
+    ".claude/**",
+    "graphify-out/**",
   ]),
 ]);
 
