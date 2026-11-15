@@ -1,5 +1,5 @@
 /**
- * Legt die festen Nutzerkonten in D1 an.
+ * Legt die ersten Nutzerkonten in D1 an (weitere legt der Admin in der App an).
  *
  * Liest `seed-users.local.json` (von Git ignoriert, siehe `seed-users.example.json`), hasht die
  * Passwörter und spielt eine idempotente SQL-Datei mit `wrangler d1 execute` ein.

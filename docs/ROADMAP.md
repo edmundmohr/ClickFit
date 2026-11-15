@@ -17,6 +17,7 @@ einschließlich der Ergänzungen aus Abschnitt 8.
 
 - Next.js auf Cloudflare Workers (OpenNext), D1 mit Drizzle, R2-Bucket vorbereitet
 - Drei feste Nutzer, Login per Benutzername, Passwort ändern (selbst und durch den Admin)
+- Nachtrag: Der Admin legt Benutzer in der App an, ändert und löscht sie (weiter ohne E-Mail)
 - i18n-System (nur Deutsch), Dark/Light nach Systemeinstellung, Einheiten kg/lbs als Einstellung
 - Layout mit Navigation, auf das iPhone ausgerichtet
 - PWA-Grundgerüst: Manifest, Icons, Service Worker mit Offline-Seite

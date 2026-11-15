@@ -95,13 +95,21 @@ npx wrangler dev --port 3100 --local-upstream localhost:3100 --var APP_URL:http:
 
 ## Nutzer und Passwörter
 
-- Es gibt nur fest angelegte Nutzer, keine Registrierung.
-- Die Nutzer stehen in `seed-users.local.json`. Die Datei ist von Git ausgeschlossen und darf
-  nie eingecheckt werden. In der Datenbank liegen nur scrypt-Hashes.
+- Es gibt keine Registrierung und keine E-Mail. Angemeldet wird per Benutzername.
+- Die ersten Nutzer (mindestens ein Admin) stehen in `seed-users.local.json`. Die Datei ist von
+  Git ausgeschlossen und darf nie eingecheckt werden. In der Datenbank liegen nur scrypt-Hashes.
 - Der Seed ist idempotent: Bestehende Nutzer bleiben unberührt, geänderte Passwörter werden
-  nicht überschrieben.
+  nicht überschrieben. Ein in der App gelöschter Nutzer, der noch in der Datei steht, wird beim
+  nächsten Seed-Lauf wieder angelegt.
 - Jeder Nutzer ändert sein Passwort unter **Mehr → Einstellungen → Passwort ändern**.
-- Der Admin kann unter **Mehr → Benutzer** für andere ein neues Passwort setzen.
+- Der Admin verwaltet die Konten unter **Mehr → Benutzer**:
+  - Benutzer anlegen mit Benutzername, Anzeigename, Rolle und Passwort.
+  - Anzeigename, Benutzername und Rolle ändern. Benutzernamen haben 3 bis 30 Zeichen aus
+    Buchstaben ohne Umlaute, Ziffern, Punkt und Unterstrich.
+  - Für andere ein neues Passwort setzen; die Person wird überall abgemeldet.
+  - Ein Konto löschen. Dabei verschwinden alle Daten der Person, auch die Fotos im R2-Bucket.
+  - Das eigene Konto lässt sich dort weder löschen noch in der Rolle ändern. So bleibt immer
+    ein Admin übrig.
 - Mindestlänge für Passwörter: 8 Zeichen.
 - Nach fünf Fehlversuchen in fünf Minuten sperrt das Rate-Limit weitere Anmeldungen pro
   IP-Adresse.

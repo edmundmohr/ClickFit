@@ -1,6 +1,6 @@
 {
   "title": "Benutzer",
-  "description": "Als Admin kannst du für andere Benutzer ein neues Passwort setzen, z. B. wenn es vergessen wurde.",
+  "description": "Hier legst du Benutzer an, änderst Name, Benutzername und Rolle, setzt ein neues Passwort oder löschst ein Konto.",
   "username": "Benutzername",
   "roles": {
     "admin": "Admin",
@@ -13,5 +13,36 @@
   "newPassword": "Neues Passwort",
   "confirmPassword": "Neues Passwort wiederholen",
   "submit": "Passwort setzen",
-  "success": "Das Passwort für {name} wurde gesetzt."
+  "success": "Das Passwort für {name} wurde gesetzt.",
+  "displayName": "Anzeigename",
+  "displayNameHint": "Leer lassen, dann gilt der Benutzername.",
+  "usernameHint": "3 bis 30 Zeichen: Buchstaben ohne Umlaute, Ziffern, Punkt oder Unterstrich. Damit meldet sich die Person an.",
+  "role": "Rolle",
+  "roleHints": {
+    "admin": "Darf Benutzer verwalten.",
+    "user": "Nutzt die App ohne Verwaltung."
+  },
+  "ownRoleHint": "Deine eigene Rolle kannst du nicht ändern.",
+  "password": "Passwort",
+  "create": {
+    "open": "Benutzer anlegen",
+    "title": "Neuer Benutzer",
+    "description": "Gib der Person Benutzername und Passwort weiter. Das Passwort kann sie danach in den Einstellungen selbst ändern.",
+    "submit": "Anlegen",
+    "success": "{name} wurde angelegt.",
+    "confirmPassword": "Passwort wiederholen"
+  },
+  "edit": {
+    "open": "Bearbeiten",
+    "title": "{name} bearbeiten",
+    "success": "Die Änderungen für {name} sind gespeichert.",
+    "description": "Ein geänderter Benutzername gilt sofort für die Anmeldung."
+  },
+  "delete": {
+    "open": "Löschen",
+    "title": "{name} löschen?",
+    "description": "Das Konto von {name} wird mit allen Daten gelöscht: Trainings, Pläne, Ernährung, Messwerte und Fotos. Das lässt sich nicht rückgängig machen.",
+    "confirm": "Endgültig löschen",
+    "success": "{name} wurde gelöscht."
+  }
 }

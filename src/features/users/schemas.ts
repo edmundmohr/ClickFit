@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { PASSWORD_MAX_LENGTH } from "@/lib/auth/password";
+import { DISPLAY_NAME_MAX_LENGTH, ROLES } from "@/domain/permissions/user-management";
 import { THEMES, UNIT_SYSTEMS } from "./services/account-service";
 
 export const profileSchema = z.object({
@@ -24,6 +25,27 @@ export const setUserPasswordSchema = z.object({
   newPassword: password,
   confirmPassword: password,
 });
+
+// Die genaue Prüfung des Benutzernamens macht der Dienst (eigene Fehlermeldung).
+const usernameInput = z.string().trim().min(1).max(100);
+const displayNameInput = z.string().trim().max(DISPLAY_NAME_MAX_LENGTH);
+
+export const createUserSchema = z.object({
+  username: usernameInput,
+  name: displayNameInput,
+  role: z.enum(ROLES),
+  newPassword: password,
+  confirmPassword: password,
+});
+
+export const updateUserSchema = z.object({
+  userId: z.string().min(1),
+  username: usernameInput,
+  name: displayNameInput,
+  role: z.enum(ROLES),
+});
+
+export const deleteUserSchema = z.object({ userId: z.string().min(1) });
 
 export function formDataToObject(formData: FormData): Record<string, string> {
   const result: Record<string, string> = {};
