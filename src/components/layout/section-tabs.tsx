@@ -10,6 +10,8 @@ export interface SectionTab {
   label: string;
   /** Nur bei exakt diesem Pfad aktiv (für die Startseite eines Bereichs). */
   exact?: boolean;
+  /** Weitere Pfade, unter denen der Tab ebenfalls aktiv ist (Unterseiten ohne eigenen Tab). */
+  matches?: string[];
 }
 
 interface SectionTabsProps {
@@ -40,7 +42,9 @@ export function SectionTabs({ tabs, label, scrollable = false }: SectionTabsProp
       )}
     >
       {tabs.map((tab) => {
-        const active = tab.exact ? pathname === tab.href : pathname.startsWith(tab.href);
+        const active =
+          (tab.exact ? pathname === tab.href : pathname.startsWith(tab.href)) ||
+          (tab.matches?.some((path) => pathname.startsWith(path)) ?? false);
         return (
           <Link
             key={tab.href}

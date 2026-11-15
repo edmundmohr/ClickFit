@@ -1,14 +1,11 @@
 {
   "title": "Pläne",
-  "description": "Deine Trainingspläne mit ihren Routinen. Der Hauptplan und die Zusatzpläne bestimmen, was auf der Heute-Seite steht; jede Routine kannst du jederzeit starten.",
-  "emptyFolder": "Dieser Plan hat noch keine Routinen. Mit dem Plus legst du die erste an.",
+  "description": "Ein Plan bündelt deine Routinen. Tippe auf einen Plan, um seine Routinen, die Einplanung und den Ort zu bearbeiten.",
+  "emptyFolder": "Dieser Plan hat noch keine Routinen. Mit „Routine hinzufügen“ legst du die erste an.",
   "noFolders": "Noch keine Pläne. Lege einen an, um deinen eigenen Plan zu bauen.",
   "summary": "{count, plural, =0 {keine Übungen} one {# Übung} other {# Übungen}} · ca. {minutes} min",
-  "start": "Starten",
   "startLabel": "{name} starten",
   "startEmpty": "Diese Routine enthält keine Übung, die sich trainieren lässt (z. B. nur gelöschte Übungen). Bearbeite die Routine und füge Übungen hinzu.",
-  "edit": "Bearbeiten",
-  "editLabel": "{name} bearbeiten",
   "newFolder": "Neuer Plan",
   "newFolderTitle": "Neuen Plan anlegen",
   "folderName": "Name des Plans",
@@ -24,7 +21,6 @@
   "deleteFolderText": "Der Plan „{name}“ wird mit allen Routinen gelöscht. Das lässt sich nicht rückgängig machen. Dein Trainingsverlauf bleibt erhalten.",
   "folderDeleted": "Plan gelöscht.",
   "create": "Anlegen",
-  "folderMenu": "Aktionen für {name}",
   "back": "Zurück zu den Plänen",
   "editor": {
     "title": "Routine bearbeiten",
@@ -76,14 +72,10 @@
     "archived": "Gelöscht – wird nicht mehr trainiert",
     "archivedNotice": "{count, plural, one {Die Übung {names} wurde gelöscht. Sie wird beim Training übersprungen und beim nächsten Speichern aus der Routine entfernt.} other {Die Übungen {names} wurden gelöscht. Sie werden beim Training übersprungen und beim nächsten Speichern aus der Routine entfernt.}}"
   },
-  "newRoutineIn": "Routine in „{name}“ hinzufügen",
   "mainPlan": "Hauptplan",
   "extraPlan": "Zusatzplan",
-  "makeMain": "Als Hauptplan verwenden",
   "madeMain": "„{name}“ ist jetzt dein Hauptplan.",
-  "makeExtra": "Als Zusatzplan einplanen",
   "madeExtra": "„{name}“ ist jetzt ein Zusatzplan. Seine Routinen erscheinen zusätzlich an ihren Wochentagen.",
-  "unschedule": "Nicht mehr einplanen",
   "unscheduled": "„{name}“ ist jetzt inaktiv.",
   "archive": "Archivieren",
   "archivedToast": "„{name}“ ist im Archiv.",
@@ -91,12 +83,44 @@
   "restored": "„{name}“ ist wiederhergestellt.",
   "archiveTitle": "Archiv",
   "archiveHint": "{count, plural, one {# Plan} other {# Pläne}} im Archiv. Archivierte Pläne erscheinen nirgends, bis du sie wiederherstellst.",
-  "location": "Ort festlegen",
   "locationTitle": "Ort für „{name}“",
   "locationText": "Routinen dieses Plans nutzen beim Training immer das Equipment und die Gewichte dieses Orts – egal, welcher Ort gerade aktiv ist.",
   "locationNone": "Kein fester Ort",
   "locationNoneHint": "Es gilt der gerade aktive Ort.",
   "locationSaved": "Ort gespeichert.",
   "locationBadge": "Ort: {name}",
-  "archivedSummary": "{count, plural, =0 {keine Routinen} one {# Routine} other {# Routinen}}"
+  "archivedSummary": "{count, plural, =0 {keine Routinen} one {# Routine} other {# Routinen}}",
+  "scheduledTitle": "In deiner Woche",
+  "scheduledHint": "Hauptplan und Zusatzpläne: Ihre Routinen stehen an ihren Wochentagen auf der Plan- und der Heute-Seite.",
+  "unscheduledTitle": "Nicht eingeplant",
+  "unscheduledHint": "Diese Pläne erscheinen nicht in deiner Woche. Ihre Routinen kannst du trotzdem jederzeit starten.",
+  "routineCount": "{count, plural, =0 {Noch keine Routinen} one {# Routine} other {# Routinen}}",
+  "noFixedDays": "ohne festen Tag",
+  "backToPlan": "Zurück zu „{name}“",
+  "routinesTitle": "Routinen",
+  "routinesHint": "Tippe auf eine Routine, um Übungen, Wochentag und Vorgaben zu ändern.",
+  "roleTitle": "Einplanung",
+  "roles": {
+    "active": {
+      "label": "Hauptplan",
+      "text": "Dein Wochenplan. Es gibt immer genau einen."
+    },
+    "extra": {
+      "label": "Zusatzplan",
+      "text": "Kommt an seinen Wochentagen zusätzlich dazu, z. B. eine Einheit draußen am Morgen."
+    },
+    "saved": {
+      "label": "Nicht eingeplant",
+      "text": "Liegt bereit und erscheint nicht in deiner Woche. Die Routinen startest du hier jederzeit."
+    }
+  },
+  "mainLocked": "Das ist dein Hauptplan. Um ihn abzulösen, mach einen anderen Plan zum Hauptplan.",
+  "makeMainTitle": "„{name}“ zum Hauptplan machen?",
+  "makeMainText": "Dein bisheriger Hauptplan „{current}“ wird dann nicht mehr eingeplant. Er bleibt unter „Nicht eingeplant“ erhalten.",
+  "makeMainConfirm": "Zum Hauptplan machen",
+  "locationCardTitle": "Ort",
+  "locationChange": "Ändern",
+  "manageTitle": "Plan verwalten",
+  "archiveText": "Archivierte Pläne erscheinen nirgends mehr. In der Übersicht kannst du sie wiederherstellen oder endgültig löschen.",
+  "archiveMainText": "Den Hauptplan kannst du nicht archivieren. Mach zuerst einen anderen Plan zum Hauptplan."
 }

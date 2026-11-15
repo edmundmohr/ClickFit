@@ -94,7 +94,7 @@ export default async function TrainingPage() {
             </Link>
           </Button>
           <Button asChild variant="outline" size="sm">
-            <Link href="/training/routines">
+            <Link href="/training/plans">
               <FolderOpenIcon aria-hidden />
               {t("managePlans")}
             </Link>

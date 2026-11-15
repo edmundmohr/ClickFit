@@ -3,19 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import {
-  ArchiveIcon,
-  ArchiveRestoreIcon,
-  CalendarMinusIcon,
-  CalendarPlusIcon,
-  FolderPlusIcon,
-  MapPinIcon,
-  MoreVerticalIcon,
-  PencilIcon,
-  PlusIcon,
-  StarIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { ArchiveIcon, ArchiveRestoreIcon, FolderPlusIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -29,15 +17,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Field } from "@/components/forms/field";
 import { useActionRunner } from "@/hooks/use-action-runner";
-import type { PlanStatus } from "@/domain/training/plan-roles";
 import {
   createFolderAction,
   createRoutineAction,
@@ -45,7 +26,6 @@ import {
   renameFolderAction,
   setPlanStatusAction,
 } from "../../flex-actions";
-import { PlanLocationDialog, type LocationOption } from "./plan-location-dialog";
 
 interface NameDialogProps {
   open: boolean;
@@ -130,6 +110,7 @@ function NameForm({ label, placeholder, initial, pending, onSubmit, footer }: Na
 
 export function NewFolderButton() {
   const t = useTranslations("routines");
+  const router = useRouter();
   const { run, pending } = useActionRunner();
   const [open, setOpen] = useState(false);
   return (
@@ -145,100 +126,31 @@ export function NewFolderButton() {
         placeholder={t("folderNamePlaceholder")}
         confirmLabel={t("create")}
         pending={pending}
-        onSubmit={(name) => run(() => createFolderAction(name), () => setOpen(false))}
+        onSubmit={(name) => run(() => createFolderAction(name), (planId) => router.push(`/training/plans/${planId}`))}
         onClose={() => setOpen(false)}
       />
     </>
   );
 }
 
-interface FolderActionsProps {
-  folderId: string;
-  title: string;
-  /** Eigener Name des Plans; leer bei erzeugten Plänen. */
-  name: string;
-  status: PlanStatus;
-  /** Fester Ort des Plans; `null` = Ort des Tages. */
-  gymId: string | null;
-  locations: LocationOption[];
-}
-
-type FolderDialog = "routine" | "rename" | "location" | null;
-
-/**
- * „Routine hinzufügen“ und das Menü eines Plans: umbenennen, Ort festlegen, Rolle wechseln
- * (Haupt-, Zusatzplan, inaktiv) und archivieren. Der Hauptplan bleibt, bis ein anderer ihn ablöst.
- */
-export function FolderActions({ folderId, title, name, status, gymId, locations }: FolderActionsProps) {
-  const t = useTranslations();
+/** „Routine hinzufügen“ unter der Liste eines Plans; öffnet danach gleich den Editor. */
+export function AddRoutineButton({ folderId }: { folderId: string }) {
+  const t = useTranslations("routines");
   const router = useRouter();
   const { run, pending } = useActionRunner();
-  const [dialog, setDialog] = useState<FolderDialog>(null);
-  const changeStatus = (target: PlanStatus, message: "madeMain" | "madeExtra" | "unscheduled" | "archivedToast") =>
-    run(
-      () => setPlanStatusAction(folderId, target),
-      () => toast.success(t(`routines.${message}`, { name: title })),
-    );
-
+  const [open, setOpen] = useState(false);
   return (
-    <div className="flex shrink-0 items-center gap-1">
-      <Button
-        variant="outline"
-        size="icon"
-        className="size-11"
-        aria-label={t("routines.newRoutineIn", { name: title })}
-        onClick={() => setDialog("routine")}
-      >
+    <>
+      <Button variant="outline" className="min-h-11" onClick={() => setOpen(true)}>
         <PlusIcon aria-hidden />
+        {t("newRoutine")}
       </Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="size-11" aria-label={t("routines.folderMenu", { name: title })}>
-            <MoreVerticalIcon aria-hidden />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {status === "active" ? null : (
-            <DropdownMenuItem className="min-h-11" onSelect={() => changeStatus("active", "madeMain")}>
-              <StarIcon aria-hidden />
-              {t("routines.makeMain")}
-            </DropdownMenuItem>
-          )}
-          {status === "saved" ? (
-            <DropdownMenuItem className="min-h-11" onSelect={() => changeStatus("extra", "madeExtra")}>
-              <CalendarPlusIcon aria-hidden />
-              {t("routines.makeExtra")}
-            </DropdownMenuItem>
-          ) : null}
-          {status === "extra" ? (
-            <DropdownMenuItem className="min-h-11" onSelect={() => changeStatus("saved", "unscheduled")}>
-              <CalendarMinusIcon aria-hidden />
-              {t("routines.unschedule")}
-            </DropdownMenuItem>
-          ) : null}
-          <DropdownMenuItem className="min-h-11" onSelect={() => setDialog("location")}>
-            <MapPinIcon aria-hidden />
-            {t("routines.location")}
-          </DropdownMenuItem>
-          <DropdownMenuItem className="min-h-11" onSelect={() => setDialog("rename")}>
-            <PencilIcon aria-hidden />
-            {t("routines.rename")}
-          </DropdownMenuItem>
-          {status === "active" ? null : (
-            <DropdownMenuItem className="min-h-11" onSelect={() => changeStatus("archived", "archivedToast")}>
-              <ArchiveIcon aria-hidden />
-              {t("routines.archive")}
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
-
       <NameDialog
-        open={dialog === "routine"}
-        title={t("routines.newRoutineTitle")}
-        label={t("routines.routineName")}
-        placeholder={t("routines.routineNamePlaceholder")}
-        confirmLabel={t("routines.create")}
+        open={open}
+        title={t("newRoutineTitle")}
+        label={t("routineName")}
+        placeholder={t("routineNamePlaceholder")}
+        confirmLabel={t("create")}
         pending={pending}
         onSubmit={(value) =>
           run(
@@ -246,25 +158,67 @@ export function FolderActions({ folderId, title, name, status, gymId, locations 
             (routineId) => router.push(`/training/routines/${routineId}`),
           )
         }
-        onClose={() => setDialog(null)}
+        onClose={() => setOpen(false)}
       />
+    </>
+  );
+}
+
+interface PlanManageActionsProps {
+  folderId: string;
+  title: string;
+  /** Eigener Name des Plans; leer bei erzeugten Plänen. */
+  name: string;
+  /** Der Hauptplan lässt sich nicht archivieren. */
+  isMain: boolean;
+}
+
+/** Umbenennen und Archivieren am Ende der Plan-Seite. */
+export function PlanManageActions({ folderId, title, name, isMain }: PlanManageActionsProps) {
+  const t = useTranslations();
+  const router = useRouter();
+  const { run, pending } = useActionRunner();
+  const [renaming, setRenaming] = useState(false);
+
+  return (
+    <div className="grid gap-3">
+      <p className="text-muted-foreground text-sm">
+        {isMain ? t("routines.archiveMainText") : t("routines.archiveText")}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" className="min-h-11" onClick={() => setRenaming(true)}>
+          <PencilIcon aria-hidden />
+          {t("routines.rename")}
+        </Button>
+        {isMain ? null : (
+          <Button
+            variant="outline"
+            className="min-h-11"
+            disabled={pending}
+            onClick={() =>
+              run(
+                () => setPlanStatusAction(folderId, "archived"),
+                () => {
+                  toast.success(t("routines.archivedToast", { name: title }));
+                  router.push("/training/plans");
+                },
+              )
+            }
+          >
+            <ArchiveIcon aria-hidden />
+            {t("routines.archive")}
+          </Button>
+        )}
+      </div>
       <NameDialog
-        open={dialog === "rename"}
+        open={renaming}
         title={t("routines.renameTitle")}
         label={t("routines.folderName")}
         initial={name}
         confirmLabel={t("common.save")}
         pending={pending}
-        onSubmit={(value) => run(() => renameFolderAction(folderId, value), () => setDialog(null))}
-        onClose={() => setDialog(null)}
-      />
-      <PlanLocationDialog
-        open={dialog === "location"}
-        folderId={folderId}
-        title={title}
-        gymId={gymId}
-        locations={locations}
-        onClose={() => setDialog(null)}
+        onSubmit={(value) => run(() => renameFolderAction(folderId, value), () => setRenaming(false))}
+        onClose={() => setRenaming(false)}
       />
     </div>
   );
