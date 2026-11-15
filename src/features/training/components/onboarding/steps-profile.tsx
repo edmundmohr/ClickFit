@@ -120,7 +120,7 @@ export function BodyFatStep({ state, update, unitSystem, currentYear }: BodyStep
         valueText={t("value", { percent })}
       />
       <div className="flex min-h-11 items-center justify-between gap-3">
-        <p className="text-sm font-medium text-[var(--tint)]">{t("estimate", { percent: estimate })}</p>
+        <p className="text-sm font-medium">{t("estimate", { percent: estimate })}</p>
         {percent !== estimate ? (
           <Button type="button" variant="outline" size="sm" onClick={() => update({ bodyFatPercent: null })}>
             {t("useEstimate")}

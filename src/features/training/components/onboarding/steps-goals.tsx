@@ -110,7 +110,8 @@ function GoalChart({ goal }: { goal: Goal }) {
   const trend = GOAL_TRENDS[goal];
   return (
     <figure className="grid gap-1">
-      <p className="text-center text-xs font-semibold tracking-wide uppercase" style={{ color: "var(--viz-2)" }}>
+      <p className="flex items-center justify-center gap-2 text-xs font-semibold tracking-wide uppercase">
+        <span aria-hidden className="border-foreground w-5 border-t-2" />
         {t("muscle")}
       </p>
       <svg viewBox={`0 0 ${CHART.width} ${CHART.height}`} role="img" aria-label={t("chart")} className="w-full">
@@ -118,7 +119,7 @@ function GoalChart({ goal }: { goal: Goal }) {
         <path
           d={trendPath(trend.muscle)}
           fill="none"
-          stroke="var(--viz-2)"
+          stroke="var(--foreground)"
           strokeWidth={3}
           strokeLinecap="round"
           className="transition-[d] duration-300"
@@ -126,14 +127,16 @@ function GoalChart({ goal }: { goal: Goal }) {
         <path
           d={trendPath(trend.fat)}
           fill="none"
-          stroke="var(--status-good)"
+          stroke="var(--foreground)"
           strokeWidth={3}
+          strokeDasharray="2 8"
           strokeLinecap="round"
           className="transition-[d] duration-300"
         />
       </svg>
       <div className="flex items-center justify-between text-xs">
-        <span className="font-semibold tracking-wide uppercase" style={{ color: "var(--status-good)" }}>
+        <span className="flex items-center gap-2 font-semibold tracking-wide uppercase">
+          <span aria-hidden className="border-foreground w-5 border-t-2 border-dotted" />
           {t("fat")}
         </span>
         <span className="text-muted-foreground">{t("days")}</span>
@@ -161,7 +164,6 @@ export function GoalStep({ state, update, unitSystem, currentYear }: BodyStepPro
               advisable(goal) ? null : (
                 <TriangleAlertIcon
                   className="size-5 shrink-0"
-                  style={{ color: "var(--status-warning)" }}
                   role="img"
                   aria-label={t("onboarding.goal.warning")}
                 />
@@ -192,7 +194,7 @@ export function FocusStep({ state, update }: StepProps) {
 
   const isSelected = (muscle: Muscle) => state.focusMuscles.includes(muscle);
   const fills = Object.fromEntries(
-    MUSCLES.map((muscle) => [muscle, isSelected(muscle) ? "var(--tint)" : IDLE_FILL]),
+    MUSCLES.map((muscle) => [muscle, isSelected(muscle) ? "var(--foreground)" : IDLE_FILL]),
   ) as Record<Muscle, string>;
   const labels = Object.fromEntries(
     MUSCLES.map((muscle) => [
@@ -209,7 +211,7 @@ export function FocusStep({ state, update }: StepProps) {
         <MuscleMap view="front" label={t("onboarding.focus.front")} fills={fills} labels={labels} selected={null} onSelect={pick} />
         <MuscleMap view="back" label={t("onboarding.focus.back")} fills={fills} labels={labels} selected={null} onSelect={pick} />
       </div>
-      <p role="status" className="text-sm font-medium empty:hidden" style={{ color: "var(--status-warning)" }}>
+      <p role="status" className="text-sm font-medium empty:hidden">
         {limitReached ? t("onboarding.focus.limit") : null}
       </p>
       <div className="flex flex-wrap justify-center gap-2">

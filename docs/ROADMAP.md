@@ -175,7 +175,7 @@ Grenzen:
   Fortschritt → Kraft und im Export. Migration 0011 (Spalten in `plan_exercise`, Tabelle
   `target_weight_change`).
 - Fragebogen neu aufgebaut nach dem Vorbild eines geführten Einstiegs: Vollbild, eine Frage pro
-  Bildschirm, drei Abschnitte mit eigener Farbe und geteilter Fortschrittsleiste. Neu abgefragt
+  Bildschirm, drei Abschnitte mit geteilter Fortschrittsleiste, schlicht in Schwarz-Weiß. Neu abgefragt
   werden Körperfettanteil (vorgeschätzt aus Größe, Gewicht, Alter), Trainingserfahrung in
   Monaten mit Selbsteinschätzung in sechs Stufen, bis zu zwei Schwerpunkt-Muskelgruppen (ein
   Satz mehr, wenn die Zeit reicht) und die körperliche Belastung im Beruf. Trainingstage werden

@@ -164,7 +164,7 @@ export function SwitchRow({ label, checked, onChange }: SwitchRowProps) {
         aria-hidden
         className={cn(
           "flex h-7 w-12 shrink-0 items-center rounded-full border p-0.5 transition-colors",
-          checked ? "border-transparent bg-[var(--tint)]" : "bg-foreground/10",
+          checked ? "bg-foreground border-transparent" : "bg-foreground/10",
         )}
       >
         <span
@@ -202,7 +202,8 @@ export function Gauge({ level, steps }: { level: number; steps: number }) {
             fill="none"
             strokeWidth={3.5}
             strokeLinecap="round"
-            stroke={index <= level ? "var(--tint)" : "var(--border)"}
+            stroke="currentColor"
+            strokeOpacity={index <= level ? 1 : 0.2}
           />
         );
       })}

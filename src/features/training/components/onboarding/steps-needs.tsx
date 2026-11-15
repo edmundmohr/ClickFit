@@ -61,7 +61,7 @@ export function FrequencyStep({ state, update }: StepProps) {
             title={t("option", { count })}
             trailing={
               recommended.includes(count) ? (
-                <span className="text-xs font-semibold tracking-wide text-[var(--tint)] uppercase">
+                <span className="text-xs font-semibold tracking-wide uppercase">
                   {t("recommended")}
                 </span>
               ) : null
@@ -175,7 +175,7 @@ export function WeekStep({ state, update }: StepProps) {
     <div className="grid flex-1 content-between gap-8">
       <div className="grid gap-4">
         <p className="flex items-center gap-2 font-medium">
-          <span aria-hidden className="size-3 rounded-full bg-[var(--tint)]" />
+          <span aria-hidden className="bg-foreground size-3 rounded-full" />
           {t(`training.splits.${split}`)}
         </p>
         <div className="grid grid-cols-7 gap-1.5">
@@ -195,13 +195,13 @@ export function WeekStep({ state, update }: StepProps) {
                 onClick={() => tap(day)}
                 className={cn(
                   "bg-foreground/10 relative flex h-24 flex-col items-center overflow-hidden rounded-full border-2 pt-3 text-sm font-semibold transition-colors",
-                  moving === day ? "border-[var(--tint)]" : "border-transparent",
+                  moving === day ? "border-foreground" : "border-transparent",
                   moving !== null && !isTraining ? "border-foreground/30 border-dashed" : null,
                 )}
               >
                 {t(`training.weekdaysShort.${day}`)}
                 {isTraining ? (
-                  <span aria-hidden className="absolute inset-x-0 bottom-0 h-7 rounded-t-[50%] bg-[var(--tint)]" />
+                  <span aria-hidden className="bg-foreground absolute inset-x-0 bottom-0 h-7 rounded-t-[50%]" />
                 ) : null}
               </button>
             );
@@ -241,7 +241,7 @@ export function ReminderStep({ failed }: { failed: boolean }) {
   return (
     <div className="my-auto grid gap-4">
       <div className="bg-card/80 flex items-start gap-3 rounded-2xl border p-4 shadow-lg">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--tint)] text-black">
+        <span className="flex size-10 shrink-0 items-center justify-center bg-foreground text-background rounded-xl">
           <BellIcon className="size-5" aria-hidden />
         </span>
         <div className="grid flex-1 gap-0.5">
