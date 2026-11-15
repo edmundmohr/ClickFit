@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
-import { aiReview, aiUsage, apiToken, bodyWeightEntry, session } from "@/db/schema";
+import { account, aiReview, aiUsage, apiToken, bodyWeightEntry, progressPhoto, session, user } from "@/db/schema";
 import { AppError } from "@/lib/errors";
 import type { Actor } from "@/domain/permissions/user-management";
 import { createUserWithPassword } from "@/features/auth/services/user-factory";
@@ -15,6 +15,12 @@ import {
   updateDisplayName,
   updatePreferences,
 } from "@/features/users/services/account-service";
+import {
+  createUserAsAdmin,
+  deleteUserAsAdmin,
+  updateUserAsAdmin,
+} from "@/features/users/services/user-admin-service";
+import { uploadPhoto } from "@/features/progress/services/photo-service";
 import { newId } from "@/lib/tokens";
 import { PASSWORD_CHECK_LIMIT } from "@/lib/auth/attempt-limit";
 import { TEST_PASSWORDS, createTestDatabase, type TestDatabase } from "../helpers/test-db";
@@ -259,5 +265,97 @@ describe("user list, profile and export", () => {
     const serialized = JSON.stringify(await exportOwnData(testDb.db, anna.id));
     expect(serialized).not.toContain("scrypt$");
     expect(serialized).not.toContain(TEST_PASSWORDS.anna);
+  });
+});
+
+describe("admin manages users", () => {
+  it("creates a user who can sign in with the given password", async () => {
+    const { id } = await createUserAsAdmin(testDb.db, admin, {
+      username: " Eddi ",
+      name: "",
+      password: TEST_PASSWORDS.eddi,
+      role: "user",
+    });
+    expect(await verifyUserPassword(testDb.db, id, TEST_PASSWORDS.eddi)).toBe(true);
+    const users = await listUsers(testDb.db, admin);
+    expect(users.at(-1)).toEqual({ id, name: "Eddi", username: "Eddi", role: "user" });
+  });
+
+  it("denies creating users to normal users and rejects bad input", async () => {
+    const input = { username: "Eddi", password: TEST_PASSWORDS.eddi, role: "user" as const };
+    await expectAppError(createUserAsAdmin(testDb.db, anna, input), "NOT_ADMIN");
+    await expectAppError(createUserAsAdmin(testDb.db, admin, { ...input, username: "Jörg" }), "USERNAME_INVALID");
+    await expectAppError(createUserAsAdmin(testDb.db, admin, { ...input, username: "ab" }), "USERNAME_INVALID");
+    await expectAppError(createUserAsAdmin(testDb.db, admin, { ...input, username: "anna" }), "USERNAME_TAKEN");
+    await expectAppError(createUserAsAdmin(testDb.db, admin, { ...input, password: "short" }), "PASSWORD_TOO_SHORT");
+    expect(await listUsers(testDb.db, admin)).toHaveLength(2);
+  });
+
+  it("changes name, username and role of another user", async () => {
+    await updateUserAsAdmin(testDb.db, admin, {
+      targetUserId: anna.id,
+      username: "Anna.M",
+      name: "Anna Maria",
+      role: "admin",
+    });
+    const row = await testDb.db.query.user.findFirst({ where: eq(user.id, anna.id) });
+    expect(row).toMatchObject({
+      name: "Anna Maria",
+      username: "anna.m",
+      displayUsername: "Anna.M",
+      email: "anna.m@users.clickfit.invalid",
+      role: "admin",
+    });
+    // Der alte Benutzername ist wieder frei, das Passwort bleibt.
+    await createUserAsAdmin(testDb.db, admin, { username: "Anna", password: TEST_PASSWORDS.eddi, role: "user" });
+    expect(await verifyUserPassword(testDb.db, anna.id, TEST_PASSWORDS.anna)).toBe(true);
+  });
+
+  it("guards updates: admin only, unique and valid usernames, own role fixed", async () => {
+    const base = { targetUserId: anna.id, username: "Anna", name: "Anna", role: "user" as const };
+    await expectAppError(updateUserAsAdmin(testDb.db, anna, base), "NOT_ADMIN");
+    await expectAppError(updateUserAsAdmin(testDb.db, admin, { ...base, username: "ADMIN" }), "USERNAME_TAKEN");
+    await expectAppError(updateUserAsAdmin(testDb.db, admin, { ...base, username: "an na" }), "USERNAME_INVALID");
+    await expectAppError(updateUserAsAdmin(testDb.db, admin, { ...base, targetUserId: "missing" }), "NOT_FOUND");
+    await expectAppError(
+      updateUserAsAdmin(testDb.db, admin, { targetUserId: admin.id, username: "Admin", name: "Admin", role: "user" }),
+      "OWN_ACCOUNT_PROTECTED",
+    );
+    // Eigener Name und Benutzername lassen sich ändern, auch nur in der Schreibweise.
+    await updateUserAsAdmin(testDb.db, admin, { targetUserId: admin.id, username: "ADMIN", name: "Chef", role: "admin" });
+    expect((await listUsers(testDb.db, admin))[0]).toMatchObject({ name: "Chef", username: "ADMIN", role: "admin" });
+  });
+
+  it("deletes a user with all data, sessions and photo files", async () => {
+    const bucket = testDb.env.UPLOADS;
+    const now = new Date();
+    await addSession(anna.id, "anna-phone");
+    await testDb.db.insert(bodyWeightEntry).values([
+      { id: newId(), userId: anna.id, date: "2026-11-10", weightKg: 64.5, source: "manual", createdAt: now },
+      { id: newId(), userId: admin.id, date: "2026-11-10", weightKg: 90, source: "manual", createdAt: now },
+    ]);
+    const photo = { data: new Uint8Array([1, 2, 3]).buffer, contentType: "image/jpeg", date: "2026-11-10", note: "", sessionId: null } as const;
+    const annaPhoto = await uploadPhoto(testDb.db, bucket, anna.id, photo);
+    const adminPhoto = await uploadPhoto(testDb.db, bucket, admin.id, photo);
+
+    await deleteUserAsAdmin(testDb.db, bucket, admin, anna.id);
+
+    expect((await listUsers(testDb.db, admin)).map((entry) => entry.username)).toEqual(["Admin"]);
+    expect(await sessionTokens(anna.id)).toEqual([]);
+    expect(await testDb.db.query.account.findMany({ where: eq(account.userId, anna.id) })).toEqual([]);
+    expect(await testDb.db.query.bodyWeightEntry.findMany()).toHaveLength(1);
+    expect(await testDb.db.query.progressPhoto.findMany({ where: eq(progressPhoto.userId, anna.id) })).toEqual([]);
+    expect(await bucket.head(`photos/${anna.id}/${annaPhoto}`)).toBeNull();
+    expect(await bucket.head(`photos/${admin.id}/${adminPhoto}`)).not.toBeNull();
+    // Der Benutzername ist danach wieder frei.
+    await createUserAsAdmin(testDb.db, admin, { username: "Anna", password: TEST_PASSWORDS.anna, role: "user" });
+  });
+
+  it("guards deletion: admin only, never the own account", async () => {
+    const bucket = testDb.env.UPLOADS;
+    await expectAppError(deleteUserAsAdmin(testDb.db, bucket, anna, admin.id), "NOT_ADMIN");
+    await expectAppError(deleteUserAsAdmin(testDb.db, bucket, admin, admin.id), "OWN_ACCOUNT_PROTECTED");
+    await expectAppError(deleteUserAsAdmin(testDb.db, bucket, admin, "missing"), "NOT_FOUND");
+    expect(await listUsers(testDb.db, admin)).toHaveLength(2);
   });
 });

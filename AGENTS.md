@@ -17,7 +17,7 @@ Maßgeblich sind `docs/SPEC.md` (Anforderungen) und `docs/ROADMAP.md` (Phasen un
 - Keine Quelldatei über 600 Zeilen. TypeScript strict, kein `any`.
 - Darstellung zuerst fürs iPhone: Bedienelemente mindestens 44 px, 16 px Schrift in Eingabefeldern, Safe-Areas.
 - Hosting komplett auf Cloudflare (Workers, D1 mit Drizzle, R2). Kein Docker, kein Prisma.
-- Drei fest angelegte Nutzer, Login per Benutzername. Diese Lösung bleibt unverändert.
+- Login per Benutzername, ohne E-Mail, Registrierung oder Einladungen. Konten legt nur der Admin an (Mehr → Benutzer); diese Lösung bleibt unverändert.
 - Echte Passwörter stehen nur in `seed-users.local.json` (von Git ausgeschlossen), nie im Code oder in Commits.
 - Fachlogik liegt ohne Framework in `src/domain` und hat Tests. Pro Phase: Tests, aktuelle README, Seed-Daten.
 - Vor jedem Commit: `npm run check`.

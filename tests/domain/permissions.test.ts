@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   canAccessOwnedRecord,
+  canChangeRoleOf,
+  canDeleteUser,
+  canManageUsers,
+  isValidUsername,
   canSetPasswordFor,
   canViewUserList,
   isAdmin,
@@ -43,6 +47,34 @@ describe("user management permissions", () => {
       allowed: false,
       reason: "SELF_NOT_ALLOWED",
     });
+  });
+
+  it("lets only admins create and edit accounts", () => {
+    expect(canManageUsers(admin)).toEqual({ allowed: true });
+    expect(canManageUsers(anna)).toEqual({ allowed: false, reason: "NOT_ADMIN" });
+  });
+
+  it("lets an admin change the role of others but never the own one", () => {
+    expect(canChangeRoleOf(admin, anna.id)).toEqual({ allowed: true });
+    expect(canChangeRoleOf(admin, admin.id)).toEqual({ allowed: false, reason: "OWN_ACCOUNT_PROTECTED" });
+    expect(canChangeRoleOf(anna, admin.id)).toEqual({ allowed: false, reason: "NOT_ADMIN" });
+  });
+
+  it("lets an admin delete others but never the own account", () => {
+    expect(canDeleteUser(admin, anna.id)).toEqual({ allowed: true });
+    expect(canDeleteUser(admin, admin.id)).toEqual({ allowed: false, reason: "OWN_ACCOUNT_PROTECTED" });
+    expect(canDeleteUser(anna, anna.id)).toEqual({ allowed: false, reason: "NOT_ADMIN" });
+    expect(canDeleteUser(anna, admin.id)).toEqual({ allowed: false, reason: "NOT_ADMIN" });
+  });
+
+  it("accepts only usernames the sign-in accepts", () => {
+    expect(isValidUsername("Anna")).toBe(true);
+    expect(isValidUsername("max_m.2")).toBe(true);
+    expect(isValidUsername("ab")).toBe(false);
+    expect(isValidUsername("a".repeat(31))).toBe(false);
+    expect(isValidUsername("Jörg")).toBe(false);
+    expect(isValidUsername("anna maria")).toBe(false);
+    expect(isValidUsername("anna@home")).toBe(false);
   });
 
   it("restricts owned records to their owner, even for admins", () => {

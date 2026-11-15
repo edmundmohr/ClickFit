@@ -17,8 +17,8 @@ const DAY_SECONDS = 60 * 60 * 24;
 
 /**
  * Endpunkte von Better Auth, die die App nicht braucht und die über HTTP nicht erreichbar sein
- * dürfen: Die Konten sind fest angelegt. Benutzername, Name, E-Mail und Passwort ändern sich
- * nur über die eigenen, geprüften Aktionen (Profil, Passwort) – sonst ließe sich z. B. über
+ * dürfen: Konten legt nur der Admin an. Benutzername, Name, E-Mail und Passwort ändern sich
+ * nur über die eigenen, geprüften Aktionen (Profil, Passwort, Nutzerverwaltung) – sonst ließe sich z. B. über
  * `/update-user` der Login-Name ohne jede Prüfung ändern. Aufrufe auf dem Server über
  * `auth.api` (Sitzung lesen, Abmelden) sind davon nicht betroffen.
  */
@@ -41,8 +41,8 @@ export const DISABLED_AUTH_PATHS = [
 
 /**
  * Better Auth übernimmt Anmeldung (per Benutzername), Abmeldung, Sessions, Cookies,
- * CSRF-/Origin-Prüfung und das Login-Rate-Limit. Registrierung ist abgeschaltet: Die wenigen
- * Konten legt das Seed-Skript an (scripts/seed.ts).
+ * CSRF-/Origin-Prüfung und das Login-Rate-Limit. Registrierung ist abgeschaltet: Die ersten
+ * Konten legt das Seed-Skript an (scripts/seed.ts), weitere der Admin in der App.
  */
 export function createAuth(env: CloudflareEnv) {
   const db = createDb(env.DB);

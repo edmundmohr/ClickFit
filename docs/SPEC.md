@@ -8,8 +8,9 @@ Die Umsetzungsreihenfolge steht in [ROADMAP.md](ROADMAP.md).
 - **Name:** ClickFit (statt „FitForge“), Domain `clickfit.online`.
 - **Hosting:** komplett auf Cloudflare (Workers + D1 + R2) statt Docker auf dem Heimserver.
 - **ORM:** Drizzle statt Prisma (passt besser zu D1/Workers).
-- **Auth:** Better Auth, Login per Benutzername. Drei fest angelegte Nutzer, keine Registrierung,
-  keine Einladungen. Passwörter können geändert werden (selbst und durch den Admin).
+- **Auth:** Better Auth, Login per Benutzername. Keine Registrierung, keine Einladungen, keine
+  E-Mail. Konten verwaltet der Admin in der App. Passwörter können geändert werden (selbst und
+  durch den Admin).
 - **Sprache:** Die App gibt es nur auf Deutsch (kein Englisch als zweite Sprache). Kommentare,
   Commit-Messages und Doku sind deutsch; Bezeichner und Dateinamen bleiben englisch.
   Damit gelten die Regeln 1 und 2 unten in dieser geänderten Form.
@@ -49,8 +50,12 @@ Creator-Programm) werden nicht gebraucht.
 
 ## Nutzer
 
-- Die App wird nur von fest angelegten Nutzern verwendet; diese Lösung ist umgesetzt und bleibt
+- Die App wird nur von Nutzern verwendet, die der Admin anlegt. Es gibt keine Registrierung,
+  keine Einladungen und keine E-Mail; angemeldet wird per Benutzername. Diese Lösung bleibt
   unverändert.
+- Der Admin kann unter **Mehr → Benutzer** Konten anlegen, Anzeigename, Benutzername und Rolle
+  ändern, ein neues Passwort setzen und Konten mit allen Daten löschen. Das eigene Konto lässt
+  sich dort weder löschen noch in der Rolle ändern; so bleibt immer ein Admin übrig.
 - Jeder Nutzer hat seine eigenen Daten, Einstellungen (Sprache, Theme) und kann seine Daten
   exportieren (JSON/CSV).
 
