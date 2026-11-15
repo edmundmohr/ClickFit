@@ -7,6 +7,7 @@ import { exerciseNote, planExercise, workoutExercise, workoutSession, workoutSet
 import { adaptDay, shortenDay } from "@/domain/training/adaptation";
 import { cycleStatus } from "@/domain/training/cycle";
 import { isDeloadWeek, nextSetTargets } from "@/domain/training/progression";
+import { plannedWeightApplies } from "@/domain/training/target-weight";
 import type { ExerciseFeedback, PlannedExercise } from "@/domain/training/types";
 import { reentryFactor } from "@/domain/training/vacation";
 import { ladderFor, type WeightUnit } from "@/domain/training/weights";
@@ -52,6 +53,9 @@ interface SeedEntry {
   targetRir: number;
   restSeconds: number;
   groupId: string | null;
+  /** Selbst festgelegtes Zielgewicht aus der Routine (nur Plantage). */
+  targetWeightKg?: number | null;
+  targetWeightSetAt?: Date | null;
 }
 
 interface SessionSeed {
@@ -124,10 +128,15 @@ async function createSession(
       groupId: entry.groupId,
     });
     const ladder = ladderFor(exercise.equipment, weights);
+    const last = previous.get(entry.exerciseId);
+    const plannedWeightKg = entry.targetWeightKg ?? null;
     const targets = nextSetTargets({
       exerciseType: exercise.type,
       prescription: { ...entry, targetRir },
-      previous: previous.get(entry.exerciseId)?.sets ?? [],
+      previous: last?.sets ?? [],
+      plannedWeightKg: plannedWeightApplies(plannedWeightKg, entry.targetWeightSetAt ?? null, last?.startedAt ?? null)
+        ? plannedWeightKg
+        : null,
       incrementKg: ladder.incrementKg,
       steps: ladder,
       isDeload: seed.isDeload,
@@ -224,7 +233,11 @@ export async function startWorkout(
         const exercise = context.catalog.find(entry.exerciseId);
         return exercise ? [{ entry, exercise }] : [];
       });
-  const entries = options.short ? shortenDay(adapted) : adapted.map((item) => item.entry);
+  // Ersetzt die Anpassung eine Übung (z. B. wegen Beschwerden), gilt ihr Zielgewicht nicht für den Ersatz.
+  const plannedIds = new Map(available.map((entry) => [entry.id, entry.exerciseId]));
+  const entries = (options.short ? shortenDay(adapted) : adapted.map((item) => item.entry)).map((entry) =>
+    plannedIds.get(entry.id) === entry.exerciseId ? entry : { ...entry, targetWeightKg: null },
+  );
 
   return createSession(
     db,

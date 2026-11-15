@@ -16,6 +16,8 @@ export interface EditorItem {
   targetRir: number;
   restSeconds: number;
   groupId: string | null;
+  /** Eigenes Zielgewicht in kg; `null` = automatisch aus der letzten Leistung. */
+  targetWeightKg: number | null;
   /** Gelöschte eigene Übung: wird angezeigt, beim Speichern aber entfernt und nicht trainiert. */
   archived?: boolean;
 }
@@ -36,7 +38,15 @@ export const RIR_OPTIONS = [0, 1, 2, 3, 4, 5];
 
 /** Sinnvolle Vorgaben für eine neu hinzugefügte Übung, je nach Art. */
 export function newItem(exercise: PickerExercise, key: string): EditorItem {
-  const base = { key, exerciseId: exercise.id, name: exercise.name, type: exercise.type, groupId: null, targetRir: 2 };
+  const base = {
+    key,
+    exerciseId: exercise.id,
+    name: exercise.name,
+    type: exercise.type,
+    groupId: null,
+    targetRir: 2,
+    targetWeightKg: null,
+  };
   if (exercise.type === "duration") return { ...base, sets: 3, repMin: 30, repMax: 60, restSeconds: 60 };
   if (exercise.type === "bodyweight_reps") return { ...base, sets: 3, repMin: 8, repMax: 15, restSeconds: 90 };
   return { ...base, sets: 3, repMin: 8, repMax: 12, restSeconds: 90 };

@@ -223,6 +223,15 @@ Typprüfung nicht an ihnen scheitert.
   löschen geht nur im Archiv; „Plan neu erstellen“ legt den bisherigen erzeugten Plan dort ab.
   Der Builder unter `/training/routines/<id>` speichert eine Routine immer vollständig und führt
   zurück zu ihrem Plan.
+- **Eigenes Zielgewicht:** Bei Übungen mit Gewicht (auch Zusatzgewicht und Unterstützung) lässt
+  sich im Builder ein Zielgewicht eintragen (`plan_exercise.target_weight_kg`, in kg, Eingabe in
+  der Einheit des Nutzers). Leer heißt automatisch wie bisher. Ein eingetragenes Gewicht gilt
+  genau so (ohne Rundung auf die Gewichtsstufen) mit dem unteren Ende des Wiederholungsbereichs,
+  bis die Übung danach trainiert wurde (`target_weight_set_at`); dann steigert die Progression
+  wieder vom tatsächlich Trainierten aus. Nur die Deload-Woche macht es leichter. Jede Änderung
+  landet in `target_weight_change` und steht unter Fortschritt → Kraft bei der Übung. Wird eine
+  Übung getauscht oder heute ersetzt, gilt ihr Zielgewicht nicht für den Ersatz; „Plan
+  verfeinern“ behält vorhandene Zielgewichte. Regeln: `src/domain/training/target-weight.ts`.
 - **Fester Ort pro Plan:** Optional hat ein Plan einen festen Trainingsort
   (`training_plan.gym_profile_id`). Seine Routinen nutzen dann beim Start, in der Anzeige und
   beim Tauschen das Equipment und die Gewichtsstufen dieses Orts, unabhängig vom aktiven Ort
@@ -316,13 +325,30 @@ Typprüfung nicht an ihnen scheitert.
   Änderungen vor (tauschen, hinzufügen, entfernen, Sätze und Wiederholungen anpassen). Die App
   prüft jeden Vorschlag (`src/domain/ai/plan-changes.ts`): nur Übungen aus dem Katalog, die zu
   Equipment, Beschwerden und Ausschlüssen passen; übernommen wird nur, was man auswählt.
-  Gesendet werden Ziel, Erfahrung, Trainingstage, Equipment, Beschwerden, der Plan, die
-  Rückmeldungen nach Übungen der letzten vier Wochen (Datum, Anstrengung, RIR; siehe
-  `src/domain/ai/feedback-summary.ts`) und der Wunsch – kein Name, keine Gewichte oder
-  Wiederholungen aus dem Verlauf.
+  Gesendet werden der Plan, die erlaubten Übungen, die Rückmeldungen nach Übungen der letzten
+  vier Wochen (`src/domain/ai/feedback-summary.ts`), der Wunsch und der gesamte Datenkontext
+  (siehe unten).
+- **Datenkontext:** Alle KI-Funktionen beziehen die vorhandenen Daten ein.
+  `src/features/ai/services/data-snapshot.ts` lädt sie, `src/domain/ai/data-summary.ts`
+  verdichtet sie (Wochenwerte, erster und letzter Stand je Übung, Plateaus) und
+  `src/domain/ai/data-context.ts` schreibt daraus einen kompakten Text. Zeitraum: acht Wochen,
+  beim Gewicht sechs Monate. Enthalten sind Profil mit Beschwerden (auch die eigene
+  Beschreibung), Einstellungen mit Zyklusphase, Urlaub und Zusatzsport, Trainings mit Notizen,
+  Fortschritt je Übung, Sätze pro Muskelgruppe, Hauptplan, Erholung, Ernährung mit Zielen,
+  Makros, Wasser und Supplements, Gewicht, Umfänge, frühere Körperfett-Schätzungen, Cardio,
+  Mobility, Schritte und Ruhepuls. Name und Benutzername kommen nie vor. Fehlende Daten stehen
+  als „keine“ darin, damit das Modell nicht rät.
+- **KI-Auswertung:** unter Fortschritt → Berichte. Das Modell bewertet sechs Bereiche
+  (Training, Ernährung, Körper, Erholung, Cardio und Mobility, Alltag), gibt bis zu sechs
+  Empfehlungen und nennt fehlende Daten; optional beantwortet es eine Frage.
+  `src/domain/ai/review.ts` prüft die Antwort. Pro Nutzer bleibt die jüngste Auswertung in der
+  Tabelle `ai_review` (Migration 0010) gespeichert, bis eine neue sie ersetzt oder sie gelöscht
+  wird.
 - **Körperfett-Schätzung:** im Foto-Dialog unter Fortschritt → Fotos, nach einer Rückfrage vor
-  jedem Foto. Gespeichert wird eine Spanne von mindestens drei Prozentpunkten, überall als grobe
-  Schätzung gekennzeichnet. Reicht das Foto nicht aus, gibt es keine Schätzung.
+  jedem Foto. Neben dem Foto gehen Profil, Gewichtsverlauf, Umfänge, frühere Schätzungen,
+  Ernährung und Training mit. Gespeichert wird eine Spanne von mindestens drei Prozentpunkten,
+  überall als grobe Schätzung gekennzeichnet. Reicht das Foto nicht aus, gibt es keine
+  Schätzung.
 - **Modell:** Standard ist `claude-opus-5-5` mit strukturierter Ausgabe. Lehnt das Modell eine
   Anfrage ab, darf der Anbieter sie auf einem Ausweich-Modell wiederholen. Über die Variable
   `LLM_MODEL` lässt sich ein anderes Modell wählen. Ein anderer Anbieter braucht nur eine neue

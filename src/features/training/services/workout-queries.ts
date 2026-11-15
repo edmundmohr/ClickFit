@@ -13,6 +13,8 @@ import type { LocalDate } from "@/lib/dates";
 
 export interface PreviousPerformance {
   date: LocalDate;
+  /** Start der Einheit; entscheidet, ob ein später geändertes Zielgewicht noch gilt. */
+  startedAt: Date;
   sets: PerformedSet[];
 }
 
@@ -93,7 +95,7 @@ export async function getPreviousPerformances(
     const chosen = sessionByExercise.get(row.exerciseId);
     if (chosen === undefined) {
       sessionByExercise.set(row.exerciseId, row.sessionId);
-      result.set(row.exerciseId, { date: row.date, sets: [] });
+      result.set(row.exerciseId, { date: row.date, startedAt: row.startedAt, sets: [] });
       exerciseRirs.set(row.exerciseId, row.exerciseRir);
     } else if (chosen !== row.sessionId) {
       continue;

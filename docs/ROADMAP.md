@@ -164,3 +164,13 @@ Grenzen:
   Messungen mit Ändern und Löschen (mit Rückgängig), Nachtragen für frühere Tage. Der Trend
   läuft immer über alle Messungen und wird nur für die Anzeige auf den Zeitraum begrenzt.
   Keine Migration.
+- KI mit allen Daten: Plan verfeinern und Körperfett-Schätzung beziehen jetzt alle
+  gespeicherten Daten ein (Training mit Notizen, Erholung, Ernährung, Gewicht, Umfänge, Cardio,
+  Mobility, Schritte, Ruhepuls, Zyklus, Beschwerden). Neu ist die KI-Auswertung unter
+  Fortschritt → Berichte: Einschätzung je Bereich, Empfehlungen und optional die Antwort auf
+  eine Frage. Die bestehende Zustimmung gilt weiter; die Liste der gesendeten Daten in den
+  Einstellungen ist angepasst. Migration 0010 (Tabelle `ai_review`).
+- Eigenes Zielgewicht pro Übung im Routine-Editor: gilt fürs nächste Training, danach steigert
+  die Progression wieder automatisch. Jede Änderung steht im Verlauf der Übung unter
+  Fortschritt → Kraft und im Export. Migration 0011 (Spalten in `plan_exercise`, Tabelle
+  `target_weight_change`).

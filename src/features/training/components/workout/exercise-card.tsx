@@ -106,7 +106,7 @@ export function ExerciseCard({
         <p className="text-sm">
           {exercise.previous && previousText
             ? `${t("workout.previous", { date: formatDayShort(exercise.previous.date) })}: ${previousText}`
-            : t("workout.noPrevious")}
+            : t(exercise.hasTargetWeight ? "workout.noPreviousPlanned" : "workout.noPrevious")}
         </p>
         {exercise.note ? (
           <p className="bg-secondary rounded-md px-3 py-2 text-sm whitespace-pre-line">{exercise.note}</p>

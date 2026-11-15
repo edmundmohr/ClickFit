@@ -2,12 +2,14 @@
  * Plan-Builder: Pläne und Routinen anlegen, bearbeiten, verschieben, archivieren und löschen;
  * Rolle (Haupt-, Zusatz-, inaktiver Plan) und festen Ort eines Plans setzen.
  */
-import { and, eq, max } from "drizzle-orm";
+import { and, asc, desc, eq, max } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
-import { gymProfile, planDay, planExercise, trainingPlan } from "@/db/schema";
+import { gymProfile, planDay, planExercise, targetWeightChange, trainingPlan } from "@/db/schema";
 import { PLAN_STATUSES, planStatusChange, type PlanStatus } from "@/domain/training/plan-roles";
 import { isOneOf } from "@/domain/training/types";
 import { normalizeGroups } from "@/domain/training/supersets";
+import { usesExternalWeight } from "@/domain/training/progression";
+import { keptTargetWeight, targetWeightChanges, targetWeightSetAt } from "@/domain/training/target-weight";
 import { AppError } from "@/lib/errors";
 import { toLocalDate, type LocalDate } from "@/lib/dates";
 import { newId } from "@/lib/tokens";
@@ -136,9 +138,15 @@ export async function createRoutine(db: AppDatabase, userId: string, folderId: s
  * Speichert eine Routine vollständig: Name, Wochentag, Ordner und die Übungen in ihrer Reihenfolge.
  * Fliegt eine Übung aus einem erzeugten Plan, merkt sich das der Generator.
  * Gelöschte eigene Übungen werden dabei entfernt (der Editor kündigt das an); unbekannte Übungen
- * sind ein Fehler.
+ * sind ein Fehler. Geänderte Zielgewichte landen im Verlauf der Übung.
  */
-export async function saveRoutine(db: AppDatabase, userId: string, planDayId: string, input: RoutineInput): Promise<void> {
+export async function saveRoutine(
+  db: AppDatabase,
+  userId: string,
+  planDayId: string,
+  input: RoutineInput,
+  now = new Date(),
+): Promise<void> {
   const { day, plan } = await getOwnedDay(db, userId, planDayId);
   const targetFolder = input.folderId === plan.id ? plan : await getOwnedFolder(db, userId, input.folderId);
   const catalog = await getUserCatalog(db, userId);
@@ -146,17 +154,34 @@ export async function saveRoutine(db: AppDatabase, userId: string, planDayId: st
     if (!catalog.find(entry.exerciseId)) throw new AppError("NOT_FOUND");
     if (entry.repMin > entry.repMax) throw new AppError("VALIDATION");
   }
-  const exercises = input.exercises.filter((entry) => !catalog.find(entry.exerciseId)?.archived);
-
   const before = await db.query.planExercise.findMany({
-    columns: { exerciseId: true },
+    columns: { exerciseId: true, targetWeightKg: true, targetWeightSetAt: true },
     where: eq(planExercise.planDayId, planDayId),
+    orderBy: asc(planExercise.position),
+  });
+  // Ein Zielgewicht gibt es nur bei Übungen mit Zusatzgewicht bzw. Unterstützung. Fehlt die Angabe
+  // (z. B. „Plan verfeinern“), bleibt das gespeicherte Gewicht der Übung erhalten.
+  const exercises = input.exercises.flatMap((entry) => {
+    const exercise = catalog.find(entry.exerciseId);
+    if (!exercise || exercise.archived) return [];
+    const kept = entry.targetWeightKg === undefined ? keptTargetWeight(before, entry.exerciseId) : entry.targetWeightKg;
+    return [{ ...entry, targetWeightKg: usesExternalWeight(exercise.type) ? kept : null }];
   });
   const rows = normalizeGroups(exercises).map((entry, position) => ({
     id: newId(),
     planDayId,
     position,
     ...entry,
+    targetWeightSetAt: targetWeightSetAt(before, entry.exerciseId, entry.targetWeightKg, now),
+  }));
+  const changes = targetWeightChanges(before, exercises).map((change) => ({
+    id: newId(),
+    userId,
+    ...change,
+    planDayId,
+    routineName: input.name || day.name,
+    date: toLocalDate(now),
+    changedAt: now,
   }));
   const moved = targetFolder.id !== plan.id;
 
@@ -172,7 +197,9 @@ export async function saveRoutine(db: AppDatabase, userId: string, planDayId: st
       })
       .where(eq(planDay.id, planDayId)),
     db.delete(planExercise).where(eq(planExercise.planDayId, planDayId)),
-    ...chunk(rows, 9).map((part) => db.insert(planExercise).values(part)),
+    // D1 erlaubt höchstens 100 gebundene Parameter pro Anweisung (11 Spalten × 8 Zeilen).
+    ...chunk(rows, 8).map((part) => db.insert(planExercise).values(part)),
+    ...chunk(changes, 9).map((part) => db.insert(targetWeightChange).values(part)),
   ]);
 
   if (plan.source === "generated") {
@@ -204,8 +231,37 @@ export async function duplicateRoutine(db: AppDatabase, userId: string, planDayI
     }),
     ...chunk(
       exercises.map((row) => ({ ...row, id: newId(), planDayId: id })),
-      9,
+      8,
     ).map((part) => db.insert(planExercise).values(part)),
   ]);
   return id;
+}
+
+export interface TargetWeightChangeView {
+  id: string;
+  date: LocalDate;
+  routineName: string | null;
+  fromKg: number | null;
+  toKg: number | null;
+}
+
+/** Die jüngsten Änderungen des eigenen Zielgewichts einer Übung, neueste zuerst. */
+export async function listTargetWeightChanges(
+  db: AppDatabase,
+  userId: string,
+  exerciseId: string,
+  limit = 20,
+): Promise<TargetWeightChangeView[]> {
+  const rows = await db.query.targetWeightChange.findMany({
+    where: and(eq(targetWeightChange.userId, userId), eq(targetWeightChange.exerciseId, exerciseId)),
+    orderBy: desc(targetWeightChange.changedAt),
+    limit,
+  });
+  return rows.map((row) => ({
+    id: row.id,
+    date: row.date,
+    routineName: row.routineName,
+    fromKg: row.fromKg,
+    toKg: row.toKg,
+  }));
 }

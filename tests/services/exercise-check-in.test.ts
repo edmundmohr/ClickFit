@@ -160,7 +160,7 @@ describe("check-in answers in the AI plan refinement", () => {
     const prompt = calls[0].prompt;
     expect(prompt).toContain(`${view.exercises[0].exerciseId} | ${view.exercises[0].name}: ${TODAY} am Limit, RIR 0`);
     expect(prompt).not.toContain("leicht, RIR 3");
-    // Gewichte und Wiederholungen aus dem Verlauf werden nicht gesendet.
-    expect(prompt).not.toContain("60 kg");
+    // Seit dem Datenkontext gehen auch Gewichte und Wiederholungen aus dem Verlauf mit.
+    expect(prompt).toContain("60 kg");
   });
 });

@@ -79,6 +79,8 @@ Creator-Programm) werden nicht gebraucht.
 - Übungen tauschen (Alternativvorschläge mit gleichen Muskelgruppen)
 - Optional später: LLM-gestützte Feinjustierung über eine austauschbare Provider-Schnittstelle
   (API-Key per Secret), aber ohne Pflicht. Die App muss voll ohne KI funktionieren.
+  Wenn die KI genutzt wird, bezieht sie alle vorhandenen Daten der Person ein (Training,
+  Ernährung, Körper, Erholung, Cardio, Gesundheitswerte), nie Name oder Benutzername.
 
 ### 3. Trainingsmodus (Workout-Screen)
 
@@ -131,6 +133,7 @@ Creator-Programm) werden nicht gebraucht.
 - Verletzungen, Schmerzen und Einschränkungen berücksichtigen, inkl. „Verletztenmodus“, der
   betroffene Bewegungsmuster meidet
 - Eigenen Trainingsplan frei erstellen (Plan-Builder mit Drag & Drop)
+- Pro Übung ein eigenes Zielgewicht festlegen; jede Änderung wird im Verlauf der Übung festgehalten
 - Flexible Gewichtseingabe: eigene Gewichtsstufen pro Gerät/Hantel, freie Werte ohne Rundung,
   kg/lbs
 - Cardio-Trainingsplan: Cardio im Onboarding wählbar, Einheiten (Dauer, Distanz, Puls-Zone,

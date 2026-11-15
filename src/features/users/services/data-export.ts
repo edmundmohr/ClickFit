@@ -10,6 +10,7 @@ import type { AppDatabase } from "@/db/client";
 import {
   activity,
   aiConsent,
+  aiReview,
   aiUsage,
   apiToken,
   bodyFatEstimate,
@@ -43,6 +44,7 @@ import {
   workoutExercise,
   workoutSession,
   workoutSet,
+  targetWeightChange,
 } from "@/db/schema";
 
 /** Kopie ohne das genannte Feld. */
@@ -100,6 +102,7 @@ export async function collectUserData(db: AppDatabase, userId: string) {
     customExercises,
     preferences,
     exerciseNotes,
+    targetWeightChanges,
     activities,
     cardioPlan,
     mobility,
@@ -120,6 +123,7 @@ export async function collectUserData(db: AppDatabase, userId: string) {
     bodyFat,
     consent,
     usage,
+    reviews,
     tokens,
   ] = await Promise.all([
     own(userProfile),
@@ -128,6 +132,7 @@ export async function collectUserData(db: AppDatabase, userId: string) {
     own(customExercise),
     own(exercisePreference),
     own(exerciseNote),
+    own(targetWeightChange),
     own(activity),
     own(cardioPlanEntry),
     own(mobilityLog),
@@ -149,6 +154,7 @@ export async function collectUserData(db: AppDatabase, userId: string) {
     own(bodyFatEstimate),
     own(aiConsent),
     own(aiUsage),
+    own(aiReview),
     own(apiToken),
   ]);
 
@@ -166,6 +172,7 @@ export async function collectUserData(db: AppDatabase, userId: string) {
       customExercises,
       exercisePreferences: preferences,
       exerciseNotes,
+      targetWeightChanges,
     },
     activity: { activities, cardioPlan, mobility, health },
     nutrition: {
@@ -193,6 +200,8 @@ export async function collectUserData(db: AppDatabase, userId: string) {
       aiConsent: consent,
       // Zahl der KI-Anfragen je Tag.
       aiUsage: usage,
+      // Jüngste KI-Auswertung aller Daten.
+      aiReviews: reviews,
       // Von API-Tokens nur die Angaben zum Wiedererkennen, nie der Hash.
       apiTokens: tokens.map((token) => omit(token, "tokenHash")),
     },

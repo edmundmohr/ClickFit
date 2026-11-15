@@ -3,6 +3,9 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ReviewCard } from "@/features/ai/components/review-card";
+import { getAiStatus } from "@/features/ai/services/ai-service";
+import { getLatestReview } from "@/features/ai/services/review-service";
 import { requireUser } from "@/features/auth/session";
 import { getDailyTotals } from "@/features/nutrition/services/diary-service";
 import { getWeights } from "@/features/nutrition/services/tracking-service";
@@ -11,8 +14,9 @@ import { getUserCatalog } from "@/features/training/services/exercise-service";
 import { weightTrend } from "@/domain/nutrition/adaptive";
 import { periodReport } from "@/domain/progress/reports";
 import { addDays, shiftMonth, toLocalDate } from "@/lib/dates";
-import { formatMonth, formatNumber } from "@/lib/format";
-import { getDb } from "@/lib/server/context";
+import { formatDayLong, formatMonth, formatNumber, formatTime } from "@/lib/format";
+import { getLlmProvider } from "@/lib/llm";
+import { getDb, getEnv } from "@/lib/server/context";
 import { cn } from "@/lib/utils";
 import { toDisplayWeight, weightUnitKey } from "@/lib/units";
 
@@ -43,12 +47,14 @@ export default async function ProgressReportsPage({ searchParams }: PageProps<"/
     `/progress/reports?type=${isYear ? "year" : "month"}&p=${target.year}${isYear ? "" : `-${pad(target.month)}`}`;
 
   const db = getDb();
-  const [sessions, sets, weights, intake, catalog] = await Promise.all([
+  const [sessions, sets, weights, intake, catalog, ai, latestReview] = await Promise.all([
     getPeriodSessions(db, user.id, from, to),
     getTrainedSets(db, user.id, { to }),
     getWeights(db, user.id, addDays(from, -WEIGHT_LOOKBACK_DAYS), to),
     getDailyTotals(db, user.id, from, to),
     getUserCatalog(db, user.id),
+    getAiStatus(db, getLlmProvider(getEnv()), user.id, today),
+    getLatestReview(db, user.id),
   ]);
   // Mit dem Katalog zählt Unterstützung (z. B. Klimmzug-Maschine) nicht als Volumen.
   const report = periodReport(sessions, sets, from, to, catalog.find);
@@ -80,6 +86,23 @@ export default async function ProgressReportsPage({ searchParams }: PageProps<"/
 
   return (
     <div className="grid gap-4">
+      {ai.available ? (
+        <ReviewCard
+          enabled={ai.enabled}
+          latest={
+            latestReview
+              ? {
+                  question: latestReview.question,
+                  review: latestReview.review,
+                  createdLabel: t("ai.review.createdLabel", {
+                    date: formatDayLong(toLocalDate(latestReview.createdAt)),
+                    time: formatTime(latestReview.createdAt),
+                  }),
+                }
+              : null
+          }
+        />
+      ) : null}
       <div className="bg-secondary flex gap-1 rounded-xl p-1">
         <Link href="/progress/reports?type=month" className={cn(tab, !isYear && "bg-background shadow-xs")}>
           {t("progress.reports.month")}

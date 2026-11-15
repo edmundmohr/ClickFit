@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { PLAN_CHANGE_ACTIONS, MAX_PLAN_CHANGES } from "@/domain/ai/plan-changes";
+import { MAX_REVIEW_QUESTION_LENGTH } from "@/domain/ai/review";
 import { requireUser } from "@/features/auth/session";
 import { attempt, invalid, type ActionResult } from "@/lib/action-result";
 import { toLocalDate } from "@/lib/dates";
@@ -11,9 +12,11 @@ import { getDb, getEnv } from "@/lib/server/context";
 import { setAiConsent } from "./services/ai-service";
 import { deleteBodyFatEstimate, estimateBodyFat, type BodyFatOutcome } from "./services/body-fat-service";
 import { MAX_WISH_LENGTH, applyPlanSuggestions, suggestPlanChanges, type PlanSuggestions } from "./services/plan-refinement";
+import { createReview, deleteReview, type AiReviewView } from "./services/review-service";
 
 const idSchema = z.string().min(1).max(80);
 const wishSchema = z.string().trim().min(3).max(MAX_WISH_LENGTH);
+const questionSchema = z.string().trim().max(MAX_REVIEW_QUESTION_LENGTH);
 const changesSchema = z
   .array(
     z.object({
@@ -74,6 +77,25 @@ export async function deleteBodyFatEstimateAction(estimateId: string): Promise<A
   const user = await requireUser();
   if (!idSchema.safeParse(estimateId).success) return invalid;
   const result = await attempt(() => deleteBodyFatEstimate(getDb(), user.id, estimateId));
+  refresh();
+  return result;
+}
+
+/** Neue KI-Auswertung aller Daten, optional mit einer Frage. Ersetzt die bisherige. */
+export async function createReviewAction(question: string): Promise<ActionResult<AiReviewView>> {
+  const user = await requireUser();
+  const parsed = questionSchema.safeParse(question);
+  if (!parsed.success) return invalid;
+  const result = await attempt(() =>
+    createReview(getDb(), getLlmProvider(getEnv()), user.id, parsed.data || null, toLocalDate(new Date())),
+  );
+  refresh();
+  return result;
+}
+
+export async function deleteReviewAction(): Promise<ActionResult> {
+  const user = await requireUser();
+  const result = await attempt(() => deleteReview(getDb(), user.id));
   refresh();
   return result;
 }

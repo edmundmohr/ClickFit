@@ -70,7 +70,12 @@
     "invalidRange": "Bei „{name}“ ist der untere Wert größer als der obere.",
     "summarySeconds": "{sets} × {min}–{max} s",
     "archived": "Gelöscht – wird nicht mehr trainiert",
-    "archivedNotice": "{count, plural, one {Die Übung {names} wurde gelöscht. Sie wird beim Training übersprungen und beim nächsten Speichern aus der Routine entfernt.} other {Die Übungen {names} wurden gelöscht. Sie werden beim Training übersprungen und beim nächsten Speichern aus der Routine entfernt.}}"
+    "archivedNotice": "{count, plural, one {Die Übung {names} wurde gelöscht. Sie wird beim Training übersprungen und beim nächsten Speichern aus der Routine entfernt.} other {Die Übungen {names} wurden gelöscht. Sie werden beim Training übersprungen und beim nächsten Speichern aus der Routine entfernt.}}",
+    "targetWeight": "Zielgewicht ({unit})",
+    "assistance": "Unterstützung ({unit})",
+    "targetWeightAuto": "Automatisch",
+    "targetWeightHint": "Leer lassen: Die App steigert anhand deiner letzten Leistung. Ein eingetragenes Gewicht gilt fürs nächste Training, danach wird von dort aus gesteigert. Jede Änderung steht im Verlauf der Übung.",
+    "summaryWeight": "{value} {unit}"
   },
   "mainPlan": "Hauptplan",
   "extraPlan": "Zusatzplan",

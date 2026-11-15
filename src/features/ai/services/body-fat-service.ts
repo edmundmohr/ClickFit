@@ -4,8 +4,9 @@
  */
 import { and, desc, eq } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
-import { bodyFatEstimate, bodyWeightEntry, progressPhoto, userProfile } from "@/db/schema";
+import { bodyFatEstimate, progressPhoto } from "@/db/schema";
 import { normalizeBodyFatEstimate } from "@/domain/ai/body-fat";
+import { formatDataContext } from "@/domain/ai/data-context";
 import { AppError } from "@/lib/errors";
 import type { LocalDate } from "@/lib/dates";
 import { LLM_IMAGE_TYPES, type LlmImageType } from "@/lib/llm/types";
@@ -13,6 +14,7 @@ import type { LlmProvider } from "@/lib/llm";
 import { newId } from "@/lib/tokens";
 import { BODY_FAT_SYSTEM_PROMPT, bodyFatSchema } from "../prompts";
 import { claimAiRequest, unwrapLlmResult } from "./ai-service";
+import { loadAiSnapshot } from "./data-snapshot";
 
 /** Größere Bilder nimmt der Anbieter nicht an. Fotos werden beim Hochladen ohnehin verkleinert. */
 const MAX_IMAGE_BYTES = 4_500_000;
@@ -44,17 +46,8 @@ function isImageType(value: string): value is LlmImageType {
   return (LLM_IMAGE_TYPES as readonly string[]).includes(value);
 }
 
-/** Angaben aus dem Profil, die die Schätzung verbessern. Kein Name, kein Benutzername. */
-async function describePerson(db: AppDatabase, userId: string, today: LocalDate): Promise<string> {
-  const [profile, weight] = await Promise.all([
-    db.query.userProfile.findFirst({ where: eq(userProfile.userId, userId) }),
-    db.query.bodyWeightEntry.findFirst({ where: eq(bodyWeightEntry.userId, userId), orderBy: desc(bodyWeightEntry.date) }),
-  ]);
-  if (!profile) return "Zur Person liegen keine Angaben vor.";
-  const age = Number(today.slice(0, 4)) - profile.birthYear;
-  const kg = weight?.weightKg ?? profile.weightKg;
-  return `Angaben der Person: Geschlecht ${profile.sex === "female" ? "weiblich" : "männlich"}, etwa ${age} Jahre, ${Math.round(profile.heightCm)} cm, ${Math.round(kg)} kg.`;
-}
+/** Abschnitte der Daten, die für eine Körperfett-Schätzung zählen. Kein Name, kein Benutzername. */
+const BODY_FAT_SECTIONS = ["profile", "body", "nutrition", "training"] as const;
 
 export async function estimateBodyFat(
   db: AppDatabase,
@@ -77,7 +70,10 @@ export async function estimateBodyFat(
   const { data, model } = unwrapLlmResult(
     await llm.generate({
       system: BODY_FAT_SYSTEM_PROMPT,
-      prompt: `${await describePerson(db, userId, today)}\nSchätze den Körperfettanteil auf dem Foto.`,
+      prompt: [
+        `Daten der Person:\n${formatDataContext(await loadAiSnapshot(db, userId, today, now), BODY_FAT_SECTIONS)}`,
+        `Das Foto stammt vom ${photo.date}. Schätze den Körperfettanteil auf dem Foto.`,
+      ].join("\n\n"),
       images: [{ mediaType: photo.contentType, base64: toBase64(new Uint8Array(await object.arrayBuffer())) }],
       schema: bodyFatSchema,
       effort: "medium",
