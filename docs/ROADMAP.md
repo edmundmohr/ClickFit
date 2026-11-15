@@ -182,3 +182,5 @@ Grenzen:
   Satz mehr, wenn die Zeit reicht) und die körperliche Belastung im Beruf. Trainingstage werden
   als Anzahl gewählt (mit Empfehlung) und in der Wochenplanung verschoben. Migration 0012
   (Spalten in `user_profile`).
+- Optionales Mobility-Warm-up im laufenden Training: passend zu den Körperbereichen der Übungen
+  des Tages, etwa fünf Minuten, startbar oder überspringbar, ohne Eintrag im Mobility-Protokoll.

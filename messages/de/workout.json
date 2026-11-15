@@ -149,5 +149,12 @@
     "skipped": "Ohne Bewertung",
     "rate": "Bewerten",
     "edit": "Ändern"
+  },
+  "mobilityWarmup": {
+    "title": "Warm-up",
+    "text": "{minutes, plural, one {Etwa # Minute} other {Etwa # Minuten}} Mobility, passend zu diesem Training: {regions}.",
+    "start": "Warm-up starten",
+    "skip": "Überspringen",
+    "end": "Warm-up beenden"
   }
 }

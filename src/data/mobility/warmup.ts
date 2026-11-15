@@ -1,0 +1,30 @@
+/**
+ * Mobility-Übungen, die sich als Warm-up vor dem Krafttraining eignen: überwiegend bewegt,
+ * ohne Hilfsmittel und auf der Trainingsfläche machbar. Lange Dehnungen im Liegen fehlen bewusst.
+ */
+export const WARMUP_EXERCISE_IDS: readonly string[] = [
+  "worlds-greatest-stretch",
+  "hip-90-90-switch",
+  "hip-cars",
+  "cossack-squat",
+  "adductor-rock-back",
+  "leg-swings",
+  "deep-squat-hold",
+  "glute-bridge",
+  "half-kneeling-hip-flexor-stretch",
+  "standing-roll-down",
+  "inchworm",
+  "downward-dog",
+  "ankle-wall-mobilization",
+  "ankle-circles",
+  "wrist-circles",
+  "quadruped-wrist-rocks",
+  "shoulder-cars",
+  "arm-circles",
+  "wall-angels",
+  "cat-cow",
+  "quadruped-thoracic-rotation",
+  "bird-dog",
+  "chin-tuck",
+  "neck-rotation",
+];

@@ -91,6 +91,8 @@
     "restart": "Nochmal von vorn",
     "loggedTitle": "Eingetragen",
     "loggedText": "Die Routine steht für heute in deinem Protokoll.",
-    "backToOverview": "Zur Übersicht"
+    "backToOverview": "Zur Übersicht",
+    "toWorkout": "Zum Training",
+    "warmupFinishedText": "Aktive Zeit: {time} Min. Du bist bereit für den ersten Satz."
   }
 }

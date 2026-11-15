@@ -27,6 +27,7 @@ import { PlateDialog } from "./plate-dialog";
 import { RestTimerBar } from "./rest-timer-bar";
 import { SessionNote } from "./session-note";
 import { useSetSync } from "./use-set-sync";
+import { WarmupCard, type WarmupPlan } from "./warmup-card";
 import { WorkoutSummary } from "./workout-summary";
 import {
   newSetFrom,
@@ -51,6 +52,8 @@ interface WorkoutScreenProps {
   userId: string;
   /** Abfrage nach jeder Übung (Einstellung unter Anpassungen). */
   checkIn: boolean;
+  /** Mobility-Warm-up passend zu den Übungen; `null`, wenn keines angeboten wird. */
+  warmup: WarmupPlan | null;
 }
 
 interface SetRef {
@@ -58,7 +61,7 @@ interface SetRef {
   setId: string;
 }
 
-export function WorkoutScreen({ view, unitSystem, userId, checkIn }: WorkoutScreenProps) {
+export function WorkoutScreen({ view, unitSystem, userId, checkIn, warmup }: WorkoutScreenProps) {
   const t = useTranslations();
   const router = useRouter();
   /** Ohne Netz beendet: Zeitpunkt des Endes, bis der Server es bestätigt hat. */
@@ -79,6 +82,7 @@ export function WorkoutScreen({ view, unitSystem, userId, checkIn }: WorkoutScre
   const [infoFor, setInfoFor] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<"finish" | "delete" | null>(null);
   const [forgottenDismissed, setForgottenDismissed] = useState(false);
+  const [warmupClosed, setWarmupClosed] = useState(false);
   const [pending, startTransition] = useTransition();
 
   const startedAt = new Date(view.startedAt);
@@ -86,6 +90,8 @@ export function WorkoutScreen({ view, unitSystem, userId, checkIn }: WorkoutScre
     (total, exercise) => total + exercise.sets.filter((set) => !set.completed).length,
     0,
   );
+  // Das Warm-up wird nur angeboten, solange noch kein Satz abgehakt ist.
+  const anySetDone = exercises.some((exercise) => exercise.sets.some((set) => set.completed));
   const elapsedSeconds = now === null ? null : (now - startedAt.getTime()) / 1000;
   const finishedAt = view.finishedAt ?? localFinish;
   const durationMinutes = finishedAt
@@ -398,6 +404,10 @@ export function WorkoutScreen({ view, unitSystem, userId, checkIn }: WorkoutScre
         {inProgress ? null : (
           <WorkoutSummary exercises={exercises} durationMinutes={durationMinutes} unitSystem={unitSystem} />
         )}
+
+        {warmup && inProgress && !warmupClosed && !anySetDone ? (
+          <WarmupCard plan={warmup} onClose={() => setWarmupClosed(true)} />
+        ) : null}
 
         {groupConsecutive(exercises).map((group) => {
           const kind = groupKind(group.items.length);

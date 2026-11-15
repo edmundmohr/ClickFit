@@ -23,30 +23,29 @@ import {
   type PlayerEvent,
   type PlayerState,
 } from "@/domain/mobility/player";
-import type { MobilitySide } from "@/domain/mobility/types";
 import { useAlertSignal, useWakeLock } from "@/features/training/components/workout/hooks";
 import { useActionRunner } from "@/hooks/use-action-runner";
 import { formatClock } from "@/lib/format";
 import { completeMobilityRoutineAction } from "../actions";
+import type { PlayerStep } from "../player-steps";
 
-/** Ein Schritt des geführten Ablaufs, fertig aufbereitet für die Anzeige. */
-export interface PlayerStep {
-  key: string;
-  name: string;
-  side: MobilitySide | null;
-  /** Haltezeit; `null` bei Wiederholungen. */
-  durationSeconds: number | null;
-  /** Wiederholungen; `null` bei gehaltenen Übungen. */
-  reps: number | null;
-  instructions: string[];
-  hint: string | null;
+export type { PlayerStep };
+
+interface RoutinePlayerProps {
+  steps: PlayerStep[];
+  /** Routine, die am Ende ins Mobility-Protokoll eingetragen wird. */
+  routineId?: string;
+  /** Warm-up im Training: kein Protokolleintrag, am Ende geht es hierüber zurück. */
+  onDone?: () => void;
+  /** Eigener Text für die Startkarte und ein Knopf zum Überspringen. */
+  offer?: { title: string; description: string; startLabel: string; skipLabel: string; onSkip: () => void };
 }
 
 const TICK_MS = 250;
 const CONTROL_CLASS = "h-14 text-base md:h-14";
 
 /** Geführter Ablauf: Countdown je Schritt, automatischer Wechsel, am Ende der Eintrag ins Protokoll. */
-export function RoutinePlayer({ routineId, steps }: { routineId: string; steps: PlayerStep[] }) {
+export function RoutinePlayer({ routineId, steps, onDone, offer }: RoutinePlayerProps) {
   const t = useTranslations("mobility.player");
   const reducer = useMemo(() => (state: PlayerState, event: PlayerEvent) => reducePlayer(state, event, steps), [steps]);
   const [state, dispatch] = useReducer(reducer, INITIAL_PLAYER_STATE);
@@ -79,14 +78,19 @@ export function RoutinePlayer({ routineId, steps }: { routineId: string; steps: 
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("title")}</CardTitle>
-          <CardDescription>{t("intro")}</CardDescription>
+          <CardTitle>{offer?.title ?? t("title")}</CardTitle>
+          <CardDescription>{offer?.description ?? t("intro")}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="grid gap-2">
           <Button size="lg" className={`w-full ${CONTROL_CLASS}`} onClick={start}>
             <PlayIcon aria-hidden />
-            {t("start")}
+            {offer?.startLabel ?? t("start")}
           </Button>
+          {offer ? (
+            <Button variant="ghost" className="min-h-11" onClick={offer.onSkip}>
+              {offer.skipLabel}
+            </Button>
+          ) : null}
         </CardContent>
       </Card>
     );
@@ -106,11 +110,20 @@ export function RoutinePlayer({ routineId, steps }: { routineId: string; steps: 
             {logged ? t("loggedTitle") : t("finishedTitle")}
           </CardTitle>
           <CardDescription>
-            {logged ? t("loggedText") : t("finishedText", { time: formatClock(elapsedSeconds) })}
+            {onDone
+              ? t("warmupFinishedText", { time: formatClock(elapsedSeconds) })
+              : logged
+                ? t("loggedText")
+                : t("finishedText", { time: formatClock(elapsedSeconds) })}
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-2">
-          {logged ? (
+          {onDone || !routineId ? (
+            <Button size="lg" className={CONTROL_CLASS} onClick={onDone}>
+              <CheckIcon aria-hidden />
+              {t("toWorkout")}
+            </Button>
+          ) : logged ? (
             <Button asChild size="lg" className={CONTROL_CLASS}>
               <Link href="/training/mobility">{t("backToOverview")}</Link>
             </Button>
