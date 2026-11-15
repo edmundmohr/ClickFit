@@ -25,12 +25,23 @@ function localDateToUtcNoon(date: LocalDate): Date {
   return new Date(`${date}T12:00:00Z`);
 }
 
-/** Lokales Datum als „Mo., 16.11.“ */
-export function formatDayShort(date: LocalDate): string {
+/** Lokales Datum als „Mo., 16.11.“, mit `withYear` als „Mo., 16.11.26“. */
+export function formatDayShort(date: LocalDate, withYear = false): string {
   return new Intl.DateTimeFormat(LOCALE, {
     weekday: "short",
     day: "2-digit",
     month: "2-digit",
+    ...(withYear ? { year: "2-digit" } : {}),
+    timeZone: "UTC",
+  }).format(localDateToUtcNoon(date));
+}
+
+/** Lokales Datum ohne Wochentag als „16.11.“ bzw. „16.11.26“ (Achsen von Diagrammen). */
+export function formatDayNumeric(date: LocalDate, withYear = false): string {
+  return new Intl.DateTimeFormat(LOCALE, {
+    day: "2-digit",
+    month: "2-digit",
+    ...(withYear ? { year: "2-digit" } : {}),
     timeZone: "UTC",
   }).format(localDateToUtcNoon(date));
 }

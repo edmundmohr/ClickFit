@@ -160,3 +160,7 @@ Grenzen:
   ohne festen Ort). Die Verwaltung liegt hinter „Pläne verwalten“ auf der Plan-Seite (kein
   eigener Tab): eine Übersicht nach „In deiner Woche“ und „Nicht eingeplant“ und eine eigene
   Seite pro Plan mit Routinen, Einplanung, Ort und Archivieren.
+- Gewichtsverlauf erweitert: Zeitraum wählbar (1, 3, 6 Monate, 1 Jahr, alles), Liste der
+  Messungen mit Ändern und Löschen (mit Rückgängig), Nachtragen für frühere Tage. Der Trend
+  läuft immer über alle Messungen und wird nur für die Anzeige auf den Zeitraum begrenzt.
+  Keine Migration.

@@ -46,6 +46,8 @@ import {
   getWaterGoal,
   getWaterGoalDates,
   getWaterTotal,
+  deleteWeight,
+  getWeightEntries,
   getWeightStatus,
   listSupplements,
   saveWeight,
@@ -495,5 +497,26 @@ describe("water, supplements and weight", () => {
     expect(status.latest?.trendKg).toBeCloseTo(80.1, 5);
     const yesterday = await getWeightStatus(testDb.db, annaId, addDays(TODAY, -30), addDays(TODAY, -1));
     expect(yesterday).toMatchObject({ today: 80 });
+  });
+
+  it("lists, backfills and deletes weights per user", async () => {
+    await saveWeight(testDb.db, annaId, addDays(TODAY, -40), 84);
+    await saveWeight(testDb.db, annaId, addDays(TODAY, -2), 82);
+    await saveWeight(testDb.db, eddiId, addDays(TODAY, -2), 95);
+
+    const all = await getWeightEntries(testDb.db, annaId, null, TODAY);
+    expect(all.map((entry) => entry.date)).toEqual([addDays(TODAY, -40), addDays(TODAY, -2)]);
+    expect(all.every((entry) => entry.source === "manual")).toBe(true);
+    expect(await getWeightEntries(testDb.db, annaId, addDays(TODAY, -29), TODAY)).toHaveLength(1);
+
+    // Nachtragen am selben Tag ersetzt den alten Wert.
+    await saveWeight(testDb.db, annaId, addDays(TODAY, -40), 83.5);
+    expect((await getWeightEntries(testDb.db, annaId, null, addDays(TODAY, -30)))[0].weightKg).toBe(83.5);
+
+    await deleteWeight(testDb.db, annaId, addDays(TODAY, -2));
+    expect(await getWeightEntries(testDb.db, annaId, null, TODAY)).toHaveLength(1);
+    // Fremde und fehlende Einträge bleiben unberührt.
+    await expectAppError(deleteWeight(testDb.db, annaId, addDays(TODAY, -2)), "NOT_FOUND");
+    expect(await getWeightEntries(testDb.db, eddiId, null, TODAY)).toHaveLength(1);
   });
 });

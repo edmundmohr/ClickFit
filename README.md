@@ -175,6 +175,12 @@ Typprüfung nicht an ihnen scheitert.
   aus der Zahl der Sätze und ihrer Härte (RIR). Zehn harte Sätze gelten als volle Erschöpfung.
   Die Ermüdung klingt linear ab, je nach Umfang über ein bis drei Tage. Ein von Hand gesetzter
   Wert ersetzt die Berechnung bis zum nächsten Training.
+- **Gewichtsverlauf:** `src/domain/progress/weight-history.ts`. Fortschritt → Körper zeigt den
+  Trend für einen wählbaren Zeitraum (`?range=30|90|180|365|all`, Standard 6 Monate). Der Trend
+  wird über alle Messungen berechnet und erst dann zugeschnitten. Darunter die Messungen des
+  Zeitraums: nachtragen (Datum wählbar, nicht in der Zukunft), ändern, löschen. Pro Tag gilt
+  eine Messung; ein von Hand gelöschter Import-Wert kommt zurück, wenn der Import denselben
+  Tag erneut schickt.
 - **Kraftniveau:** `src/domain/progress/strength.ts`. Grobe Richtwerte aus dem Verhältnis von
   geschätztem 1RM zu Körpergewicht, keine Wettkampfnormen.
 - **Plateau:** Sind die letzten drei Einheiten einer Übung über mindestens drei Wochen nicht

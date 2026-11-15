@@ -148,6 +148,37 @@ export async function getWeights(db: AppDatabase, userId: string, from: LocalDat
     .orderBy(asc(bodyWeightEntry.date));
 }
 
+/** Gewichtseintrag mit Herkunft für die Liste im Fortschritt. */
+export interface WeightEntryView extends WeightPoint {
+  /** `manual` (von Hand) oder `import` (Health-Import, Home Assistant, CSV). */
+  source: string;
+}
+
+/** Alle Gewichtseinträge bis `to`, ab `from` (ohne Startdatum seit der ersten Messung), aufsteigend. */
+export async function getWeightEntries(
+  db: AppDatabase,
+  userId: string,
+  from: LocalDate | null,
+  to: LocalDate,
+): Promise<WeightEntryView[]> {
+  const conditions = [eq(bodyWeightEntry.userId, userId), lte(bodyWeightEntry.date, to)];
+  if (from !== null) conditions.push(gte(bodyWeightEntry.date, from));
+  return db
+    .select({ date: bodyWeightEntry.date, weightKg: bodyWeightEntry.weightKg, source: bodyWeightEntry.source })
+    .from(bodyWeightEntry)
+    .where(and(...conditions))
+    .orderBy(asc(bodyWeightEntry.date));
+}
+
+/** Löscht die Messung eines Tages; fehlt sie, gilt das als Fehler. */
+export async function deleteWeight(db: AppDatabase, userId: string, date: LocalDate): Promise<void> {
+  const deleted = await db
+    .delete(bodyWeightEntry)
+    .where(and(eq(bodyWeightEntry.userId, userId), eq(bodyWeightEntry.date, date)))
+    .returning({ id: bodyWeightEntry.id });
+  if (deleted.length === 0) throw new AppError("NOT_FOUND");
+}
+
 export interface WeightStatus {
   /** Heutiger Messwert, falls schon eingetragen. */
   today: number | null;
