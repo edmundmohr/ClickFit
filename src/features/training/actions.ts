@@ -54,14 +54,14 @@ export async function regeneratePlanAction(): Promise<ActionResult> {
   return ok(undefined);
 }
 
-export type SwapOption = Pick<Exercise, "id" | "name" | "primary" | "equipment">;
+export type SwapOption = Pick<Exercise, "id" | "name" | "primary" | "equipment" | "instructions">;
 
 export async function getSwapOptionsAction(planExerciseId: string): Promise<ActionResult<SwapOption[]>> {
   const user = await requireUser();
   if (!idSchema.safeParse(planExerciseId).success) return invalid;
   try {
     const options = await getSwapOptions(getDb(), user.id, planExerciseId);
-    return ok(options.map(({ id, name, primary, equipment }) => ({ id, name, primary, equipment })));
+    return ok(options.map(({ id, name, primary, equipment, instructions }) => ({ id, name, primary, equipment, instructions })));
   } catch (error) {
     return fail(error);
   }
