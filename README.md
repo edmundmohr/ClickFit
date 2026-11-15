@@ -282,6 +282,10 @@ Typprüfung nicht an ihnen scheitert.
   beruhen auf der Formel nach Tanaka (208 − 0,7 × Alter) und sind Richtwerte.
 - **Mobility:** 60 Übungen und 17 Routinen liegen als Daten im Code (`src/data/mobility`) und
   brauchen keinen Seed. Der geführte Ablauf läuft unter `/training/mobility/<id>`.
+- **Warm-up:** Im laufenden Training steht oben ein optionales Mobility-Warm-up (etwa fünf
+  Minuten), bis der erste Satz abgehakt ist. `buildWarmup` (`src/domain/mobility/warmup.ts`)
+  leitet aus den Bewegungsmustern der Übungen die Körperbereiche ab und wählt dazu bis zu fünf
+  überwiegend bewegte Übungen aus `src/data/mobility/warmup.ts`. Es wird nichts gespeichert.
 - **Zyklus:** Die Phase wird rein nach Kalender aus dem letzten Periodenbeginn geschätzt. Die
   Angaben lassen sich jederzeit samt Abschalten löschen.
 

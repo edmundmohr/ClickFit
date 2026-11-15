@@ -148,6 +148,8 @@ Creator-Programm) werden nicht gebraucht.
   Intervalle) planen und loggen
 - Flexibles Mobility-Training: eigenständige Mobility-Routinen, unabhängig vom Krafttraining,
   nach Körperregion/Beschwerde auswählbar
+- Optionales Mobility-Warm-up im laufenden Training, abgestimmt auf die Körperbereiche der
+  Übungen des Tages (z. B. Hüfte bei Kniebeugen); zählt nicht ins Mobility-Protokoll
 - Unterarm-/Griffkraft-Training als optionales Modul
 - Sportartspezifische Pläne: Zusatzsportarten angeben (z. B. Radfahren, Laufen), Plan
   berücksichtigt Belastung und Erholung

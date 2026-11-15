@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MOBILITY_EXERCISES_BY_ID, MOBILITY_ROUTINES_BY_ID } from "@/data/mobility";
 import { expandRoutine, stepsDurationSeconds } from "@/domain/mobility/routines";
 import { requireUser } from "@/features/auth/session";
-import { RoutinePlayer, type PlayerStep } from "@/features/mobility/components/routine-player";
+import { RoutinePlayer } from "@/features/mobility/components/routine-player";
+import { toPlayerSteps } from "@/features/mobility/player-steps";
 
 export async function generateMetadata({ params }: PageProps<"/training/mobility/[id]">): Promise<Metadata> {
   const { id } = await params;
@@ -24,15 +25,7 @@ export default async function MobilityRoutinePage({ params }: PageProps<"/traini
 
   const t = await getTranslations("mobility");
   const steps = expandRoutine(routine, MOBILITY_EXERCISES_BY_ID);
-  const playerSteps: PlayerStep[] = steps.map((step, index) => ({
-    key: `${index}-${step.exercise.id}-${step.side ?? "both"}`,
-    name: step.exercise.name,
-    side: step.side,
-    durationSeconds: step.durationSeconds,
-    reps: step.reps,
-    instructions: step.exercise.instructions,
-    hint: step.exercise.hint ?? null,
-  }));
+  const playerSteps = toPlayerSteps(steps);
   // Für die Übersicht steht jede Übung einmal da; die zweite Seite steckt in „je Seite“.
   const exercises = steps.filter((step) => step.side !== "right");
   const meta = [

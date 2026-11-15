@@ -4,7 +4,7 @@
 import { asc, eq, inArray } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
 import { workoutExercise, workoutSet } from "@/db/schema";
-import type { ExerciseType } from "@/domain/exercises/types";
+import type { ExerciseType, MovementPattern } from "@/domain/exercises/types";
 import type { ExerciseBests } from "@/domain/training/records";
 import {
   DAY_FOCUSES,
@@ -41,6 +41,8 @@ export interface WorkoutExerciseView {
   exerciseId: string;
   name: string;
   type: ExerciseType;
+  /** Bewegungsmuster aus der Bibliothek; daraus entsteht das Warm-up. */
+  pattern?: MovementPattern;
   repMin: number;
   repMax: number;
   targetRir: number;
@@ -139,6 +141,7 @@ export async function getWorkoutView(
           exerciseId: row.exerciseId,
           name: exercise.name,
           type: exercise.type,
+          pattern: exercise.pattern,
           repMin: row.repMin,
           repMax: row.repMax,
           targetRir: row.targetRir,
