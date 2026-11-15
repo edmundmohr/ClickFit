@@ -143,8 +143,9 @@ describe("onboarding and plan", () => {
     });
     expect(stored ? toTrainingProfile(stored).focusMuscles : null).toEqual(["glutes", "chest"]);
 
-    const base = { ...onboarding, focusMuscles: ["glutes", "chest", "lats"] };
+    const base = { ...onboarding, focusMuscles: ["glutes", "chest", "lats", "biceps"] };
     expect(onboardingSchema.safeParse(base).success).toBe(false);
+    expect(onboardingSchema.safeParse({ ...onboarding, focusMuscles: ["glutes", "chest", "lats"] }).success).toBe(true);
     expect(onboardingSchema.safeParse({ ...onboarding, focusMuscles: ["glutes", "glutes"] }).success).toBe(false);
   });
 

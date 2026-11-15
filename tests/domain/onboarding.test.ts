@@ -105,7 +105,8 @@ describe("focus muscles", () => {
   it("allows at most two", () => {
     expect(toggleFocusMuscle([], "glutes")).toEqual(["glutes"]);
     expect(toggleFocusMuscle(["glutes"], "glutes")).toEqual([]);
-    expect(toggleFocusMuscle(["glutes", "chest"], "lats")).toBeNull();
+    expect(toggleFocusMuscle(["glutes", "chest"], "lats")).toEqual(["glutes", "chest", "lats"]);
+    expect(toggleFocusMuscle(["glutes", "chest", "lats"], "biceps")).toBeNull();
     expect(toggleFocusMuscle(["glutes", "chest"], "chest")).toEqual(["glutes"]);
   });
 

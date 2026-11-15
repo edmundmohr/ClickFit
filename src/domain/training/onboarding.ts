@@ -131,7 +131,7 @@ export function moveTrainingDay(weekdays: readonly Weekday[], from: Weekday, to:
 }
 
 /** Höchstens so viele Muskelgruppen lassen sich als Schwerpunkt wählen. */
-export const MAX_FOCUS_MUSCLES = 2;
+export const MAX_FOCUS_MUSCLES = 3;
 
 /** Wählt eine Muskelgruppe an oder ab; `null`, wenn die Obergrenze schon erreicht ist. */
 export function toggleFocusMuscle(selected: readonly Muscle[], muscle: Muscle): Muscle[] | null {
