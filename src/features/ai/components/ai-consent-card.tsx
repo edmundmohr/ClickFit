@@ -19,6 +19,7 @@ export function AiConsentCard({ status }: { status: AiStatus }) {
       <div className="grid gap-1 text-sm">
         <p className="font-medium">{t("whatTitle")}</p>
         <ul className="text-muted-foreground list-disc space-y-1 pl-5">
+          <li>{t("sendReview")}</li>
           <li>{t("sendPlan")}</li>
           <li>{t("sendPhoto")}</li>
           <li>{t("never")}</li>

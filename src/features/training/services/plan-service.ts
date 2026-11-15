@@ -28,6 +28,8 @@ export interface PlanExerciseView {
   targetRir: number;
   restSeconds: number;
   groupId: string | null;
+  /** Eigenes Zielgewicht in kg; `null` = automatisch. */
+  targetWeightKg: number | null;
   /** Die eigentlich geplante Übung, wenn sie für heute ersetzt wurde. */
   replaces: Exercise | null;
   reason: SubstitutionReason | null;
@@ -101,6 +103,8 @@ function toDayView(day: DayRow, rows: ExerciseRow[], context: Adaptation, adapt:
       targetRir: entry.targetRir,
       restSeconds: entry.restSeconds,
       groupId: entry.groupId,
+      // Wurde die Übung heute ersetzt, gilt das Zielgewicht der ursprünglichen nicht.
+      targetWeightKg: replaces ? null : entry.targetWeightKg,
       replaces,
       reason,
     })),
@@ -387,7 +391,12 @@ export async function swapPlanExercise(
   const replacement = catalog.find(newExerciseId);
   if (!replacement || replacement.archived) throw new AppError("NOT_FOUND");
   const previousId = row.planExercise.exerciseId;
-  await db.update(planExercise).set({ exerciseId: newExerciseId }).where(eq(planExercise.id, planExerciseId));
+  // Ein eigenes Zielgewicht gehört zur alten Übung und gilt für die neue nicht.
+  const sameExercise = previousId === newExerciseId;
+  await db
+    .update(planExercise)
+    .set(sameExercise ? { exerciseId: newExerciseId } : { exerciseId: newExerciseId, targetWeightKg: null, targetWeightSetAt: null })
+    .where(eq(planExercise.id, planExerciseId));
   if (row.source === "generated" && previousId !== newExerciseId) {
     await recordRejection(db, userId, previousId, "swappedOut");
   }

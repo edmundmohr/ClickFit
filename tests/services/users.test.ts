@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
-import { aiUsage, apiToken, bodyWeightEntry, session } from "@/db/schema";
+import { aiReview, aiUsage, apiToken, bodyWeightEntry, session } from "@/db/schema";
 import { AppError } from "@/lib/errors";
 import type { Actor } from "@/domain/permissions/user-management";
 import { createUserWithPassword } from "@/features/auth/services/user-factory";
@@ -243,6 +243,16 @@ describe("user list, profile and export", () => {
     ]);
     const exported = await exportOwnData(testDb.db, anna.id);
     expect(exported.data.app.aiUsage).toEqual([{ userId: anna.id, date: "2026-11-13", count: 3 }]);
+  });
+
+  it("exports the own AI review", async () => {
+    const content = { summary: "Läuft.", answer: null, areas: [], recommendations: [], dataGaps: [] };
+    await testDb.db.insert(aiReview).values([
+      { userId: anna.id, question: null, content, model: "test-model", createdAt: new Date() },
+      { userId: admin.id, question: "Fremd", content, model: "test-model", createdAt: new Date() },
+    ]);
+    const exported = await exportOwnData(testDb.db, anna.id);
+    expect(exported.data.app.aiReviews).toEqual([expect.objectContaining({ userId: anna.id, content })]);
   });
 
   it("never includes password hashes in the export", async () => {

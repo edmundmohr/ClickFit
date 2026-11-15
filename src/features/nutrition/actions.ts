@@ -46,6 +46,7 @@ import {
   addSupplement,
   addWater,
   deleteSupplement,
+  deleteWeight,
   saveWeight,
   setSupplementTaken,
   setWaterGoal,
@@ -270,6 +271,14 @@ export async function saveWeightAction(date: string | null, weightKg: number): P
   const day = resolveTrackingDate(date, toLocalDate(new Date()));
   if (!day || !weightSchema.safeParse(weightKg).success) return invalid;
   const result = await attempt(() => saveWeight(getDb(), user.id, day, weightKg));
+  refresh();
+  return result;
+}
+
+export async function deleteWeightAction(date: string): Promise<ActionResult> {
+  const user = await requireUser();
+  if (!localDateSchema.safeParse(date).success) return invalid;
+  const result = await attempt(() => deleteWeight(getDb(), user.id, date));
   refresh();
   return result;
 }

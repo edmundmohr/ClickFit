@@ -231,6 +231,7 @@ describe("plan builder state", () => {
     targetRir: 2,
     restSeconds: 90,
     groupId,
+    targetWeightKg: null,
   });
 
   it("reorders items", () => {

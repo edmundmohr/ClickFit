@@ -48,6 +48,7 @@ import {
 } from "./editor-state";
 import { ExercisePicker } from "./exercise-picker";
 import { RoutineItem } from "./routine-item";
+import type { UnitSystem } from "@/lib/units";
 
 interface RoutineEditorProps {
   routineId: string;
@@ -60,6 +61,8 @@ interface RoutineEditorProps {
   initialItems: EditorItem[];
   folders: { id: string; title: string }[];
   exercises: PickerExercise[];
+  /** Einheit des Nutzers für die Eingabe des Zielgewichts (gespeichert wird in kg). */
+  unitSystem: UnitSystem;
 }
 
 const selectClass = "border-input bg-background h-11 w-full min-w-0 rounded-md border px-3 text-base";
@@ -76,6 +79,7 @@ export function RoutineEditor({
   initialItems,
   folders,
   exercises,
+  unitSystem,
 }: RoutineEditorProps) {
   const t = useTranslations();
   const router = useRouter();
@@ -131,15 +135,18 @@ export function RoutineEditor({
       weekday,
       folderId,
       // Gelöschte Übungen fallen beim Speichern heraus (siehe Hinweis über der Liste).
-      exercises: activeItems.map(({ exerciseId, sets, repMin, repMax, targetRir, restSeconds, groupId }) => ({
-        exerciseId,
-        sets,
-        repMin,
-        repMax,
-        targetRir,
-        restSeconds,
-        groupId,
-      })),
+      exercises: activeItems.map(
+        ({ exerciseId, sets, repMin, repMax, targetRir, restSeconds, groupId, targetWeightKg }) => ({
+          exerciseId,
+          sets,
+          repMin,
+          repMax,
+          targetRir,
+          restSeconds,
+          groupId,
+          targetWeightKg,
+        }),
+      ),
     };
     run(
       () => saveRoutineAction(routineId, input),
@@ -236,6 +243,7 @@ export function RoutineEditor({
                   <RoutineItem
                     key={item.key}
                     item={item}
+                    unitSystem={unitSystem}
                     groupLabel={startsGroup && kind ? t(`routines.editor.${kind}`) : null}
                     expanded={expandedKey === item.key}
                     isFirst={index === 0}

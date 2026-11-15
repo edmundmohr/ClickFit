@@ -80,7 +80,8 @@ export function isDeloadWeek(daysSincePlanStart: number, deloadEveryWeeks: numbe
   return weekIndex % deloadEveryWeeks === deloadEveryWeeks - 1;
 }
 
-function usesExternalWeight(type: ExerciseType): boolean {
+/** Übungen mit Zusatzgewicht bzw. Unterstützung in kg (nicht Körpergewicht oder Zeit). */
+export function usesExternalWeight(type: ExerciseType): boolean {
   return type === "weight_reps" || type === "weighted_bodyweight" || type === "assisted_bodyweight";
 }
 
@@ -184,6 +185,24 @@ export interface NextTargetsInput {
   hold?: boolean;
   /** Wiedereinstieg nach einer Pause: Zielgewichte mit diesem Faktor (< 1) verringern. */
   weightFactor?: number;
+  /**
+   * Selbst festgelegtes Zielgewicht aus der Routine. Ersetzt die letzte Leistung als Ausgangspunkt:
+   * alle Sätze mit diesem Gewicht und dem unteren Ende des Wiederholungsbereichs.
+   */
+  plannedWeightKg?: number | null;
+}
+
+/**
+ * Zielwerte aus einem selbst festgelegten Zielgewicht: Es gilt genau so, wie es eingetragen ist
+ * (ohne Rundung auf die Gewichtsstufen), mit dem unteren Ende des Wiederholungsbereichs. Nur die
+ * Deload-Woche macht es leichter; gesteigert wird erst nach dieser Einheit.
+ */
+function plannedTargets(input: NextTargetsInput, plannedKg: number, steps: WeightSteps, setCount: number): SetTarget[] {
+  const reference: PerformedSet = { weightKg: plannedKg, reps: input.prescription.repMin, rir: null };
+  const target = input.isDeload
+    ? deloadTarget(reference, input.prescription, steps, input.exerciseType)
+    : { weightKg: reference.weightKg, reps: reference.reps };
+  return Array.from({ length: setCount }, () => ({ ...target }));
 }
 
 /** Zielgewicht und Ziel-Wiederholungen für jeden Satz der nächsten Einheit. */
@@ -192,6 +211,8 @@ export function nextSetTargets(input: NextTargetsInput): SetTarget[] {
   const steps = input.steps ?? stepsFromIncrement(incrementKg);
   const factor = input.weightFactor ?? 1;
   const setCount = isDeload ? deloadSetCount(prescription.sets) : prescription.sets;
+  const planned = input.plannedWeightKg ?? null;
+  if (planned !== null && usesExternalWeight(exerciseType)) return plannedTargets(input, planned, steps, setCount);
   const done = previous.filter((set) => set.reps !== null);
 
   return Array.from({ length: setCount }, (_, index): SetTarget => {

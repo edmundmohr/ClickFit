@@ -8,9 +8,11 @@ import { SeriesChart } from "@/components/charts/series-chart";
 import { requireUser } from "@/features/auth/session";
 import { getWeights } from "@/features/nutrition/services/tracking-service";
 import { ExerciseSelect } from "@/features/progress/components/exercise-select";
+import { TargetWeightHistory } from "@/features/progress/components/target-weight-history";
 import { getTrainedSets } from "@/features/progress/services/progress-service";
 import { getUserCatalog } from "@/features/training/services/exercise-service";
 import { getProfile } from "@/features/training/services/profile-service";
+import { listTargetWeightChanges } from "@/features/training/services/routine-service";
 import { mostUsedExercises } from "@/domain/progress/muscle-load";
 import { LIFT_EXERCISE_IDS, STRENGTH_LIFTS, detectPlateau, exerciseSeries, rateStrength } from "@/domain/progress/strength";
 import { bestsOf, isAssisted } from "@/domain/training/records";
@@ -50,6 +52,7 @@ export default async function ProgressStrengthPage({ searchParams }: PageProps<"
   const params = await searchParams;
   const requested = typeof params.exercise === "string" ? params.exercise : "";
   const selected = usage.find((entry) => entry.exerciseId === requested) ?? usage[0];
+  const targetWeightChanges = await listTargetWeightChanges(db, user.id, selected.exerciseId);
   // Bei unterstützten Übungen ist das Gewicht die Unterstützung: Verlauf und Rekord sind umgekehrt.
   const exerciseType = findExercise(selected.exerciseId)?.type ?? "weight_reps";
   const assisted = isAssisted(exerciseType);
@@ -179,6 +182,8 @@ export default async function ProgressStrengthPage({ searchParams }: PageProps<"
           </div>
         </CardContent>
       </Card>
+
+      <TargetWeightHistory changes={targetWeightChanges} unitSystem={user.unitSystem} />
 
       <Card>
         <CardHeader>

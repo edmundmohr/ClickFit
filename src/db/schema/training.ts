@@ -134,8 +134,32 @@ export const planExercise = sqliteTable(
     restSeconds: integer().notNull(),
     /** Übungen mit gleicher Kennung bilden einen Supersatz bzw. Zirkel. */
     groupId: text(),
+    /** Selbst festgelegtes Zielgewicht in kg; `null` = automatisch aus der letzten Leistung. */
+    targetWeightKg: real(),
+    /** Wann das Zielgewicht zuletzt geändert wurde: Es gilt, bis danach trainiert wurde. */
+    targetWeightSetAt: timestamp(),
   },
   (table) => [index("plan_exercise_plan_day_id_idx").on(table.planDayId)],
+);
+
+/** Verlauf der selbst festgelegten Zielgewichte je Übung (aus dem Routine-Editor). */
+export const targetWeightChange = sqliteTable(
+  "target_weight_change",
+  {
+    id: text().primaryKey(),
+    userId: cascadeUser(),
+    exerciseId: text().notNull(),
+    /** Routine, in der geändert wurde; bleibt als Name erhalten, auch wenn sie gelöscht wird. */
+    planDayId: text().references(() => planDay.id, { onDelete: "set null" }),
+    routineName: text(),
+    /** Vorher und nachher in kg; `null` = automatisch (kein eigenes Zielgewicht). */
+    fromKg: real(),
+    toKg: real(),
+    /** Lokales Datum der Änderung (YYYY-MM-DD, Europe/Berlin). */
+    date: text().notNull(),
+    changedAt: timestamp().notNull(),
+  },
+  (table) => [index("target_weight_change_user_exercise_idx").on(table.userId, table.exerciseId)],
 );
 
 export const workoutSession = sqliteTable(

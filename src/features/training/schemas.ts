@@ -2,6 +2,7 @@ import { z } from "zod";
 import { ACTIVITY_TYPES } from "@/domain/cardio/types";
 import { EQUIPMENT, EXERCISE_TYPES, MECHANICS, MOVEMENT_PATTERNS, MUSCLES } from "@/domain/exercises/types";
 import { MAX_CYCLE_LENGTH, MIN_CYCLE_LENGTH } from "@/domain/training/cycle";
+import { MAX_TARGET_WEIGHT_KG } from "@/domain/training/target-weight";
 import { VACATION_TYPES } from "@/domain/training/vacation";
 import { WEIGHT_UNITS } from "@/domain/training/weights";
 import { isValidLocalDate, toLocalDate } from "@/lib/dates";
@@ -133,6 +134,8 @@ export const routineExerciseSchema = z.object({
   targetRir: z.number().int().min(0).max(5),
   restSeconds: z.number().int().min(0).max(900),
   groupId: z.string().min(1).max(40).nullable(),
+  /** Eigenes Zielgewicht in kg; leer = automatisch (fehlt auch bei älteren, noch offenen Editor-Seiten). */
+  targetWeightKg: z.number().min(0).max(MAX_TARGET_WEIGHT_KG).nullish(),
 });
 
 export const routineSchema = z.object({

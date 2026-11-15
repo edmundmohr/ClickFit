@@ -22,6 +22,8 @@ export interface SetDraft {
 
 export interface ExerciseDraft extends Omit<WorkoutExerciseView, "sets"> {
   sets: SetDraft[];
+  /** Beim Start gab es Zielgewichte (aus der letzten Leistung oder der Routine). */
+  hasTargetWeight?: boolean;
 }
 
 export function usesWeight(type: ExerciseType): boolean {
@@ -52,6 +54,7 @@ export function toDrafts(exercises: WorkoutExerciseView[]): ExerciseDraft[] {
   return exercises.map((exercise) => ({
     ...exercise,
     sets: exercise.sets.map((set) => toDraft(set, exercise.unit)),
+    hasTargetWeight: exercise.sets.some((set) => set.targetWeightKg !== null),
   }));
 }
 

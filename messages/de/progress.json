@@ -17,6 +17,23 @@
     "current": "Aktueller Trend: {value} {unit}",
     "change": "Veränderung in 30 Tagen: {value} {unit}",
     "noWeights": "Noch keine Messungen. Trage dein Gewicht regelmäßig ein, am besten morgens.",
+    "rangeLabel": "Zeitraum des Verlaufs",
+    "ranges": {
+      "30": "1 M",
+      "90": "3 M",
+      "180": "6 M",
+      "365": "1 J",
+      "all": "Alle"
+    },
+    "rangesLong": {
+      "30": "Letzte 30 Tage",
+      "90": "Letzte 3 Monate",
+      "180": "Letzte 6 Monate",
+      "365": "Letztes Jahr",
+      "all": "Gesamter Verlauf"
+    },
+    "rangeChange": "Trend im Zeitraum: {value} {unit} aus {count, plural, one {# Messung} other {# Messungen}}",
+    "fewInRange": "Für eine Kurve braucht es mindestens zwei Messungen in diesem Zeitraum.",
     "measurementsTitle": "Körperumfänge",
     "measurementsHint": "Miss immer an derselben Stelle und zur selben Tageszeit.",
     "site": "Körperstelle",
@@ -29,6 +46,23 @@
     "delete": "Messung vom {date} löschen",
     "deleted": "Messung gelöscht.",
     "chartLabel": "Verlauf {site}"
+  },
+  "weightLog": {
+    "title": "Messungen",
+    "date": "Datum",
+    "value": "Gewicht ({unit})",
+    "hint": "Für einen früheren Tag das Datum ändern. Pro Tag gilt eine Messung.",
+    "replaces": "Ersetzt die Messung vom {date} ({value} {unit}).",
+    "save": "Speichern",
+    "saved": "Gewicht gespeichert.",
+    "imported": "Importiert",
+    "edit": "Messung vom {date} ändern",
+    "delete": "Messung vom {date} löschen",
+    "deleted": "Messung gelöscht.",
+    "undo": "Rückgängig",
+    "showAll": "Alle {count} anzeigen",
+    "showLess": "Weniger anzeigen",
+    "empty": "Keine Messungen in diesem Zeitraum."
   },
   "sites": {
     "waist": "Taille",
@@ -84,7 +118,12 @@
       "variation": "Tausche die Übung für einige Wochen gegen eine Variante."
     },
     "mostUsedTitle": "Meistgenutzte Übungen",
-    "mostUsedValue": "{sets, plural, one {# Satz} other {# Sätze}} in {sessions, plural, one {# Einheit} other {# Einheiten}}"
+    "mostUsedValue": "{sets, plural, one {# Satz} other {# Sätze}} in {sessions, plural, one {# Einheit} other {# Einheiten}}",
+    "targetWeightTitle": "Zielgewicht-Änderungen",
+    "targetWeightHint": "Eigene Zielgewichte aus deinen Routinen. Sie gelten jeweils fürs nächste Training.",
+    "targetWeightAuto": "automatisch",
+    "targetWeightChange": "{from} → {to}",
+    "targetWeightRoutine": "{date} · {routine}"
   },
   "muscles": {
     "modes": {

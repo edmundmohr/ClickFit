@@ -40,6 +40,7 @@ export default async function RoutinePage({ params }: PageProps<"/training/routi
     targetRir: entry.targetRir,
     restSeconds: entry.restSeconds,
     groupId: entry.groupId,
+    targetWeightKg: entry.targetWeightKg,
     archived: entry.exercise.archived ?? false,
   }));
   const exercises: PickerExercise[] = catalog.all
@@ -75,6 +76,7 @@ export default async function RoutinePage({ params }: PageProps<"/training/routi
           title: folderTitle(folder, (split) => t(`training.splits.${split}`)),
         }))}
         exercises={exercises}
+        unitSystem={user.unitSystem}
       />
     </>
   );

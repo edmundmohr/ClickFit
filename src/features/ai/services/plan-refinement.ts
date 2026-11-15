@@ -5,6 +5,7 @@
 import { and, desc, eq, gte, isNotNull, or } from "drizzle-orm";
 import type { AppDatabase } from "@/db/client";
 import { workoutExercise, workoutSession } from "@/db/schema";
+import { formatDataContext } from "@/domain/ai/data-context";
 import { FEEDBACK_LOOKBACK_DAYS, summarizeFeedback, type FeedbackEntry } from "@/domain/ai/feedback-summary";
 import {
   applyPlanChanges,
@@ -24,6 +25,7 @@ import { addDays, type LocalDate } from "@/lib/dates";
 import type { LlmProvider } from "@/lib/llm";
 import { PLAN_SYSTEM_PROMPT, planChangesSchema } from "../prompts";
 import { claimAiRequest, unwrapLlmResult } from "./ai-service";
+import { loadAiSnapshot } from "./data-snapshot";
 
 export const MAX_WISH_LENGTH = 500;
 
@@ -109,10 +111,14 @@ async function loadBasis(db: AppDatabase, userId: string, today: LocalDate): Pro
   };
 }
 
-/** Der Text, der an das Modell geht. Enthält Trainingsdaten, aber weder Name noch Benutzername. */
+/**
+ * Der Text, der an das Modell geht. Enthält Trainingsdaten und, falls übergeben, alle übrigen
+ * Daten der Person (`dataContext`), aber weder Name noch Benutzername.
+ */
 export function buildPlanPrompt(
   basis: Pick<PlanBasis, "days" | "profile" | "catalogLines"> & Partial<Pick<PlanBasis, "feedbackLines">>,
   wish: string,
+  dataContext?: string,
 ): string {
   const feedback = basis.feedbackLines ?? [];
   const { profile } = basis;
@@ -134,6 +140,7 @@ export function buildPlanPrompt(
       feedback.length > 0 ? feedback.join("\n") : "keine"
     }`,
     `Erlaubte Übungen (Kennung | Name | Art | Bewegungsmuster | Hauptmuskeln):\n${basis.catalogLines.join("\n")}`,
+    ...(dataContext ? [`Weitere Daten der Person:\n${dataContext}`] : []),
     `Wunsch der Person:\n"""${wish}"""`,
   ].join("\n\n");
 }
@@ -146,12 +153,12 @@ export async function suggestPlanChanges(
   wish: string,
   today: LocalDate,
 ): Promise<PlanSuggestions> {
-  const basis = await loadBasis(db, userId, today);
+  const [basis, snapshot] = await Promise.all([loadBasis(db, userId, today), loadAiSnapshot(db, userId, today)]);
   const llm = await claimAiRequest(db, provider, userId, today);
   const { data } = unwrapLlmResult(
     await llm.generate({
       system: PLAN_SYSTEM_PROMPT,
-      prompt: buildPlanPrompt(basis, wish.trim().slice(0, MAX_WISH_LENGTH)),
+      prompt: buildPlanPrompt(basis, wish.trim().slice(0, MAX_WISH_LENGTH), formatDataContext(snapshot)),
       schema: planChangesSchema,
       effort: "medium",
     }),

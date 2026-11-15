@@ -87,3 +87,24 @@ export const bodyFatEstimate = sqliteTable(
   },
   (table) => [index("body_fat_estimate_user_date_idx").on(table.userId, table.date)],
 );
+
+/** Gespeicherte KI-Auswertung (Aufbau wie `AiReview` in `src/domain/ai/review.ts`). */
+export interface StoredAiReview {
+  summary: string;
+  answer: string | null;
+  areas: { area: string; status: string; text: string }[];
+  recommendations: { area: string; text: string }[];
+  dataGaps: string[];
+}
+
+/** Jüngste KI-Auswertung aller Daten eines Nutzers; eine neue ersetzt die alte. */
+export const aiReview = sqliteTable("ai_review", {
+  userId: text()
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  /** Frage der Person; `null`, wenn ohne Frage ausgewertet wurde. */
+  question: text(),
+  content: text({ mode: "json" }).$type<StoredAiReview>().notNull(),
+  model: text().notNull(),
+  createdAt: timestamp().notNull(),
+});

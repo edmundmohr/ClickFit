@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTranslations } from "next-intl";
@@ -16,12 +17,15 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { formatClock } from "@/lib/format";
+import { usesExternalWeight } from "@/domain/training/progression";
+import { formatClock, formatNumber } from "@/lib/format";
+import { fromDisplayWeight, parseDecimal, toDisplayWeight, weightUnitKey, type UnitSystem } from "@/lib/units";
 import { cn } from "@/lib/utils";
 import { MAX_SETS, MIN_SETS, REST_OPTIONS, RIR_OPTIONS, type EditorItem } from "./editor-state";
 
 interface RoutineItemProps {
   item: EditorItem;
+  unitSystem: UnitSystem;
   /** Überschrift „Supersatz“/„Zirkel“ über der ersten Übung einer Gruppe. */
   groupLabel: string | null;
   expanded: boolean;
@@ -40,6 +44,49 @@ interface RoutineItemProps {
 
 const inputClass = "border-input bg-background h-11 w-full min-w-0 rounded-md border px-2 text-center text-base tabular-nums";
 
+interface TargetWeightFieldProps {
+  item: EditorItem;
+  unitSystem: UnitSystem;
+  label: string;
+  onChange: (weightKg: number | null) => void;
+}
+
+/** Zielgewicht in der Einheit des Nutzers; leer = automatisch. Komma und Punkt sind erlaubt. */
+function TargetWeightField({ item, unitSystem, label, onChange }: TargetWeightFieldProps) {
+  const t = useTranslations("routines.editor");
+  const [text, setText] = useState(() =>
+    item.targetWeightKg === null ? "" : String(toDisplayWeight(item.targetWeightKg, unitSystem)).replace(".", ","),
+  );
+  const hintId = `weight-hint-${item.key}`;
+
+  function update(value: string) {
+    setText(value);
+    if (value.trim() === "") return onChange(null);
+    const parsed = parseDecimal(value);
+    if (parsed !== null) onChange(fromDisplayWeight(parsed, unitSystem));
+  }
+
+  return (
+    <div className="grid gap-1.5">
+      <Label htmlFor={`weight-${item.key}`}>{label}</Label>
+      <input
+        id={`weight-${item.key}`}
+        inputMode="decimal"
+        autoComplete="off"
+        placeholder={t("targetWeightAuto")}
+        value={text}
+        aria-describedby={hintId}
+        onChange={(event) => update(event.target.value)}
+        onFocus={(event) => event.target.select()}
+        className={inputClass}
+      />
+      <p id={hintId} className="text-muted-foreground text-xs">
+        {t("targetWeightHint")}
+      </p>
+    </div>
+  );
+}
+
 function clampInt(value: string, min: number, max: number, fallback: number): number {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? Math.min(Math.max(Math.round(parsed), min), max) : fallback;
@@ -47,6 +94,7 @@ function clampInt(value: string, min: number, max: number, fallback: number): nu
 
 export function RoutineItem({
   item,
+  unitSystem,
   groupLabel,
   expanded,
   isFirst,
@@ -60,11 +108,14 @@ export function RoutineItem({
   onToggleLink,
 }: RoutineItemProps) {
   const t = useTranslations("routines.editor");
+  const tUnits = useTranslations("training.units");
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
     id: item.key,
   });
   const isTimed = item.type === "duration";
   const maxValue = isTimed ? 600 : 100;
+  const hasWeight = usesExternalWeight(item.type);
+  const unit = tUnits(weightUnitKey(unitSystem));
 
   return (
     <li
@@ -105,6 +156,9 @@ export function RoutineItem({
               {item.archived ? <span className="text-destructive block text-sm">{t("archived")}</span> : null}
               <span className="text-muted-foreground block truncate text-sm tabular-nums">
                 {t(isTimed ? "summarySeconds" : "summary", { sets: item.sets, min: item.repMin, max: item.repMax })}
+                {hasWeight && item.targetWeightKg !== null
+                  ? ` · ${t("summaryWeight", { value: formatNumber(toDisplayWeight(item.targetWeightKg, unitSystem), 2), unit })}`
+                  : null}
                 {" · "}
                 {t("summaryRest", { time: formatClock(item.restSeconds) })}
               </span>
@@ -214,6 +268,14 @@ export function RoutineItem({
                 </select>
               </div>
             </div>
+            {hasWeight ? (
+              <TargetWeightField
+                item={item}
+                unitSystem={unitSystem}
+                label={t(item.type === "assisted_bodyweight" ? "assistance" : "targetWeight", { unit })}
+                onChange={(targetWeightKg) => onPatch({ targetWeightKg })}
+              />
+            ) : null}
             <div className="flex flex-wrap gap-2">
               <Button type="button" variant="outline" size="sm" disabled={isFirst} onClick={() => onMove(-1)}>
                 <ArrowUpIcon aria-hidden />
