@@ -178,7 +178,7 @@ Grenzen:
 - Fragebogen neu aufgebaut nach dem Vorbild eines geführten Einstiegs: Vollbild, eine Frage pro
   Bildschirm, drei Abschnitte mit geteilter Fortschrittsleiste, schlicht in Schwarz-Weiß. Neu abgefragt
   werden Körperfettanteil (vorgeschätzt aus Größe, Gewicht, Alter), Trainingserfahrung in
-  Monaten mit Selbsteinschätzung in sechs Stufen, bis zu zwei Schwerpunkt-Muskelgruppen (ein
+  Monaten mit Selbsteinschätzung in sechs Stufen, bis zu drei Schwerpunkt-Muskelgruppen (ein
   Satz mehr, wenn die Zeit reicht) und die körperliche Belastung im Beruf. Trainingstage werden
   als Anzahl gewählt (mit Empfehlung) und in der Wochenplanung verschoben. Migration 0012
   (Spalten in `user_profile`).

@@ -107,10 +107,10 @@
   },
   "focus": {
     "title": "Wo liegt dein Fokus?",
-    "hint": "Wähle bis zu zwei Muskelgruppen. Ihre Übungen bekommen einen Satz mehr, wenn die Zeit reicht.",
+    "hint": "Wähle bis zu drei Muskelgruppen. Ihre Übungen bekommen einen Satz mehr, wenn die Zeit reicht.",
     "front": "Körper von vorn",
     "back": "Körper von hinten",
-    "limit": "Du kannst höchstens zwei Muskelgruppen wählen.",
+    "limit": "Du kannst höchstens drei Muskelgruppen wählen.",
     "selected": "{name}: gewählt",
     "notSelected": "{name}: nicht gewählt"
   },

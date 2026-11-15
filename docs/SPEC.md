@@ -73,7 +73,7 @@ Creator-Programm) werden nicht gebraucht.
 - Das Onboarding kann später jederzeit erneut durchlaufen werden
 - Aufbau: Vollbild, eine Frage pro Bildschirm, drei Abschnitte (Profil, Ziele, Bedürfnisse).
   Zusätzlich: Körperfettanteil (vorgeschätzt), Trainingserfahrung in Monaten mit
-  Selbsteinschätzung, bis zu zwei Schwerpunkt-Muskelgruppen, Belastung im Beruf
+  Selbsteinschätzung, bis zu drei Schwerpunkt-Muskelgruppen, Belastung im Beruf
 
 ### 2. Personalisierte Trainingspläne
 
