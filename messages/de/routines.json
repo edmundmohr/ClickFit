@@ -74,7 +74,7 @@
     "targetWeight": "Zielgewicht ({unit})",
     "assistance": "Unterstützung ({unit})",
     "targetWeightAuto": "Automatisch",
-    "targetWeightHint": "Leer lassen: Die App steigert anhand deiner letzten Leistung. Ein eingetragenes Gewicht gilt fürs nächste Training, danach wird von dort aus gesteigert. Jede Änderung steht im Verlauf der Übung.",
+    "targetWeightHint": "Leer lassen: Die App steigert anhand deiner letzten Leistung. Neu erstellte Pläne tragen für noch nie trainierte Übungen einen vorsichtigen Startwert ein. Ein eingetragenes Gewicht gilt fürs nächste Training, danach wird von dort aus gesteigert. Jede Änderung steht im Verlauf der Übung.",
     "summaryWeight": "{value} {unit}"
   },
   "mainPlan": "Hauptplan",

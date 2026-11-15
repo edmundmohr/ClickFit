@@ -120,7 +120,7 @@
     "mostUsedTitle": "Meistgenutzte Übungen",
     "mostUsedValue": "{sets, plural, one {# Satz} other {# Sätze}} in {sessions, plural, one {# Einheit} other {# Einheiten}}",
     "targetWeightTitle": "Zielgewicht-Änderungen",
-    "targetWeightHint": "Eigene Zielgewichte aus deinen Routinen. Sie gelten jeweils fürs nächste Training.",
+    "targetWeightHint": "Zielgewichte aus deinen Routinen: eigene Änderungen und die Startwerte neu erstellter Pläne. Sie gelten jeweils fürs nächste Training.",
     "targetWeightAuto": "automatisch",
     "targetWeightChange": "{from} → {to}",
     "targetWeightRoutine": "{date} · {routine}"

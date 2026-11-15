@@ -193,7 +193,7 @@ describe("onboarding and plan", () => {
 });
 
 describe("workout logging", () => {
-  it("starts a workout with the planned sets and no targets on the first time", async () => {
+  it("starts a workout with the planned sets and the start weight of the new plan", async () => {
     const plan = await getActivePlan(testDb.db, annaId);
     const sessionId = await startWorkout(testDb.db, annaId, plan!.days[0].id);
     const view = await getWorkoutView(testDb.db, annaId, sessionId);
@@ -202,7 +202,14 @@ describe("workout logging", () => {
       plan!.days[0].exercises.map((entry) => entry.exercise.id),
     );
     expect(view.exercises[0].sets).toHaveLength(plan!.days[0].exercises[0].sets);
-    expect(view.exercises[0].sets[0]).toMatchObject({ targetWeightKg: null, targetReps: null, completed: false });
+    // Neuer Plan, Übung nie trainiert: vorsichtiges Startgewicht mit der unteren Wiederholungszahl.
+    const startWeight = plan!.days[0].exercises[0].targetWeightKg;
+    expect(startWeight).toBeGreaterThan(0);
+    expect(view.exercises[0].sets[0]).toMatchObject({
+      targetWeightKg: startWeight,
+      targetReps: plan!.days[0].exercises[0].repMin,
+      completed: false,
+    });
     expect(view.exercises[0].previous).toBeNull();
     expect(view.exercises[0].bests).toBeNull();
   });
@@ -322,8 +329,8 @@ describe("progression, history and streak", () => {
     expect(first.sets[0].targetWeightKg).toBeGreaterThan(60);
     expect(first.sets[0].targetReps).toBe(day.exercises[0].repMin);
     expect(first.bests?.maxWeightKg).toBe(60);
-    // Übungen ohne Vorwerte bleiben ohne Ziel.
-    expect(next.exercises[1].sets[0].targetWeightKg).toBeNull();
+    // Übungen ohne Vorwerte starten mit dem Startgewicht des Plans (bzw. ohne Ziel, wenn es keins gibt).
+    expect(next.exercises[1].sets[0].targetWeightKg).toBe(day.exercises[1].targetWeightKg);
   });
 
   it("shows previous values and records of an older workout only from workouts before it", async () => {

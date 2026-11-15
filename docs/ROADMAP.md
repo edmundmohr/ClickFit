@@ -184,3 +184,6 @@ Grenzen:
   (Spalten in `user_profile`).
 - Optionales Mobility-Warm-up im laufenden Training: passend zu den Körperbereichen der Übungen
   des Tages, etwa fünf Minuten, startbar oder überspringbar, ohne Eintrag im Mobility-Protokoll.
+- Startgewicht neuer Pläne: Ein erzeugter Plan schätzt für noch nie trainierte Übungen ein
+  vorsichtiges Zielgewicht aus Körpergewicht, Geschlecht, Alter, Erfahrung, Ziel und Beschwerden.
+  Keine Migration.
