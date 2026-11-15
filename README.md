@@ -201,8 +201,12 @@ Typprüfung nicht an ihnen scheitert.
   Progression schlägt dann die nächste vorhandene Stufe vor. Beim Loggen ist jeder Wert
   erlaubt. Der Scheiben-Rechner probiert alle Kombinationen der vorhandenen Scheiben durch.
 - **Pläne und Routinen:** Ein Plan (`training_plan`) enthält Routinen (`plan_day`). Unter
-  `/training/routines` (Tab „Pläne“) lassen sich beliebig viele Pläne anlegen, z. B. „Sommer“,
-  „Winter“, „Draußen“. Jeder Plan hat eine Rolle (`status`, Regeln in
+  `/training/plans` (Knopf „Pläne verwalten“ auf der Plan-Seite, kein eigener Tab) lassen
+  sich beliebig viele Pläne anlegen, z. B. „Sommer“, „Winter“, „Draußen“. Die Übersicht trennt
+  „In deiner Woche“ (Haupt- und Zusatzpläne) von „Nicht eingeplant“; das Archiv liegt
+  eingeklappt darunter. Jeder Plan hat eine eigene Seite `/training/plans/<id>` mit Routinen,
+  Einplanung (drei erklärte Optionen), Ort und „Plan verwalten“ (umbenennen, archivieren).
+  Die alte Adresse `/training/routines` leitet auf die Übersicht weiter. Jeder Plan hat eine Rolle (`status`, Regeln in
   `src/domain/training/plan-roles.ts`): genau ein **Hauptplan** (`active`), beliebig viele
   **Zusatzpläne** (`extra`), **inaktive** Pläne (`saved`) und das **Archiv** (`archived`).
   Haupt- und Zusatzpläne sind eingeplant: Ihre Routinen mit festem Wochentag stehen auf der
@@ -211,7 +215,8 @@ Typprüfung nicht an ihnen scheitert.
   Hauptplan lässt sich nicht archivieren oder löschen, erst ein anderer Plan muss ihn ablösen.
   Ein neu eingeplanter Plan beginnt am Tag des Wechsels (Kalender, Deload-Wochen). Endgültig
   löschen geht nur im Archiv; „Plan neu erstellen“ legt den bisherigen erzeugten Plan dort ab.
-  Der Builder unter `/training/routines/<id>` speichert eine Routine immer vollständig.
+  Der Builder unter `/training/routines/<id>` speichert eine Routine immer vollständig und führt
+  zurück zu ihrem Plan.
 - **Fester Ort pro Plan:** Optional hat ein Plan einen festen Trainingsort
   (`training_plan.gym_profile_id`). Seine Routinen nutzen dann beim Start, in der Anzeige und
   beim Tauschen das Equipment und die Gewichtsstufen dieses Orts, unabhängig vom aktiven Ort

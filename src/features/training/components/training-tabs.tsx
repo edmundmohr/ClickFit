@@ -9,8 +9,8 @@ export async function TrainingTabs() {
       scrollable
       label={t("label")}
       tabs={[
-        { href: "/training", label: t("plan"), exact: true },
-        { href: "/training/routines", label: t("routines") },
+        // Die Pläne erreicht man über „Pläne verwalten“ auf der Plan-Seite; dort bleibt „Plan“ markiert.
+        { href: "/training", label: t("plan"), exact: true, matches: ["/training/plans", "/training/routines"] },
         { href: "/training/cardio", label: t("cardio") },
         { href: "/training/mobility", label: t("mobility") },
         { href: "/training/exercises", label: t("exercises") },

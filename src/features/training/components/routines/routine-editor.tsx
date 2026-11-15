@@ -300,7 +300,7 @@ export function RoutineEditor({
                     () => deleteRoutineAction(routineId),
                     () => {
                       toast.success(t("routines.editor.deleted"));
-                      router.push("/training/routines");
+                      router.push(`/training/plans/${initialFolderId}`);
                     },
                   )
                 }

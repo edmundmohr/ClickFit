@@ -157,4 +157,6 @@ Grenzen:
   Hauptplan, Zusatzplänen, inaktiven Plänen und Archiv. Zusatzpläne erscheinen zusätzlich an
   ihren Wochentagen, sodass auch zwei Einheiten am Tag geplant sind (z. B. morgens draußen,
   abends zu Hause). Optional fester Ort pro Plan. Migration 0009 (nur Daten: bestehende Pläne
-  ohne festen Ort).
+  ohne festen Ort). Die Verwaltung liegt hinter „Pläne verwalten“ auf der Plan-Seite (kein
+  eigener Tab): eine Übersicht nach „In deiner Woche“ und „Nicht eingeplant“ und eine eigene
+  Seite pro Plan mit Routinen, Einplanung, Ort und Archivieren.

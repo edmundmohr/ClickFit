@@ -55,9 +55,12 @@ export default async function RoutinePage({ params }: PageProps<"/training/routi
 
   return (
     <>
-      <Link href="/training/routines" className="text-muted-foreground mb-3 inline-flex min-h-11 items-center gap-1 text-sm">
+      <Link
+        href={`/training/plans/${routine.folder.id}`}
+        className="text-muted-foreground mb-3 inline-flex min-h-11 items-center gap-1 text-sm"
+      >
         <ArrowLeftIcon className="size-4" aria-hidden />
-        {t("routines.back")}
+        {t("routines.backToPlan", { name: folderTitle(routine.folder, (split) => t(`training.splits.${split}`)) })}
       </Link>
       <PageHeader title={t("routines.editor.title")} />
       <RoutineEditor

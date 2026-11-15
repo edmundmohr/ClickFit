@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { CheckIcon, MapPinIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -25,6 +26,42 @@ interface PlanLocationDialogProps {
 }
 
 /** Auswahl des festen Orts eines Plans: „Kein fester Ort“ oder einer der Trainingsorte. */
+interface PlanLocationCardProps {
+  folderId: string;
+  title: string;
+  gymId: string | null;
+  locations: LocationOption[];
+}
+
+/** Aktueller Ort eines Plans mit „Ändern“; öffnet die Auswahl. */
+export function PlanLocationCard({ folderId, title, gymId, locations }: PlanLocationCardProps) {
+  const t = useTranslations("routines");
+  const [open, setOpen] = useState(false);
+  const current = locations.find((location) => location.id === gymId) ?? null;
+  return (
+    <div className="flex items-center gap-3">
+      <span className="grid min-w-0 flex-1 gap-0.5">
+        <span className="flex items-center gap-1.5 font-medium">
+          {current ? <MapPinIcon className="size-4 shrink-0" aria-hidden /> : null}
+          <span className="truncate">{current ? current.name : t("locationNone")}</span>
+        </span>
+        <span className="text-muted-foreground text-sm">{current ? t("locationText") : t("locationNoneHint")}</span>
+      </span>
+      <Button variant="outline" className="min-h-11 shrink-0" onClick={() => setOpen(true)}>
+        {t("locationChange")}
+      </Button>
+      <PlanLocationDialog
+        open={open}
+        folderId={folderId}
+        title={title}
+        gymId={gymId}
+        locations={locations}
+        onClose={() => setOpen(false)}
+      />
+    </div>
+  );
+}
+
 export function PlanLocationDialog({ open, folderId, title, gymId, locations, onClose }: PlanLocationDialogProps) {
   const t = useTranslations("routines");
   const { run, pending } = useActionRunner();
