@@ -27,7 +27,7 @@ einschließlich der Ergänzungen aus Abschnitt 8.
 - Übungsbibliothek mit 232 Übungen im Code (`src/data/exercises`): Muskelgruppen, Equipment,
   Schwierigkeit, Anleitung, Alternativen; Suche und Filter
 - Übungstypen: Gewicht × Wdh., Körpergewicht (auch mit Zusatzgewicht oder unterstützt), Dauer
-- Fragebogen in sieben Schritten, jederzeit wiederholbar
+- Fragebogen, jederzeit wiederholbar (ursprünglich sieben Schritte, später neu aufgebaut, siehe unten)
 - Plan-Generator (deterministisch): Split nach Trainingstagen, Übungsauswahl nach Equipment,
   Erfahrung, Dauer, Ausschlüssen und Beschwerden
 - Trainingsmodus: Satz-Logging mit RIR und Notiz, Vorwerte, Ein-Tipp-Logging, Pausentimer mit
@@ -174,3 +174,10 @@ Grenzen:
   die Progression wieder automatisch. Jede Änderung steht im Verlauf der Übung unter
   Fortschritt → Kraft und im Export. Migration 0011 (Spalten in `plan_exercise`, Tabelle
   `target_weight_change`).
+- Fragebogen neu aufgebaut nach dem Vorbild eines geführten Einstiegs: Vollbild, eine Frage pro
+  Bildschirm, drei Abschnitte mit eigener Farbe und geteilter Fortschrittsleiste. Neu abgefragt
+  werden Körperfettanteil (vorgeschätzt aus Größe, Gewicht, Alter), Trainingserfahrung in
+  Monaten mit Selbsteinschätzung in sechs Stufen, bis zu zwei Schwerpunkt-Muskelgruppen (ein
+  Satz mehr, wenn die Zeit reicht) und die körperliche Belastung im Beruf. Trainingstage werden
+  als Anzahl gewählt (mit Empfehlung) und in der Wochenplanung verschoben. Migration 0012
+  (Spalten in `user_profile`).

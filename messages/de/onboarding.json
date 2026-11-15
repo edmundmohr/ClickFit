@@ -1,29 +1,207 @@
 {
   "title": "Dein Fragebogen",
-  "step": "Schritt {current} von {total}",
   "next": "Weiter",
   "back": "Zurück",
+  "close": "Fragebogen verlassen",
   "finish": "Plan erstellen",
-  "finishing": "Plan wird erstellt …",
+  "progress": "Schritt {current} von {total}",
   "done": "Dein Plan ist fertig.",
+  "sections": {
+    "profile": "Dein Profil",
+    "goals": "Deine Ziele",
+    "needs": "Deine Bedürfnisse"
+  },
+  "intro": {
+    "upNext": "Als Nächstes",
+    "goals": "Dein Profil steht. Jetzt geht es darum, was du erreichen willst.",
+    "needs": "Deine Ziele sind klar. Jetzt passen wir den Plan an deinen Alltag an."
+  },
+  "creating": {
+    "title": "Dein Plan wird erstellt …",
+    "text": "Übungen, Sätze und Wochentage werden auf deine Antworten abgestimmt."
+  },
+  "sex": {
+    "title": "Wähle dein Geschlecht",
+    "hint": "Daraus berechnet die App deinen Kalorienbedarf.",
+    "male": "Männlich",
+    "female": "Weiblich"
+  },
+  "birth": {
+    "title": "In welchem Jahr bist du geboren?",
+    "hint": "Mit deinem Alter rechnet die App deinen Kalorienbedarf genauer aus.",
+    "label": "Geburtsjahr"
+  },
+  "height": {
+    "title": "Wie groß bist du?",
+    "hint": "Die Körpergröße wirkt sich direkt auf deinen Kalorienverbrauch aus.",
+    "label": "Körpergröße in Zentimetern",
+    "unit": "cm"
+  },
+  "weight": {
+    "title": "Wie viel wiegst du?",
+    "hint": "Aus Gewicht und Größe schätzt die App deinen ungefähren Körperfettanteil.",
+    "label": "Körpergewicht in {unit}"
+  },
+  "bodyFat": {
+    "title": "Dein Körperfettanteil",
+    "hint": "Der Wert ist vorgeschätzt. Passe ihn an, wenn du ihn genauer kennst.",
+    "label": "Körperfettanteil in Prozent",
+    "value": "{percent} %",
+    "estimate": "Schätzung: {percent} %",
+    "useEstimate": "Schätzung übernehmen",
+    "bands": {
+      "male": {
+        "athletic": "Sehr definiert, Muskeln und Adern deutlich sichtbar.",
+        "fit": "Sportlich, Bauchmuskeln sind zu erkennen.",
+        "average": "Durchschnittlich, wenig sichtbare Definition.",
+        "high": "Weiche Konturen, Fett vor allem am Bauch.",
+        "very_high": "Deutlich erhöhter Körperfettanteil."
+      },
+      "female": {
+        "athletic": "Sehr definiert, Muskeln deutlich sichtbar.",
+        "fit": "Sportlich, straffe Konturen.",
+        "average": "Durchschnittlich, weiche Konturen.",
+        "high": "Ausgeprägte Kurven, kaum sichtbare Muskulatur.",
+        "very_high": "Deutlich erhöhter Körperfettanteil."
+      }
+    }
+  },
+  "trainingAge": {
+    "title": "Trainingserfahrung",
+    "hint": "Wie lange machst du schon regelmäßig Krafttraining? Das bestimmt Umfang und Übungsauswahl.",
+    "label": "Trainingserfahrung",
+    "none": "Gar keine Erfahrung",
+    "months": "{count, plural, one {Seit # Monat} other {Seit # Monaten}}",
+    "years": "{count, plural, one {Seit # Jahr} other {Seit # Jahren}}",
+    "yearsOpen": "Seit über {count} Jahren",
+    "recent": "Hast du in den letzten 3 Monaten durchgehend trainiert?"
+  },
+  "assessment": {
+    "title": "Wie würdest du dich selbst einschätzen?",
+    "hint": "Der Vorschlag ergibt sich aus deiner Trainingserfahrung. Du kannst ihn ändern.",
+    "levels": {
+      "newcomer": "Neuling",
+      "returner": "Wiedereinstieg",
+      "beginner": "Anfänger",
+      "average": "Durchschnitt",
+      "advanced": "Fortgeschritten",
+      "elite": "Profi"
+    },
+    "hints": {
+      "newcomer": "Ich taste mich ran.",
+      "returner": "Nach einer Pause geht es wieder los.",
+      "beginner": "Ich lerne noch.",
+      "average": "Ich trainiere regelmäßig und kenne die Grundübungen.",
+      "advanced": "Mehrere Jahre konsequentes Training.",
+      "elite": "Training auf Wettkampfniveau."
+    }
+  },
   "goal": {
-    "title": "Was ist dein Ziel?"
+    "title": "Was strebst du an?",
+    "muscle": "Muskelmasse",
+    "fat": "Körperfett",
+    "days": "90 Tage",
+    "chart": "Erwarteter Verlauf von Muskelmasse und Körperfett über 90 Tage",
+    "warning": "Passt weniger gut zu deinem Körperfettanteil",
+    "warningText": "Mit deinem Körperfettanteil kommst du mit einem anderen Ziel meist schneller voran. Du kannst trotzdem dabei bleiben."
   },
-  "experience": {
-    "title": "Wie viel Trainingserfahrung hast du?"
+  "focus": {
+    "title": "Wo liegt dein Fokus?",
+    "hint": "Wähle bis zu zwei Muskelgruppen. Ihre Übungen bekommen einen Satz mehr, wenn die Zeit reicht.",
+    "front": "Körper von vorn",
+    "back": "Körper von hinten",
+    "limit": "Du kannst höchstens zwei Muskelgruppen wählen.",
+    "selected": "{name}: gewählt",
+    "notSelected": "{name}: nicht gewählt"
   },
-  "schedule": {
-    "title": "Wann trainierst du?",
-    "days": "Trainingstage",
-    "daysHint": "Wähle 1 bis 6 Tage. Gewählt: {count}",
-    "duration": "Dauer einer Einheit"
+  "frequency": {
+    "title": "Wie oft möchtest du trainieren?",
+    "option": "{count, plural, one {# Training pro Woche} other {# Trainings pro Woche}}",
+    "recommended": "Empfohlen",
+    "confirmTitle": "Nicht optimaler Umfang",
+    "confirmText": "So viele Trainings passen möglicherweise nicht ideal zu deiner Erfahrung. Möchtest du trotzdem fortfahren?",
+    "confirmYes": "Ja",
+    "confirmNo": "Nein"
   },
   "location": {
-    "title": "Wo trainierst du hauptsächlich?",
+    "title": "Wo wirst du trainieren?",
+    "customize": "Ausstattung anpassen",
     "equipment": "Was hast du dort zur Verfügung?",
     "equipmentHint": "Der Plan nutzt nur Übungen, die damit möglich sind. Übungen ohne Geräte gehen immer.",
     "selectAll": "Alles auswählen",
     "selectNone": "Nichts auswählen"
+  },
+  "week": {
+    "title": "Deine Wochenplanung",
+    "hint": "Tippe ein Training an und danach den Tag, auf den du es verschieben möchtest.",
+    "training": "{day}: Training",
+    "free": "{day}: frei",
+    "moveTo": "{day}: frei, Training hierher verschieben",
+    "duration": "Dauer der Einheit",
+    "minutes": "{count} Minuten"
+  },
+  "reminder": {
+    "title": "Benachrichtigung, sobald die Pause endet",
+    "hint": "So kannst du in der Pause das Handy weglegen und verpasst den nächsten Satz nicht.",
+    "sampleTitle": "Weiter geht's",
+    "sampleText": "Deine Pause für die Übung Bankdrücken ist vorbei.",
+    "sampleTime": "Vor 1 min",
+    "accept": "Erinnere mich!",
+    "later": "Vielleicht später",
+    "failed": "Die Benachrichtigung ließ sich nicht einschalten. Du kannst das später in den Einstellungen nachholen."
+  },
+  "pain": {
+    "title": "Hast du Schmerzen?",
+    "hint": "Tippe die betroffenen Stellen an. Übungen, die sie stark belasten, lässt der Plan weg.",
+    "figure": "Körper mit antippbaren Stellen",
+    "note": "Anmerkung (optional)"
+  },
+  "activity": {
+    "title": "Wie aktiv ist deine Freizeit neben dem Krafttraining?",
+    "sedentary": "Inaktiv",
+    "light": "Leicht aktiv",
+    "moderate": "Moderat aktiv",
+    "active": "Aktiv",
+    "very_active": "Sehr aktiv"
+  },
+  "activityHints": {
+    "sedentary": "Überwiegend sitzend, kein zusätzlicher Sport.",
+    "light": "Normale Alltagsbewegung, kein zusätzlicher Sport.",
+    "moderate": "Zusätzlicher Sport an zwei bis drei Tagen pro Woche.",
+    "active": "Viel Bewegung im Alltag und Sport an mindestens drei Tagen.",
+    "very_active": "Sehr bewegter Alltag und Sport an mehr als drei Tagen."
+  },
+  "work": {
+    "title": "Wie sieht deine Arbeit körperlich aus?",
+    "hint": "Mehrere Angaben sind möglich. Du kannst die Frage auch überspringen.",
+    "options": {
+      "sitting": "Sitzend",
+      "driving": "Fahrend",
+      "lifting": "Hebend",
+      "kneeling": "Kniend",
+      "leaning": "Vorgebeugt",
+      "overhead": "Über Kopf",
+      "rotating": "Drehend",
+      "walking": "Laufend",
+      "holding": "Haltend",
+      "standing": "Stehend",
+      "strenuous": "Körperlich schwer",
+      "shift_work": "Schichtarbeit"
+    },
+    "examples": {
+      "sitting": "z. B. im Büro",
+      "driving": "z. B. im Bus oder Lkw",
+      "lifting": "z. B. in Pflege oder Erziehung",
+      "kneeling": "z. B. beim Fliesenlegen",
+      "leaning": "z. B. in der Zahnarztpraxis",
+      "overhead": "z. B. beim Malern",
+      "rotating": "z. B. an der Kasse",
+      "walking": "z. B. im Service",
+      "holding": "z. B. im Lager",
+      "standing": "z. B. im Unterricht",
+      "strenuous": "z. B. auf dem Bau",
+      "shift_work": "z. B. im Wechseldienst"
+    }
   },
   "cardio": {
     "title": "Möchtest du zusätzlich Cardio machen?",
@@ -41,36 +219,11 @@
     "swimming": "Schwimmen",
     "other": "Anderes"
   },
-  "body": {
-    "title": "Deine Körperdaten",
-    "hint": "Daraus berechnet die App später deinen Kalorienbedarf.",
-    "sex": "Geschlecht",
-    "sexes": {
-      "male": "Männlich",
-      "female": "Weiblich"
-    },
-    "birthYear": "Geburtsjahr",
-    "height": "Größe (cm)",
-    "weight": "Gewicht ({unit})",
-    "activity": "Aktivität im Alltag"
-  },
-  "activity": {
-    "sedentary": "Überwiegend sitzend",
-    "light": "Leicht aktiv",
-    "moderate": "Mäßig aktiv",
-    "active": "Sehr aktiv",
-    "very_active": "Körperlich schwere Arbeit"
-  },
-  "limits": {
-    "title": "Gibt es Einschränkungen?",
-    "hint": "Beide Angaben sind freiwillig.",
-    "injuries": "Beschwerden oder Verletzungen",
-    "injuriesHint": "Übungen, die diese Bereiche stark belasten, lässt der Plan weg.",
-    "note": "Anmerkung (optional)",
-    "excluded": "Übungen ausschließen",
-    "excludedHint": "Diese Übungen kommen in deinem Plan nicht vor.",
-    "excludedSearch": "Übung suchen",
-    "excludedCount": "{count, plural, =0 {Keine Übung ausgeschlossen} one {# Übung ausgeschlossen} other {# Übungen ausgeschlossen}}",
+  "excluded": {
+    "title": "Letzte Frage: Gibt es Übungen, die du nicht machen möchtest?",
+    "hint": "Diese Übungen kommen in deinem Plan nicht vor. Die Angabe ist freiwillig.",
+    "search": "Übung suchen",
+    "count": "{count, plural, =0 {Keine Übung ausgeschlossen} one {# Übung ausgeschlossen} other {# Übungen ausgeschlossen}}",
     "remove": "{name} wieder zulassen"
   },
   "regions": {
@@ -82,9 +235,5 @@
     "knee": "Knie",
     "ankle": "Sprunggelenk",
     "neck": "Nacken"
-  },
-  "errors": {
-    "days": "Wähle 1 bis 6 Trainingstage.",
-    "body": "Bitte prüfe Geburtsjahr, Größe und Gewicht."
   }
 }

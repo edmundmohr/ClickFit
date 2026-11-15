@@ -134,8 +134,12 @@ Typprüfung nicht an ihnen scheitert.
   Wörter). Die Übungsseite zeigt sie als eigene Abschnitte, im Trainingsmodus öffnet das
   Info-Symbol sie als Dialog, ohne das Training zu verlassen. Eigene Übungen haben keine.
   `tests/domain/exercise-catalog.test.ts` prüft Anzahl, Format und Dubletten.
-- **Fragebogen:** unter `/onboarding`. Daraus entsteht der Plan; „Plan neu erstellen“ erzeugt ihn
-  aus dem gespeicherten Profil erneut.
+- **Fragebogen:** unter `/onboarding`, im Vollbild ohne Navigation. Eine Frage pro Bildschirm in
+  drei Abschnitten (Dein Profil, Deine Ziele, Deine Bedürfnisse) mit Auswahlrädern,
+  Schiebereglern, Muskel- und Körperkarte. Die Fachlogik dazu (Körperfett-Schätzung,
+  Selbsteinschätzung, empfohlene Trainingstage, Wochenplanung, Schwerpunkt-Muskeln) liegt in
+  `src/domain/training/onboarding.ts` mit Tests in `tests/domain/onboarding.test.ts`. Daraus
+  entsteht der Plan; „Plan neu erstellen“ erzeugt ihn aus dem gespeicherten Profil erneut.
 - **Plan-Generator:** `src/domain/training/plan-generator`. Gleiche Eingaben ergeben immer
   denselben Plan.
 - **Progression:** `src/domain/training/progression.ts`. Erreichen die Wiederholungen das obere

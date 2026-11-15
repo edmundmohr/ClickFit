@@ -31,6 +31,13 @@ export const userProfile = sqliteTable("user_profile", {
   injuries: text({ mode: "json" }).$type<string[]>().notNull(),
   injuryNote: text(),
   excludedExerciseIds: text({ mode: "json" }).$type<string[]>().notNull(),
+  /** Angaben aus dem ausführlichen Fragebogen; bei älteren Profilen leer. */
+  bodyFatPercent: real(),
+  trainingMonths: integer(),
+  trainedRecently: integer({ mode: "boolean" }),
+  selfAssessment: text(),
+  focusMuscles: text({ mode: "json" }).$type<string[]>().notNull().default(sql`'[]'`),
+  workPostures: text({ mode: "json" }).$type<string[]>().notNull().default(sql`'[]'`),
   completedAt: timestamp().notNull(),
   updatedAt: timestamp().notNull(),
 });

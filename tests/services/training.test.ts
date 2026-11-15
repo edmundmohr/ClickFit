@@ -10,7 +10,7 @@ import { onboardingSchema, type OnboardingInput, type SaveSetInput } from "@/fea
 import { getTrainingStats, listCompletedSessions } from "@/features/training/services/history-service";
 import { plannedWeekdays } from "@/features/training/titles";
 import { createPlanFromProfile, getActivePlan, getSwapOptions, swapPlanExercise } from "@/features/training/services/plan-service";
-import { getProfile, saveOnboarding } from "@/features/training/services/profile-service";
+import { getProfile, saveOnboarding, toTrainingProfile } from "@/features/training/services/profile-service";
 import {
   deleteSet,
   deleteWorkout,
@@ -117,6 +117,35 @@ describe("onboarding and plan", () => {
     expect(stored?.locationType).toBe("gym");
     expect(stored?.equipment).toEqual([...EQUIPMENT]);
     expect(await getProfile(testDb.db, eddiId)).toBeNull();
+  });
+
+  it("stores the answers of the detailed questionnaire", async () => {
+    const before = await getProfile(testDb.db, annaId);
+    expect(before?.profile.focusMuscles).toEqual([]);
+    expect(before?.profile.bodyFatPercent).toBeNull();
+
+    await saveOnboarding(testDb.db, annaId, {
+      ...onboarding,
+      bodyFatPercent: 24,
+      trainingMonths: 18,
+      trainedRecently: true,
+      selfAssessment: "average",
+      focusMuscles: ["glutes", "chest"],
+      workPostures: ["sitting", "shift_work"],
+    });
+    const stored = await getProfile(testDb.db, annaId);
+    expect(stored?.profile).toMatchObject({
+      bodyFatPercent: 24,
+      trainingMonths: 18,
+      trainedRecently: true,
+      selfAssessment: "average",
+      workPostures: ["sitting", "shift_work"],
+    });
+    expect(stored ? toTrainingProfile(stored).focusMuscles : null).toEqual(["glutes", "chest"]);
+
+    const base = { ...onboarding, focusMuscles: ["glutes", "chest", "lats"] };
+    expect(onboardingSchema.safeParse(base).success).toBe(false);
+    expect(onboardingSchema.safeParse({ ...onboarding, focusMuscles: ["glutes", "glutes"] }).success).toBe(false);
   });
 
   it("creates an active plan for the chosen weekdays", async () => {

@@ -1,7 +1,7 @@
 /**
  * Grundtypen für Profil, Trainingsplan und Workout. Reine Typen ohne Framework.
  */
-import type { Equipment } from "@/domain/exercises/types";
+import type { Equipment, Muscle } from "@/domain/exercises/types";
 
 export const GOALS = ["muscle_gain", "fat_loss", "recomposition", "maintain"] as const;
 export type Goal = (typeof GOALS)[number];
@@ -93,6 +93,8 @@ export interface TrainingProfile {
   equipment: Equipment[];
   excludedExerciseIds: string[];
   injuries: BodyRegion[];
+  /** Schwerpunkt-Muskelgruppen: Ihre Übungen bekommen einen Satz mehr, wenn die Zeit reicht. */
+  focusMuscles?: Muscle[];
 }
 
 export interface PlannedExercise {

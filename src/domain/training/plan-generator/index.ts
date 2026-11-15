@@ -18,6 +18,7 @@ import {
   MIN_SETS_PER_EXERCISE,
   WARMUP_SECONDS,
   estimateExerciseSeconds,
+  estimateSessionSeconds,
   fillWithinBudget,
   prescribe,
   reduceSets,
@@ -219,6 +220,30 @@ export interface GeneratorOptions {
 export const LEG_SPORT_THRESHOLD = 3;
 const LEG_MUSCLES: readonly Muscle[] = ["quads", "hamstrings", "glutes", "calves", "adductors", "abductors"];
 
+/** Mehr Sätze bekommt eine Schwerpunkt-Übung nicht, auch wenn noch Zeit wäre. */
+export const MAX_FOCUS_SETS = 5;
+
+/**
+ * Schwerpunkt-Muskelgruppen: Übungen, die sie als Hauptmuskel trainieren, bekommen einen Satz
+ * mehr – der Reihe nach und nur, solange die Einheit im Zeitbudget bleibt.
+ */
+function addFocusSets(
+  day: PlannedDay,
+  focusMuscles: readonly Muscle[],
+  byId: ReadonlyMap<string, Exercise>,
+  budgetSeconds: number,
+): void {
+  day.exercises.forEach((entry, index) => {
+    const exercise = byId.get(entry.exerciseId);
+    if (!exercise || entry.sets >= MAX_FOCUS_SETS) return;
+    if (!exercise.primary.some((muscle) => focusMuscles.includes(muscle))) return;
+    const boosted = day.exercises.map((item, position) =>
+      position === index ? { ...item, sets: item.sets + 1 } : item,
+    );
+    if (estimateSessionSeconds(boosted) <= budgetSeconds) day.exercises = boosted;
+  });
+}
+
 export function generatePlan(
   profile: TrainingProfile,
   catalog: readonly Exercise[],
@@ -237,6 +262,12 @@ export function generatePlan(
     weekday: weekdays[index],
     exercises: buildDay(DAY_TEMPLATES[focus], profile, candidates, usedInWeek, options.preferences),
   }));
+
+  const focusMuscles = profile.focusMuscles ?? [];
+  if (focusMuscles.length > 0) {
+    const byId = new Map(candidates.map((exercise) => [exercise.id, exercise]));
+    for (const day of plannedDays) addFocusSets(day, focusMuscles, byId, profile.sessionMinutes * 60);
+  }
 
   if (options.includeGrip) {
     // Die Tage mit Zug-Anteil zuerst; kurze Griffarbeit kommt ans Ende und zählt nicht ins Zeitbudget.
