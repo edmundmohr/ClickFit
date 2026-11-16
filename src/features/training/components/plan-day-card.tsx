@@ -10,6 +10,7 @@ import { formatClock } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { PlanDayView, PlanExerciseView } from "../services/plan-service";
 import { routineTitle } from "../titles";
+import { ExerciseQuickInfoDialog } from "./exercise-quick-info-dialog";
 import { StartWorkoutForm } from "./start-workout-form";
 import { SwapExerciseDialog } from "./swap-exercise-dialog";
 
@@ -59,6 +60,7 @@ export async function PlanDayCard({ day, isToday, canStart, allowSwap = true }: 
           </span>
         ) : null}
       </Link>
+      <ExerciseQuickInfoDialog name={entry.exercise.name} instructions={entry.exercise.instructions} />
       {allowSwap && !entry.replaces ? (
         <SwapExerciseDialog planExerciseId={entry.id} name={entry.exercise.name} />
       ) : null}

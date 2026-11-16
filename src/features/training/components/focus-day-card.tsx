@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { PlayIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ExerciseQuickInfoDialog } from "./exercise-quick-info-dialog";
 import { startFocusWorkoutAction } from "../actions";
 import type { FocusDayView } from "../services/focus-day-service";
 
@@ -29,15 +30,18 @@ export async function FocusDayCard({ day, canStart }: { day: FocusDayView; canSt
       <CardContent className="grid gap-4">
         <ul className="divide-y">
           {day.exercises.map((entry) => (
-            <li key={entry.exerciseId} className="py-2">
-              <span className="block truncate font-medium">{entry.exercise.name}</span>
-              <span className="text-muted-foreground block text-sm">
+            <li key={entry.exerciseId} className="flex items-center gap-2 py-2">
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-medium">{entry.exercise.name}</span>
+                <span className="text-muted-foreground block text-sm">
                 {t(entry.exercise.type === "duration" ? "training.prescriptionSeconds" : "training.prescription", {
                   sets: entry.sets,
                   repMin: entry.repMin,
                   repMax: entry.repMax,
-                })}
+                  })}
+                </span>
               </span>
+              <ExerciseQuickInfoDialog name={entry.exercise.name} instructions={entry.exercise.instructions} />
             </li>
           ))}
         </ul>

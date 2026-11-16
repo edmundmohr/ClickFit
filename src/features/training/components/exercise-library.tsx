@@ -7,6 +7,7 @@ import { BanIcon, ChevronRightIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Chip } from "@/components/forms/choice";
+import { ExerciseQuickInfoDialog } from "./exercise-quick-info-dialog";
 import { MUSCLES, type Equipment, type Muscle } from "@/domain/exercises/types";
 
 export interface LibraryExercise {
@@ -14,6 +15,7 @@ export interface LibraryExercise {
   name: string;
   primary: Muscle[];
   equipment: Equipment[];
+  instructions: string[];
   custom: boolean;
   excluded: boolean;
 }
@@ -88,10 +90,10 @@ export function ExerciseLibrary({ exercises, ownEquipment }: ExerciseLibraryProp
       {filtered.length === 0 ? <p className="text-sm">{t("training.library.empty")}</p> : null}
       <ul className="divide-y rounded-xl border">
         {filtered.map((exercise) => (
-          <li key={exercise.id}>
+          <li key={exercise.id} className="flex items-center">
             <Link
               href={`/training/exercises/${exercise.id}`}
-              className="hover:bg-accent/60 flex min-h-14 items-center gap-2 px-4 py-2"
+              className="hover:bg-accent/60 flex min-h-14 min-w-0 flex-1 items-center gap-2 py-2 pr-1 pl-4"
             >
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-medium">{exercise.name}</span>
@@ -109,6 +111,7 @@ export function ExerciseLibrary({ exercises, ownEquipment }: ExerciseLibraryProp
               ) : null}
               <ChevronRightIcon className="text-muted-foreground size-4 shrink-0" aria-hidden />
             </Link>
+            <ExerciseQuickInfoDialog name={exercise.name} instructions={exercise.instructions} />
           </li>
         ))}
       </ul>

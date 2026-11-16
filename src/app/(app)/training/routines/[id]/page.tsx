@@ -50,6 +50,7 @@ export default async function RoutinePage({ params }: PageProps<"/training/routi
       name: exercise.name,
       type: exercise.type,
       muscles: exercise.primary.map((muscle) => t(`muscles.${muscle}`)).join(", "),
+      instructions: exercise.instructions,
       custom: exercise.custom ?? false,
     }))
     .sort((a, b) => a.name.localeCompare(b.name, "de"));

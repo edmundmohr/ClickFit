@@ -28,6 +28,8 @@ export interface PickerExercise {
   type: ExerciseType;
   /** Übersetzte Hauptmuskeln als Text, für Anzeige und Suche. */
   muscles: string;
+  /** Kurzanleitung für den Info-Knopf in der Übungsauswahl. */
+  instructions: string[];
   custom: boolean;
 }
 

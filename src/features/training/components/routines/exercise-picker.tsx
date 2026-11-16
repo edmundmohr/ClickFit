@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { ExerciseQuickInfoDialog } from "../exercise-quick-info-dialog";
 import type { PickerExercise } from "./editor-state";
 
 const MAX_RESULTS = 40;
@@ -59,11 +60,11 @@ export function ExercisePicker({ exercises, usedIds, onPick }: ExercisePickerPro
           />
           <ul className="-mx-2 min-h-0 flex-1 divide-y overflow-y-auto">
             {matches.slice(0, MAX_RESULTS).map((exercise) => (
-              <li key={exercise.id}>
+              <li key={exercise.id} className="flex items-center">
                 <button
                   type="button"
                   onClick={() => onPick(exercise)}
-                  className="hover:bg-accent/60 flex min-h-14 w-full items-center gap-2 px-2 py-2 text-left"
+                  className="hover:bg-accent/60 flex min-h-14 min-w-0 flex-1 items-center gap-2 px-2 py-2 text-left"
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium">{exercise.name}</span>
@@ -72,6 +73,7 @@ export function ExercisePicker({ exercises, usedIds, onPick }: ExercisePickerPro
                   {exercise.custom ? <Badge variant="secondary">{t("training.library.custom")}</Badge> : null}
                   <PlusIcon className="text-muted-foreground size-4 shrink-0" aria-hidden />
                 </button>
+                <ExerciseQuickInfoDialog name={exercise.name} instructions={exercise.instructions} />
               </li>
             ))}
           </ul>

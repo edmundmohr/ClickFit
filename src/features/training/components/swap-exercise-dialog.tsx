@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { FormError } from "@/components/forms/form-error";
 import type { ErrorCode } from "@/lib/errors";
+import { ExerciseQuickInfoDialog } from "./exercise-quick-info-dialog";
 import { getSwapOptionsAction, swapExerciseAction, type SwapOption } from "../actions";
 
 export function SwapExerciseDialog({ planExerciseId, name }: { planExerciseId: string; name: string }) {
@@ -66,12 +67,12 @@ export function SwapExerciseDialog({ planExerciseId, name }: { planExerciseId: s
         {options?.length === 0 ? <p className="text-muted-foreground text-sm">{t("training.plan.swapEmpty")}</p> : null}
         <ul className="grid gap-2">
           {options?.map((option) => (
-            <li key={option.id}>
+            <li key={option.id} className="flex items-center gap-1">
               <button
                 type="button"
                 disabled={pending}
                 onClick={() => choose(option.id)}
-                className="hover:bg-accent/60 w-full rounded-lg border px-3 py-3 text-left disabled:opacity-50"
+                className="hover:bg-accent/60 min-w-0 flex-1 rounded-lg border px-3 py-3 text-left disabled:opacity-50"
               >
                 <span className="block font-medium">{option.name}</span>
                 <span className="text-muted-foreground block text-sm">
@@ -82,6 +83,7 @@ export function SwapExerciseDialog({ planExerciseId, name }: { planExerciseId: s
                     : t("equipment.none")}
                 </span>
               </button>
+              <ExerciseQuickInfoDialog name={option.name} instructions={option.instructions} />
             </li>
           ))}
         </ul>
