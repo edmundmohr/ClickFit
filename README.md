@@ -141,6 +141,9 @@ Typprüfung nicht an ihnen scheitert.
   (`mistakes`, Format „Fehler – Korrektur“) und 2–4 Kurzbefehle (`cues`, höchstens etwa fünf
   Wörter). Die Übungsseite zeigt sie als eigene Abschnitte, im Trainingsmodus öffnet das
   Info-Symbol sie als Dialog, ohne das Training zu verlassen. Eigene Übungen haben keine.
+- **Info-Knopf („i“):** In Wochenplan, Fokus- und Erholungstag, Übungsbibliothek, Übungsauswahl
+  der Routine, Tausch-Dialog und bei den Alternativen öffnet das „i“ neben einer Übung die
+  Kurzanleitung als Dialog (`exercise-quick-info-dialog.tsx`).
   `tests/domain/exercise-catalog.test.ts` prüft Anzahl, Format und Dubletten.
 - **Fragebogen:** unter `/onboarding`, im Vollbild ohne Navigation. Eine Frage pro Bildschirm in
   drei Abschnitten (Dein Profil, Deine Ziele, Deine Bedürfnisse) mit Auswahlrädern,

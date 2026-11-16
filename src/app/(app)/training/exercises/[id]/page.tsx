@@ -10,6 +10,7 @@ import { requireUser } from "@/features/auth/session";
 import { findExercise } from "@/features/training/catalog";
 import { ExerciseActions } from "@/features/training/components/exercise-actions";
 import { CueList, MistakeList } from "@/features/training/components/exercise-coaching";
+import { ExerciseQuickInfoDialog } from "@/features/training/components/exercise-quick-info-dialog";
 import { ExerciseNoteForm } from "@/features/training/components/exercise-note-form";
 import { getTrainingContext } from "@/features/training/services/context-service";
 import { getUserCatalog, isCustomExerciseId } from "@/features/training/services/exercise-service";
@@ -162,10 +163,14 @@ export default async function ExerciseDetailPage({ params }: PageProps<"/trainin
             <CardContent>
               <ul className="divide-y">
                 {alternatives.map((alternative) => (
-                  <li key={alternative.id}>
-                    <Link href={`/training/exercises/${alternative.id}`} className="flex min-h-11 items-center py-2 font-medium">
+                  <li key={alternative.id} className="flex items-center gap-2">
+                    <Link
+                      href={`/training/exercises/${alternative.id}`}
+                      className="flex min-h-11 min-w-0 flex-1 items-center py-2 font-medium"
+                    >
                       {alternative.name}
                     </Link>
+                    <ExerciseQuickInfoDialog name={alternative.name} instructions={alternative.instructions} />
                   </li>
                 ))}
               </ul>

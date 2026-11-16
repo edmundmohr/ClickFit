@@ -21,11 +21,12 @@ export default async function ExercisesPage() {
   const context = await getTrainingContext(getDb(), user.id, toLocalDate(new Date()));
   const excluded = new Set(context.profile?.excludedExerciseIds ?? []);
   const exercises = context.catalog.all
-    .map(({ id, name, primary, equipment, custom }) => ({
+    .map(({ id, name, primary, equipment, instructions, custom }) => ({
       id,
       name,
       primary,
       equipment,
+      instructions,
       custom: custom ?? false,
       excluded: excluded.has(id),
     }))
