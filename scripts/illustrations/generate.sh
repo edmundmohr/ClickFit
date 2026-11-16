@@ -19,6 +19,12 @@ run_one() {
   local name="cf_${id//-/_}"
   agy -p "Generate one image with your image generation tool and name it $name. Do not write code and do not draw it with Python or SVG; use real AI image generation. Motif: $motif $STYLE" \
     --model gemini-3.8-flash-medium --print-timeout 300s > "logs/$id.txt" 2>&1 < /dev/null
+  # Kontingent des Abos aufgebraucht: Serie beenden, der nächste Lauf macht hier weiter.
+  if grep -q "RESOURCE_EXHAUSTED" "logs/$id.txt"; then
+    touch quota.flag
+    echo "quota $id" >> progress.txt
+    return 0
+  fi
   # Die CLI erzeugt teils mehrere Anläufe; der neueste zählt.
   local newest
   newest=$(find "$BRAIN" -type f -name "${name}*.jpg" -not -path "*/.system_generated/*" -exec stat -f "%m %N" {} + 2>/dev/null | sort -n | tail -1 | cut -d" " -f2-)
@@ -31,9 +37,12 @@ run_one() {
   fi
 }
 
+rm -f quota.flag
+echo "run $(date +%Y-%m-%dT%H:%M)" >> progress.txt
 running=0
 while IFS=$'\t' read -r id motif; do
   [[ -z "$id" ]] && continue
+  [[ -f quota.flag ]] && break
   run_one "$id" "$motif" &
   running=$((running + 1))
   if (( running >= JOBS )); then
@@ -42,4 +51,8 @@ while IFS=$'\t' read -r id motif; do
   fi
 done < "$MOTIFS"
 wait
-echo "all done" >> progress.txt
+if [[ -f quota.flag ]]; then
+  echo "stopped: quota" >> progress.txt
+else
+  echo "run finished" >> progress.txt
+fi
