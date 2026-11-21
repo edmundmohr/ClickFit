@@ -7,16 +7,21 @@ export const ILLUSTRATED_EXERCISE_IDS: readonly string[] = [
   "band-lat-pulldown",
   "barbell-bench-press",
   "barbell-row",
+  "barbell-shrug",
   "cable-crossover",
   "chest-press-machine",
   "dumbbell-bench-press",
   "dumbbell-fly",
   "dumbbell-row",
+  "dumbbell-shrug",
   "lat-pulldown",
   "pec-deck",
   "pull-up",
   "push-up",
   "seated-cable-row",
+  "seated-row-machine",
+  "suspension-row",
+  "table-inverted-row",
 ];
 
 export const EXERCISE_ILLUSTRATION_WIDTH = 960;
