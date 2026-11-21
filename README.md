@@ -145,7 +145,7 @@ Typprüfung nicht an ihnen scheitert.
   der Routine, Tausch-Dialog und bei den Alternativen öffnet das „i“ neben einer Übung die
   Kurzanleitung als Dialog (`exercise-quick-info-dialog.tsx`). Gibt es zur Übung eine
   Illustration (`src/data/exercises/illustrations.ts`, siehe [GRAPHICS.md](docs/GRAPHICS.md)),
-  steht sie über der Anleitung.
+  steht sie über der Anleitung und das „i“ ist grün.
   `tests/domain/exercise-catalog.test.ts` prüft Anzahl, Format und Dubletten.
 - **Fragebogen:** unter `/onboarding`, im Vollbild ohne Navigation. Eine Frage pro Bildschirm in
   drei Abschnitten (Dein Profil, Deine Ziele, Deine Bedürfnisse) mit Auswahlrädern,
