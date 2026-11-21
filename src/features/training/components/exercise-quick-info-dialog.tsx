@@ -9,6 +9,7 @@ import {
   EXERCISE_ILLUSTRATION_WIDTH,
   exerciseIllustrationPath,
 } from "@/data/exercises/illustrations";
+import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface ExerciseQuickInfoDialogProps {
@@ -25,8 +26,14 @@ export function ExerciseQuickInfoDialog({ exerciseId, name, instructions }: Exer
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="size-11 shrink-0" aria-label={t("infoLabel", { name })}>
-          <InfoIcon aria-hidden />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-11 shrink-0"
+          aria-label={t(illustration ? "infoLabelIllustrated" : "infoLabel", { name })}
+        >
+          {/* Grün wie die Muskeln in den Illustrationen: Hier gibt es ein Bild zur Übung. */}
+          <InfoIcon className={cn(illustration && "text-lime-600 dark:text-lime-400")} aria-hidden />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[85dvh] overflow-y-auto">
