@@ -38,7 +38,7 @@ export async function RecoveryDayCard({ day, canStart }: { day: RecoveryDayView;
                   })}
                 </span>
               </span>
-              <ExerciseQuickInfoDialog name={entry.exercise.name} instructions={entry.exercise.instructions} />
+              <ExerciseQuickInfoDialog exerciseId={entry.exercise.id} name={entry.exercise.name} instructions={entry.exercise.instructions} />
             </li>
           ))}
         </ul>

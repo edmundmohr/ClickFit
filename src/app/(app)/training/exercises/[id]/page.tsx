@@ -170,7 +170,7 @@ export default async function ExerciseDetailPage({ params }: PageProps<"/trainin
                     >
                       {alternative.name}
                     </Link>
-                    <ExerciseQuickInfoDialog name={alternative.name} instructions={alternative.instructions} />
+                    <ExerciseQuickInfoDialog exerciseId={alternative.id} name={alternative.name} instructions={alternative.instructions} />
                   </li>
                 ))}
               </ul>

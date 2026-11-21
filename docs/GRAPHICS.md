@@ -38,3 +38,33 @@ sips -Z 960 -s format jpeg -s formatOptions 72 <Quelle>.jpg --out public/illustr
 Zum Schluss den Namen in `ILLUSTRATIONS` in `src/components/illustration.tsx` eintragen.
 
 An die CLI gehen nur die Bildbeschreibungen, keine Daten aus der App.
+
+## Übungsillustrationen
+
+Im Info-Dialog („i“ neben einer Übung) erscheint über der Kurzanleitung eine Illustration, wenn es
+für die Übung eine abgenommene gibt. Die Bilder liegen unter `public/illustrations/exercises/<id>.jpg`
+(960 × 716 px), die Liste der Übungen mit Bild steht in `src/data/exercises/illustrations.ts`.
+`tests/domain/exercise-illustrations.test.ts` prüft, dass Liste und Dateien übereinstimmen.
+
+Der Stil ist fest: eine gesichtslose, geschlechtsneutrale Figur in hellem Grauweiß mit dünnen
+schwarzen Konturlinien, Geräte in Mittelgrau, die arbeitenden Muskeln als klare Flächen in
+Limettengrün (#a3e635), fast schwarzer Hintergrund (#0a0a0a) mit dünner Bodenlinie, Format 4:3,
+kein Text. Anders als bei den Schmuckgrafiken ist hier eine Person zu sehen.
+
+### Erzeugen
+
+- `scripts/illustrations/motifs.tsv`: eine Zeile pro Übung (Kennung, englische Bildbeschreibung
+  mit Blickwinkel). Bisher die 78 Standardübungen (Priorität 1).
+- `scripts/illustrations/generate.sh <Arbeitsordner> <motifs.tsv>`: ruft die Antigravity-CLI je
+  Übung auf, legt das Ergebnis verkleinert in `out/<id>.jpg` ab, überspringt vorhandene Bilder und
+  endet, sobald das Bild-Kontingent des Abos aufgebraucht ist.
+- Im Arbeitsordner muss `style-reference.jpg` liegen (ein Bild im festen Stil). Ohne diese Vorlage
+  driftet der Stil zwischen einzelnen Aufrufen, der Text allein reicht nicht.
+
+Jedes Bild wird vor der Übernahme angesehen: Stil wie die Vorlage, Haltung und Gerät richtig,
+Hände am Gerät, zwei Arme und zwei Beine. Falsche Bilder werden neu erzeugt, bei Bedarf mit
+angepasster Bildbeschreibung. Erst abgenommene Bilder kommen nach `public/illustrations/exercises/`
+und in die Liste.
+
+Das Bild-Kontingent des Abos ist knapp (einige Bilder je Fünf-Stunden-Fenster, dazu eine Grenze
+über mehrere Tage). Die Serie läuft deshalb in Etappen.

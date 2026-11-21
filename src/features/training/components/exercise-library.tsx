@@ -111,7 +111,7 @@ export function ExerciseLibrary({ exercises, ownEquipment }: ExerciseLibraryProp
               ) : null}
               <ChevronRightIcon className="text-muted-foreground size-4 shrink-0" aria-hidden />
             </Link>
-            <ExerciseQuickInfoDialog name={exercise.name} instructions={exercise.instructions} />
+            <ExerciseQuickInfoDialog exerciseId={exercise.id} name={exercise.name} instructions={exercise.instructions} />
           </li>
         ))}
       </ul>

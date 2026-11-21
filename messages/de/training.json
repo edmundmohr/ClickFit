@@ -203,6 +203,7 @@
     "mistakes": "Typische Fehler",
     "fullGuide": "Ganze Anleitung und Alternativen",
     "infoLabel": "Ausführung von {name} anzeigen",
+    "illustrationAlt": "Illustration: {name}",
     "pattern": "Bewegung"
   },
   "history": {
