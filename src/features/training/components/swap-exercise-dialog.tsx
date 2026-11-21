@@ -83,7 +83,7 @@ export function SwapExerciseDialog({ planExerciseId, name }: { planExerciseId: s
                     : t("equipment.none")}
                 </span>
               </button>
-              <ExerciseQuickInfoDialog name={option.name} instructions={option.instructions} />
+              <ExerciseQuickInfoDialog exerciseId={option.id} name={option.name} instructions={option.instructions} />
             </li>
           ))}
         </ul>

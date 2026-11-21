@@ -73,7 +73,7 @@ export function ExercisePicker({ exercises, usedIds, onPick }: ExercisePickerPro
                   {exercise.custom ? <Badge variant="secondary">{t("training.library.custom")}</Badge> : null}
                   <PlusIcon className="text-muted-foreground size-4 shrink-0" aria-hidden />
                 </button>
-                <ExerciseQuickInfoDialog name={exercise.name} instructions={exercise.instructions} />
+                <ExerciseQuickInfoDialog exerciseId={exercise.id} name={exercise.name} instructions={exercise.instructions} />
               </li>
             ))}
           </ul>

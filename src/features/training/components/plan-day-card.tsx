@@ -60,7 +60,7 @@ export async function PlanDayCard({ day, isToday, canStart, allowSwap = true }: 
           </span>
         ) : null}
       </Link>
-      <ExerciseQuickInfoDialog name={entry.exercise.name} instructions={entry.exercise.instructions} />
+      <ExerciseQuickInfoDialog exerciseId={entry.exercise.id} name={entry.exercise.name} instructions={entry.exercise.instructions} />
       {allowSwap && !entry.replaces ? (
         <SwapExerciseDialog planExerciseId={entry.id} name={entry.exercise.name} />
       ) : null}

@@ -41,7 +41,7 @@ export async function FocusDayCard({ day, canStart }: { day: FocusDayView; canSt
                   })}
                 </span>
               </span>
-              <ExerciseQuickInfoDialog name={entry.exercise.name} instructions={entry.exercise.instructions} />
+              <ExerciseQuickInfoDialog exerciseId={entry.exercise.id} name={entry.exercise.name} instructions={entry.exercise.instructions} />
             </li>
           ))}
         </ul>
