@@ -3,8 +3,10 @@
  * (960 × 716 px, Erzeugung siehe docs/GRAPHICS.md). Übungen ohne Eintrag zeigen nur den Text.
  */
 export const ILLUSTRATED_EXERCISE_IDS: readonly string[] = [
+  "back-extension",
   "band-chest-fly",
   "band-lat-pulldown",
+  "band-seated-row",
   "barbell-bench-press",
   "barbell-row",
   "barbell-shrug",
@@ -13,13 +15,16 @@ export const ILLUSTRATED_EXERCISE_IDS: readonly string[] = [
   "dumbbell-bench-press",
   "dumbbell-fly",
   "dumbbell-row",
+  "dumbbell-shoulder-press",
   "dumbbell-shrug",
   "lat-pulldown",
+  "overhead-press",
   "pec-deck",
   "pull-up",
   "push-up",
   "seated-cable-row",
   "seated-row-machine",
+  "superman",
   "suspension-row",
   "table-inverted-row",
 ];
