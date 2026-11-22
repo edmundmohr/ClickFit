@@ -28,7 +28,6 @@ export const ILLUSTRATED_EXERCISE_IDS: readonly string[] = [
   "push-up",
   "seated-cable-row",
   "seated-row-machine",
-  "shoulder-press-machine",
   "superman",
   "suspension-row",
   "table-inverted-row",
