@@ -5,6 +5,7 @@
 export const ILLUSTRATED_EXERCISE_IDS: readonly string[] = [
   "back-extension",
   "band-chest-fly",
+  "band-curl",
   "band-lat-pulldown",
   "band-lateral-raise",
   "band-overhead-press",
@@ -35,9 +36,12 @@ export const ILLUSTRATED_EXERCISE_IDS: readonly string[] = [
   "seated-cable-row",
   "seated-row-machine",
   "shoulder-press-machine",
+  "skull-crusher",
   "superman",
   "suspension-row",
   "table-inverted-row",
+  "triceps-pushdown",
+  "wrist-curl",
 ];
 
 export const EXERCISE_ILLUSTRATION_WIDTH = 960;
